@@ -1,0 +1,27 @@
+\chapter*{Lesson 11}
+\section{Authenticated encryption (Age of Ultron)}
+Last time we proved CPA-security of $\Pi$. Today we will explore the
+\textit{auth}  property.
+Consider $\Pi$ as
+    \begin{gather*} Enc:\{0,1\}^{\lambda}*\M \to \C \\ Tag:\{0,1\}^{\lambda}*\C
+    \to \Phi \end{gather*}
+   
+    \begin{lemma} If $Tag(.,.)$ is \textbf{EUF-CMA} , then $\Pi$ has
+    auth-property.  \end{lemma}
+    
+    What is \textbf{EUF-CMA} ?\\ i
+    It's a property similar to \textbf{uf-cma} ,
+    but now I want that the challenge message $(m^{*}, \phi^{*})$ is made by a
+    fresh $m^{*}$ and a valid \textbf{fresh} $\phi^{*}$.\\ 
+    The difference is that in ufcma we didn't care about the freshness of
+    $\phi^{*}$.
+
+\begin{proof}
+    Suppose $\Pi$ has not the \textit{auth}  property.\\ 
+    So we have an $\A'$ which can win the \textbf{auth} challenge of $\Pi$.\\
+    On the other hand, we have a $\Pi_{2}$ schema which uses an \textbf{euf-cma}
+    $Tag(.,.)$ function.\\
+    So, by reduction, ...
+
+\end{proof}
+    

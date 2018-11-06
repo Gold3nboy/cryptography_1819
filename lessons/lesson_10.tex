@@ -294,6 +294,10 @@ that the $Dec(.)$ function is defined as
 \]
 where $\perp$ represents invalid/meaningless messages.\\
 
+In the end, we want that our \textit{authenticated encryption schema} is
+cpa-secure and has this last property, called \textbf{strong unforgeability} or
+\textbf{auth} . 
+
 \begin{theorem}
     Let $\Pi$ be an SKE (shared key encryption). If $\Pi$ has \textbf{
     \textit{CPA + auth} } security, then it also has \textbf{CCA} security.
@@ -344,7 +348,115 @@ We have 3 ways to combine these 2 schema to obtain a new one:
         \end{gather*}
         
 \end{enumerate}
-In a paper is clearly...
+In a paper is clearly stated that the first solution doesn't work taking random
+combination of CPA-secure and MAC schemes, because there are couple which,
+mixed, are not CCA-secure. Furthermore the second solution doesn't work for the
+same above reason, even if it's now part of the standard.\\
+
+Instead, the third solution works always for a CPA-secure scheme $\Pi_{1}$ and
+strong unforgeability scheme $\Pi_{2}$ which, combined, they generate the final scheme
+$\Pi$.
+\begin{theorem}
+    If $\Pi$ is made combining $\Pi_{1}$ cpa-secure and $\Pi_{2}$
+    \textit{auth}-secure 
+    as stated in the third point,
+    then $\Pi$ is cpa-secure and \textit{auth-secure} . 
+\end{theorem}
+\begin{proof}
+    By reduction, we negate that $\Pi$ has both the properties and we find
+    the contraddiction.\\
+    Suppose now that $\Pi$ hasn't the cpa-security property.
 
 
 
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A' $}
+      \newinst[5]{B}{$ \A $} % Increase "5" to widen
+      \newinst[4]{C}{$ \C_{k \leftarrow\$ \{0,1\}^{\lambda} 
+      } $}
+
+      \postlevel
+      \mess{A}{$m$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$m$}{C}
+      \node[anchor=west] at (mess to) {  };
+
+      \postlevel
+      \mess{C}{$c'$}{B}
+      \node[anchor=west] at (mess from) {\shortstack[l] {
+                  $c'\leftarrow\$ Enc(k, m)$
+          } };
+      \postlevel
+      \mess{B}{$(c',\phi=Tag(k_{2}, c')) $}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-5.7) to[out=240,in=110] (1.2,-1.6);
+    \postlevel
+    \mess{A}{$m_{0}^{*},m_{1}^{*} $}{B}
+      \node[anchor=west] at (mess to) {  };
+
+      \postlevel
+    \mess{B}{$m_{0}^{*}, m_{1}^{*}$}{C}
+      \node[anchor=west] at (mess to) {  };
+    
+    \postlevel
+    \mess{C}{$c^{*}$}{B}
+      \node[anchor=west] at (mess to) {  };
+    
+      \postlevel
+      \mess{B}{$c^{*}, \phi^{*}$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+      		$    $ 
+            \\
+            $    $ }};
+    \postlevel
+    \mess{A}{other messages}{C}
+    \postlevel
+    \mess{C}{other responses}{A}
+
+    \postlevel
+    \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      
+    \postlevel
+    \mess{B}{$b'$}{C}
+      \node[anchor=west] at (mess to) {  };
+      
+%      \postlevel
+%      \mess{A}{$b' \in {0,1}$}{B}
+%      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+  % \caption{}
+  % \label{fig:}
+\end{figure}
+
+Here we are supposing that $\A$ can break the cpa-security of a generic $\Pi_{1}$ 
+scheme used by $\C$, while $\A'$ can break the cpa-security of a generic scheme
+$\Pi$. $\C$ can generate the $Tag(k_{2},.)$ function, randomly chosing
+$k_{2}$((((
+and simulating $\Pi$.
+\\=================================================================================\\
+REVIEW\\
+Professor says that we have to show that $Game^{cpa}(\lambda, 0) \approx_{c}
+Game^{cpa}(\lambda, 1)$ , but why??? Isn't this proof enough?
+\\=================================================================================\\
+Proved for the cpa-security property, now we have to prove, in a similar way,
+that the auth property must be holded by $\Pi$ if $\Pi_{2}$ is an auth-secure
+scheme.
+\begin{exercise}
+    Prove it!\\
+    Similar to the cpa-security proof.
+\end{exercise}
+
+
+
+
+
+\end{proof}

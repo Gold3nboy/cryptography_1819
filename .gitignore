@@ -10,3 +10,5 @@ books/
 *.fls*
 *.tz
 *.gz
+*.toc
+hw1/
