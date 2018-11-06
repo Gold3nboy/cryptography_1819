@@ -1,0 +1,408 @@
+\usepackage{titletoc}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{thmtools}
+\usepackage{acronym}
+\usepackage{multirow}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{cancel}
+\usepackage{ifthen}
+\usepackage{etoolbox}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{calc}
+\usepackage{tikz}
+\hypersetup{colorlinks=false}
+
+\makeatletter
+
+
+\titlecontents{chapter}[0em]{\lsstyle\smallskip\bfseries}%\vspace{1cm}%
+      {\contentslabel[\chaptername~\thecontentslabel]{0em}\hspace{5.6em}}%
+      {\renewcommand\thecontentslabel{\relax}\itshape}%numberless%
+      {\hfill\contentspage}[\medskip]%
+
+
+%this is used to create space between \forall, \exist [ and others ] with the
+      %next character
+\let\eps\varepsilon
+\newcommand\+{\mkern2mu}
+
+
+
+
+\newcommand{\ie}{\textit{i.e.}, }
+\newcommand{\eg}{\textit{e.g.}, }
+
+\newcommand{\divides}{\big|}
+
+\newcommand{\biglor}{\bigvee}
+\newcommand{\bigxor}{\bigoplus}
+
+\newcommand{\Definition}{\ensuremath{\mathop{=}\limits^{\scriptscriptstyle \triangle}}}
+
+\renewcommand{\vec}[1]{\overline{#1}}
+\newcommand{\norm}[1]{\left\lVert{#1}\right\rVert}
+
+\renewcommand{\epsilon}{\varepsilon}
+
+\newcommand{\comma}{\ensuremath{, \allowbreak}}
+\newcommand{\from}{\leftarrow}
+\newcommand{\toandfrom}{\rightleftarrows}
+
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\G}{\mathcal{G}}
+\renewcommand{\H}{\mathcal{H}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\M}{\mathcal{M}}
+\renewcommand{\P}{\mathcal{P}}
+\newcommand{\R}{\mathcal{R}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\Z}{\mathcal{Z}}
+
+\newcommand{\RO}{\mathrm{RO}}
+
+\newcommand{\Naturals}{\mathbb{N}^{+}}
+\newcommand{\NaturalsZ}{\mathbb{N}}
+\newcommand{\Integers}{\mathbb{Z}}
+\newcommand{\Reals}{\mathbb{R}}
+\newcommand{\Bool}{\{0,1\}}
+\newcommand{\QR}[1][p]{\mathbb{QR}_{#1}}
+
+\newcommand{\IntegersPrimeGroup}[1][p]{\Integers^{\star}_{#1}}
+
+\newcommand{\Coll}{\mathrm{Coll}}
+\newcommand{\Ext}{\mathrm{Ext}}
+\newcommand{\Gen}{\mathrm{Gen}}
+\newcommand{\KGen}{\mathrm{KGen}}
+\newcommand{\KeyGen}{\mathrm{KeyGen}}
+\newcommand{\Mac}{\mathrm{Mac}}
+\newcommand{\Sign}{\mathrm{Sign}}
+\newcommand{\Vrfy}{\mathrm{Vrfy}}
+\newcommand{\Enc}{\mathrm{Enc}}
+\newcommand{\Dec}{\mathrm{Dec}}
+\newcommand{\Trans}{\mathrm{Trans}}
+
+\renewcommand{\Game}{\G}
+
+\newcommand{\IDSGame}{\Game^{\mathrm{id}}_{\Pi, \Adv}}
+
+\newcommand{\GenericEncScheme}{\Pi}
+\newcommand{\GenericKeyGen}{\Gen}
+\newcommand{\GenericEnc}{\Enc}
+\newcommand{\GenericDec}{\Dec}
+\newcommand{\GenericEncSchemeTuple}{\GenericEncScheme = \left( \GenericKeyGen\comma \GenericEnc\comma \GenericDec \right)}
+
+\newcommand{\GenericMACScheme}[1][]{\Pi_{#1}}
+\newcommand{\GenericMac}{\Mac}
+\newcommand{\GenericVrfy}{\Vrfy}
+\newcommand{\GenericAuthSpace}{\Phi}
+\newcommand{\GenericMACSchemeTuple}[1][]{\GenericMACScheme[#1] = \left( \GenericKeyGen\comma \GenericMac\comma \GenericVrfy \right)}
+
+\newcommand{\SKEScheme}[1][]{\Pi_{#1}}
+\newcommand{\SKEKeyGen}{\Gen}
+\newcommand{\SKEEnc}{\Enc}
+\newcommand{\SKEDec}{\Dec}
+\newcommand{\SKESchemeTuple}[1][]{\SKEScheme[#1] = \left( \SKEKeyGen \comma \SKEEnc \comma \SKEDec \right)}
+
+\newcommand{\SKEGameOneTime}{\Game^{\scriptstyle \text{one time}}_{\SKEScheme, \Adv}}
+
+\newcommand{\CCAScheme}{\Pi'}
+\newcommand{\CCAKeyGen}{\Gen'}
+\newcommand{\CCAEnc}{\Enc'}
+\newcommand{\CCADec}{\Dec'}
+\newcommand{\CCASchemeTuple}{\CCAScheme = \left( \CCAKeyGen \comma \CCAEnc \comma \CCADec \right)}
+
+\newcommand{\PRFGameReal}{\Game^{\scriptstyle \text{real}}_{\F, \Adv}}
+\newcommand{\PRFGameRand}{\Game^{\scriptstyle \text{rand}}_{\F, \Adv}}
+
+\newcommand{\PKEScheme}{\Pi}
+\newcommand{\PKEKeyGen}{\Gen}
+\newcommand{\PKEEnc}{\Enc}
+\newcommand{\PKEDec}{\Dec}
+\newcommand{\PKESchemeTuple}{\PKEScheme = \left( \PKEKeyGen \comma \PKEEnc \comma \PKEDec \right)}
+
+\newcommand{\PKEGameCPA}{\Game_{\Adv, \Pi}^{\text{CPA \\ one-time}}}
+\newcommand{\PKEGameCCA}[1]{\Game_{\Adv, \Pi}^{\text{CCA{#1}}}}
+
+\newcommand{\SignScheme}{\Pi}
+\newcommand{\SignSchemeKGen}{\KGen}
+\newcommand{\SignSchemeSign}{\Sign}
+\newcommand{\SignSchemeVrfy}{\Vrfy}
+\newcommand{\SignSchemeTuple}{\SignScheme = \left( \SignSchemeKGen \comma \SignSchemeSign \comma \SignSchemeVrfy \right)}
+
+\newcommand{\RSA}{\mathrm{RSA}}
+\newcommand{\RSAGen}{\Gen_{\RSA}}
+\newcommand{\RSAfun}{f_{\RSA}}
+\newcommand{\RSAinv}{f_{\RSA}^{-1}}
+\newcommand{\RSAtuple}{(\RSAGen, \RSAfun, \RSAinv)}
+
+\newcommand{\CPAGame}{\Game^{\scriptstyle \text{cpa}}_{\SKEScheme,\Adv}}
+\newcommand{\CCAGame}{\Game^{\scriptstyle \text{cca}}_{\SKEScheme,\Adv}}
+
+\newcommand{\CFPTuple}{\Pi = (\Gen, f_0, f_1)}
+\newcommand{\CFPGame}{\Game^{\scriptstyle \text{CF}}_{\Pi, \Adv}}
+
+\newcommand{\CRHGame}{\Game^{\scriptstyle \text{CR}}_{\H,\Adv}}
+\newcommand{\CRDMGame}{\Game^{\scriptstyle \text{CR}}_{{\scriptstyle \text{DM}}, \Adv}}
+
+\newcommand{\UFCMAGame}{\Game^{\scriptstyle \text{ufcma}}_{\GenericMACScheme,\Adv}}
+
+\newcommand{\UHFGameReal}{\Game^{\scriptstyle \text{real}}_{\F(\H),\Adv}}
+\newcommand{\UHFGameHybrid}{H_{\$,\H,\Adv}}
+\newcommand{\UHFGameRand}{\Game^{\scriptstyle \text{rand}}_{\$,\Adv}}
+
+\newcommand{\OTPEnc}{\Enc}
+\newcommand{\OTPDec}{\Dec}
+
+\newcommand{\Feistel}[1][F]{\psi_{#1}}
+
+\newcommand{\Group}{\mathbb{G}}
+\newcommand{\Field}{\mathbb{F}}
+\newcommand{\GroupTuple}{(\Group \comma g \comma q)}
+\newcommand{\GroupGen}{\GroupTuple \from \mathrm{GroupGen}(1^{\lambda})}
+
+\newcommand{\Bilin}{\mathrm{Bilin}}
+\newcommand{\BilinearGroup}{\Group}
+\newcommand{\BilinearGroupBis}{\BilinearGroup_{T}}
+\newcommand{\BilinearMap}{\hat{e}}
+\newcommand{\BilinearGroupTuple}{\left( \BilinearGroup, \BilinearGroupBis, q, g, \BilinearMap \right)}
+
+\newcommand{\WatersKGen}{\mathrm{BiGen}}
+
+\newcommand{\pk}{pk}
+\newcommand{\sk}{sk}
+
+\newcommand{\params}{params}
+
+\newcommand{\pr}{\mathop{\mathrm{Pr}}}
+\renewcommand{\Pr}[2][]{\ensuremath{\pr\limits_{#1} \left[ {#2} \right]}}
+
+\newcommand{\rand}[1]{\from {\scriptstyle \$} {#1}}
+\newcommand{\abs}[1]{\left|{#1}\right|}
+\newcommand{\poly}{\mathrm{poly}}
+
+\newcommand{\DotProduct}[2]{\left< {#1}, {#2} \right>}
+\newcommand{\Generator}[1]{\left< {#1} \right>}
+
+\newcommand{\repr}[1]{\left< {#1} \right>}
+
+\newcommand{\CompInd}{\approx_c}
+\newcommand{\StatInd}{\approx_s}
+
+\newcommand{\Adv}{\A}
+\newcommand{\Distinguisher}{\D}
+
+\newcommand{\negl}[1]{\mathrm{negl}\left({#1}\right)}
+
+\newcommand{\xor}{\oplus}
+%========================================================================================================
+
+
+
+%\renewcommand\thmt@mklistcmd{%
+%  \@xa\protected@edef\csname l@\thmt@envname\endcsname{% CHECK: why p@edef?
+%    \@nx\@dottedtocline{1}{1.5em}{\@nx\thmt@listnumwidth}{\thmt@thmname}{mu}%
+%  }%
+%  \ifthmt@isstarred
+%    \@xa\def\csname ll@\thmt@envname\endcsname{%
+%      \protect\numberline{\thmt@thmname\protect\let\protect\autodot\protect:}%
+%      \ifx\@empty\thmt@shortoptarg\else\protect\thmtformatoptarg{\thmt@shortoptarg}\fi
+%    }%
+%  \else
+%    \@xa\def\csname ll@\thmt@envname\endcsname{%
+%      % \thmt@thmname\ \csname the\thmt@envname\endcsname: \hfil%
+%      \ifx\@empty\thmt@shortoptarg\else\thmt@shortoptarg\fi
+%    }%
+%  \fi
+%  \@xa\gdef\csname thmt@contentsline@\thmt@envname\endcsname{%
+%    \thmt@contentslineShow% default:show
+%  }%
+%}
+\makeatother
+
+
+\theoremstyle{plain}
+\declaretheorem[qed=\ensuremath{\diamond}]{theorem}
+\declaretheorem[qed=\ensuremath{\diamond}]{lemma}
+\declaretheorem[qed=\ensuremath{\diamond}]{corollary}
+\declaretheorem[qed=\ensuremath{\diamond}]{fact}
+\declaretheorem[qed=\ensuremath{\diamond}]{claim}
+\declaretheorem[qed=\ensuremath{\diamond}]{observation}
+\declaretheorem[qed=\ensuremath{\diamond}]{proposition}
+
+\crefname{thm}{theorem}{theorems}
+\Crefname{thm}{Theorem}{Theorems}
+
+\crefname{lem}{lemma}{lemmas}
+\Crefname{lem}{Lemma}{Lemmas}
+
+\crefname{cor}{corollary}{corollarys}
+\Crefname{cor}{Corollary}{Corollarys}
+
+\crefname{fct}{fact}{facts}
+\Crefname{fct}{Fact}{Facts}
+
+\crefname{clm}{claim}{claims}
+\Crefname{clm}{Claim}{Claims}
+
+\crefname{obs}{observation}{observations}
+\Crefname{obs}{Observation}{Observations}
+
+\crefname{prop}{proposition}{propositions}
+\Crefname{prop}{Proposition}{Propositions}
+
+
+\theoremstyle{definition}
+\declaretheorem[qed=\ensuremath{\diamond}]{definition}
+\declaretheorem[qed=\ensuremath{\diamond}]{construction}
+
+\crefname{defn}{definition}{definitions}
+\Crefname{defn}{Definition}{Definitions}
+
+\crefname{cons}{construction}{constructions}
+\Crefname{cons}{Construction}{Constructions}
+
+
+% \theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}
+\newtheorem{cor}{Corollary}
+\newtheorem{fct}{Fact}
+\newtheorem{clm}{Claim}
+\newtheorem{obs}{Observation}
+\newtheorem{prop}{Proposition}
+\newtheorem{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{solution}{Solution}
+\newtheorem{example}{Example}
+% \theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem{cons}{Construction}
+
+%----------------------IMAGES-----------------------------------
+\usepackage[underline=false]{pgf-umlsd}
+\usepackage{tikz}
+
+% From http://tex.stackexchange.com/questions/164707/how-to-use-greek-letters-in-pgf-umlsd-or-generally-terms-starting-with
+\renewcommand{\mess}[4][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+  \node (\detokenize{#3} from) at (mess from) {};
+  \node (\detokenize{#3} to) at (mess to) {};
+}
+% From http://tex.stackexchange.com/questions/98525/pgf-umlsd-and-externalize
+\newcommand{\sdinit}{%
+   \pgfdeclarelayer{umlsd@background}%
+   \pgfdeclarelayer{umlsd@threadlayer}%
+   \pgfsetlayers{umlsd@background,umlsd@threadlayer,main}%
+}
+\newcommand{\sdbegin}{%
+   \setlength{\unitlength}{1cm}%
+   \tikzstyle{sequence}=[coordinate]%
+   \tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum
+   height=0.8cm, minimum width=1.6cm, fill=white, 
+   drop shadow={opacity=1,fill=black}]%
+   \ifpgfumlsdroundedcorners%
+      \tikzstyle{inststyle}+=[rounded corners=3mm]%
+   \fi%
+   \tikzstyle{blockstyle}=[anchor=north west]%
+   \tikzstyle{blockcommentstyle}=[anchor=north west, font=\small]%
+   \tikzstyle{dot}=[inner sep=0pt,fill=black,circle,minimum size=0.2pt]%
+   \global\def\unitfactor{0.6}%
+   \global\def\threadbias{center}%
+   % reset counters
+   \setcounter{preinst}{0}%
+   \setcounter{instnum}{0}%
+   \setcounter{threadnum}{0}%
+   \setcounter{seqlevel}{0}%
+   \setcounter{callevel}{0}%
+   \setcounter{callselflevel}{0}%
+   \setcounter{blocklevel}{0}%
+   % origin
+   \node[coordinate] (inst0) {};%
+}
+\newcommand{\sdend}{%
+   \begin{pgfonlayer}{umlsd@background}%
+      \ifnum\value{instnum}>0%
+         \foreach \t [evaluate=\t] in {1,...,\theinstnum}{%
+            \draw[dotted] (inst\t) -- ++(0,-\theseqlevel*\unitfactor-2.2*\unitfactor);%
+         }%
+      \fi%
+      \ifnum\value{threadnum}>0%
+         \foreach \t [evaluate=\t] in {1,...,\thethreadnum}{%
+            \path (thread\t)+(0,-\theseqlevel*\unitfactor-0.1*\unitfactor) node (threadend) {};%
+            \tikzstyle{threadstyle}+=[threadcolor\t]%
+            \drawthread{thread\t}{threadend}%
+         }%
+      \fi%
+   \end{pgfonlayer}%
+}
+
+
+
+\newcounter{listcount} \newcounter{totcount}
+\newcommand{\printarray}[2][1em]{% \printarray[<width>]{<array list>}
+  \unskip \setcounter{totcount}{0}% Reset totcount counter
+  \renewcommand*{\do}[1]{\stepcounter{totcount}}% Count elements
+  \docsvlist{#2}% Process list a first time to obtain # of elements
+  \setcounter{listcount}{0}% Reset listcount counter
+  \renewcommand*{\do}[1]{%
+    \stepcounter{listcount}% Move to next element
+    \framebox[#1][c]{\rule{0pt}{1.5ex}\smash{\ensuremath{##1}}}%
+    \ifnum\value{listcount}<\value{totcount}\thickspace\fi
+  }
+  \docsvlist{#2}% Process list a second time to typeset each element
+}
+
+
+% \newcommand{\thmsymbol}{\( \diamond \)}
+% \newenvironment{definition}{\begin{defn}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{defn}}
+% \newenvironment{construction}{\begin{cons}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{cons}}
+% \newenvironment{theorem}{\begin{thm}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{thm}}
+% \newenvironment{lemma}{\begin{lem}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{lem}}
+% \newenvironment{corollary}{\begin{cor}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{cor}}
+% \newenvironment{fact}{\begin{fct}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{fct}}
+% \newenvironment{claim}{\begin{clm}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{clm}}
+% \newenvironment{observation}{\begin{obs}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{obs}}
+% \newenvironment{proposition}{\begin{prop}%
+% \renewcommand{\qedsymbol}{\thmsymbol}\pushQED{\qed}}%
+% {\popQED\end{prop}}
+
+
+% \renewcommand{\thmtformatoptarg}[1]{ #1}
+\setcounter{chapter}{4}

@@ -1,0 +1,416 @@
+\chapter*{Lesson 7}
+\textbf{WARNING : I was absent} 
+\begin{theorem}
+    If $G$ is a PRG, then $F_{GGM}$ is a PRF.
+\end{theorem}
+(this definition should mean implicitly that the $k$ key has been chosen by the
+challenger before the proof starts)
+\begin{proof} TO BE REVIEWED.
+    Now use the induction on the height $n$ of the GGM tree for $\nu(\lambda)
+    \in \poly{\lambda} $ .\\
+    
+    \textbf{Base Case $\Rightarrow n=1$} follows by security of PRG $G$ function,
+    because
+    \[
+        (F_{k}(0), F_{k}(1))=(G_{0}(k), G_{1}(k)) \approx_{c} U_{2\lambda}
+    \]
+    This means that, chosen $k$, the two values returned by $F$ are
+    indistinguishable from 2 values taken at random and inserted in the
+    truth table of a possible random function. Since these values are
+    indistinguishables, the source functions are indistinguishables and $F_{k}$
+    is pseudorandom.\\
+    
+    Now, for the \textbf{Inductive step} :\\
+    \begin{lemma}
+       Let $F':\{0,1\}^{n-1} \to \{0,1\}^{\lambda} $ be a PRF.
+       Now define $F_{k}(x,y)=G_{x}(F_{k}'(y))$ where $F_{k}:\{0,1\}^{n} \to
+       \{0,1\}^{\lambda} $.\\
+       If $\{F_{k}'\}$ is a PRF so is $ \{F_{k}\}$.
+    \end{lemma}
+    
+    Consider the following images:
+
+    
+    \newpage
+    \begin{figure}[h!]
+       \centering
+       \sdinit{}
+       \begin{tikzpicture}[scale=.6]
+          % Define symbols and names for the parties
+          \sdbegin{}
+          \newinst{A}{$ \A $}
+          \newinst[5]{B}{$C$} % Increase "5" to widenC
+          
+          \mess{A}{$x,y$}{B}
+          \node[anchor=west] at (mess to) {  };
+    
+          \postlevel
+          \mess{B}{z}{A}
+          \node[anchor=west] at (mess from) {\shortstack[l]{
+          		$ k \leftarrow\$ {0,1}^{\lambda}
+          		   $ 
+                \\
+        $  z=F_{k}(x,y)=G_{x}(F_{k}'(y))  $ }};
+          
+          % Message from Bob to Alice, with computations by both sides
+          
+          \sdend{}
+       \end{tikzpicture}
+       \caption{$ \H\Y\B_{\F, \A}^{0}(\lambda) $}
+       \label{fig:hib0}
+    \end{figure}
+    
+    
+    \begin{figure}[h!]
+        \centering
+       \sdinit{}
+       \begin{tikzpicture}[scale=.6]
+          % Define symbols and names for the parties
+          \sdbegin{}
+          \newinst{A}{$ \A $}
+          \newinst[5]{B}{$C$} % Increase "5" to widen
+          
+          \mess{A}{$x,y$}{B}
+          \node[anchor=west] at (mess to) {  };
+    
+          \postlevel
+          \mess{B}{z}{A}
+          \node[anchor=west] at (mess from) {\shortstack[l]{
+                      $ R' \leftarrow\$ \R'(\lambda, n-1, \lambda) $ 
+                \\
+        $  z=H(x, y)=G_{x}(R'(y))  $ }};
+          
+          % Message from Bob to Alice, with computations by both sides
+          
+          \sdend{}
+       \end{tikzpicture}
+       \caption{$ \H\Y\B_{\R', G, \A}^{1}(\lambda) $}
+       \label{fig:hib1}
+    \end{figure}
+    
+    
+    \begin{figure}[h!]
+       \centering
+       \sdinit{}
+       \begin{tikzpicture}[scale=.5]
+          % Define symbols and names for the parties
+          \sdbegin{}
+          \newinst{A}{$ \A $}
+          \newinst[5]{B}{$C$} % Increase "5" to widen
+          
+          \mess{A}{$x,y$}{B}
+          \node[anchor=west] at (mess to) {  };
+    
+          \postlevel
+          \mess{B}{z}{A}
+          \node[anchor=west] at (mess from) {\shortstack[l]{
+                      $ R \leftarrow\$ \R(\lambda, n, \lambda) $ 
+                \\
+        $  z=R(x, y)  $ }};
+          
+          % Message from Bob to Alice, with computations by both sides
+          
+          \sdend{}
+       \end{tikzpicture}
+       \caption{$ \H\Y\B_{\R, \A}^{2}(\lambda) $}
+       \label{fig:hib2}
+    \end{figure}
+    
+    \begin{lemma}
+$\H\Y\B^{0} \approx_{c} \H\Y\B^{1} \approx_{c} \H\Y\B^{2}$.
+    \end{lemma}
+
+    \begin{clm}
+ $\H\Y\B^{0} \approx_{c} \H\Y\B^{1}$       
+    \end{clm}
+
+   Assume $ \exists .PPT. D_{01}$ that can distinguish $F_{k}$ and $H$ ; then
+   there may exist a distinguisher $D$ as in the image which breaks the
+   assumption made by inductive step.
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ D_{01}  $}
+      \newinst[3]{B}{$ D $} % Increase "5" to widen
+      \newinst[3]{C}{$\C  $}
+
+      \mess{A}{$x, y$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \mess{B}{$y$}{C}
+      \node[anchor=west] at (mess to) {  };
+
+      \postlevel
+      \mess{C}{$z'$}{B}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+      		$  k \leftarrow\$ U_{\lambda}  $ 
+            \\
+            $z'=F_{k}(y)$ or $z'=R'(y)$
+            \\
+    $ R' \leftarrow\$ \R'(\lambda, n-1, \lambda)$;}}
+      
+      
+      \mess{B}{$G_{x}(z')$}{A}
+      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+   \end{tikzpicture}
+\end{figure}
+
+\begin{clm}
+ $\H\Y\B^{1} \approx_{c} \H\Y\B^{2}$       
+\end{clm}
+
+For this proof we use the following simple lemma.
+\begin{lmm}
+    If $ G:\{0,1\}^{\lambda} \to \{0,1\}^{2\lambda} $ is a PRG, then for any
+    $t(\lambda) \in \poly{\lambda} $
+    \[
+        (G(k_{1}), ..., G(k_{t})) \approx_{c} (U_{2\lambda}, ..., U_{2\lambda})
+    \]
+    for $k_{1}, ..., k_{t} \leftarrow\$ U_{\lambda}$
+\end{lmm}
+
+Assume that it exists a distinguisher $D_{1, 2}$ which is capable of distinguish
+$H(x, y)$ and $R(x, y)$.\\
+
+...TO REVIEW, NOT UNDERSTOOD AT ALL ...
+\end{proof}
+
+\section{CPA SECURITY}
+
+Suppose $G$ is a PRG.\\
+Given $Enc(k,m)=G(k) \xor m$, and a known $(\bar{m}, \bar{c})$ where
+$c=G(k)\xor m$, then this function is not 2 time secure, since $c \xor
+\bar{c}=m \xor \bar{m}$, easy to invert.\\
+(??? some glue arguments missing ???)\\
+\[
+\]
+
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.7]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
+      
+      \postlevel
+      \mess{A}{$m_{i} \in \M$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c_{i}=Enc(k, m_{i})$}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      
+   \postlevel 
+    \mess{A}{$m_{0}^{*}, m_{1}^{*} \in \M$}{B}
+      \node[anchor=west] at (mess to) {  };
+
+      \postlevel
+      \mess{B}{$c*$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+      		$ k \leftarrow\$ \K   $ 
+            \\
+            $b \leftarrow\$ \{0,1\} $ 
+            \\
+    $ c=Enc(k, m_{b})   $ }};
+      
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$m_{i} \in \M$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c_{i}=Enc(k, m_{i})$}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
+      \postlevel
+      \mess{A}{$b' \in \{0,1\}$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Game_{\Pi, \A}^{cpa}(\lambda, b)$}
+   \label{fig:cpa1}
+\end{figure}
+The adversary wins if finds which $m_{b}^{*}$ message was previously encrypted.
+For sure $m_{i}$ can be equal to $m_{0}$ or $m_{1}$.\\
+The two cyclic requests, before and after the starred messages, can be
+arbitrarily long (also 0, there is no constraint).
+\begin{definition}
+  A scheme is CPA-secure if $Game_{\Pi, \A}^{cpa}(\lambda,0)
+    \approx_{c}Game_{\Pi, \A}^{cpa}(\lambda,1)  $
+\end{definition}
+
+\begin{observation}
+    No deterministic scheme can achieve CPA security.
+\end{observation}
+This is because the Adversary is not limited in what he can ask to the
+Challenger: if he asks $m_{0}$ and $m_{1}$ before sending the starred messages,
+he will know in advance the encrypted form of the messages, and he will be able
+to distinguish with $ \P [Game^{cpa}]=1 $ the two games.\\
+
+So, a way to obtain a CPA-secure encryption scheme consists of returning
+different cyphertexts for the same message, and we can build a scheme which
+tries to generate this kind of output using PRFs.\\
+
+Consider the following SKE scheme $\Pi$.\\
+Let $\F=\{ F_{k}:\{0,1\}^{n} \to \{0,1\}^{l} \}$ be a
+PRF:
+\begin{itemize}
+    \item $k \leftarrow\$ U_{\lambda}$
+    \item $Enc(k, m)$, picking a random $r \leftarrow\$ \{0,1\}^{n} $ with an
+        output of $c=(c_{1}, c_{2})=(r, F_{k}(r) \xor m) \leftarrow\$
+        \{0,1\}^{n+l}$
+    
+    \item $Dec(k, (c_{1}, c_{2}))=F_{k}(c_{1}) \xor c_{2}$
+\end{itemize}
+.
+In this scheme, the only secret thing is $k$, which gives a \textit{flavour} to
+the random function; Adversary can see $c=(r, F_{k}(r) \xor m)$, so he can see
+$r$.
+\begin{theorem}
+    If $\F$ is a family of PRF functions, then $\Pi$ is  CPA-secure
+\end{theorem}
+To prove this, we have to prove that $Game_{\Pi, \A}^{cpa}(\lambda, 0)
+\approx_{c} Game_{\Pi, \A}^{cpa}(\lambda, 1)$.
+\begin{proof}
+    Consider hybrid arguments
+    \[
+        \H\Y\B_{0} \equiv Game_{\Pi, \A}^{cpa}(\lambda, 0)
+    \]
+    and 
+    \[ \H\Y\B_{1}\], like $\H\Y\B_{0}$ but with another distribution of $Enc(k,
+    m_{b})$: \begin{itemize}
+        \item picking $r \leftarrow\$ \{0,1\}^{n} $
+        \item $R \leftarrow\$ \R(\lambda, n, l)$
+        \item output obtained is $(r, R(r) \xor m_{b})$
+    \end{itemize}
+    and 
+    \[ \H\Y\B_{2}(\lambda, b)\] which simply outputs $(r_{1}, r_{2})
+    \leftarrow\$ U_{n+l}$.
+
+\begin{lemma}
+    $\H\Y\B_{0} \approx_{c} \H\Y\B_{1}$ for each $b \in
+    \{0,1\} 
+    $
+\end{lemma}
+\begin{proof}
+    Suppose these two hybrids are distinguishable; but then we can use the related
+    distinguisher to break the starting assumption saying $\F$ is a PRF.\\
+
+    Since they are two similar games (but just for the encryption function), we can use
+    the CPA game for this reduction.
+\newpage
+    Fix $b=0$ and build the following
+
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.65]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \D_{01} $}
+      \newinst[5]{B}{$ \D_{PRF} $} % Increase "5" to widen
+      \newinst[4]{C}{$ \C $}
+
+      \postlevel
+      \mess{A}{$m_{i} \in \M$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$r_{i}$}{C}
+      \node[anchor=west] at (mess to) {  };
+
+      \postlevel
+      \mess{C}{$z_{i}$}{B}
+      \node[anchor=west] at (mess from) {\shortstack[l] {
+                  $z_{i}=F_{k}(r_{i})$
+                  \\
+                  $z_{i}=R(r_{i})$
+          } };
+      \postlevel:
+      \mess{B}{$c_{i}=(c_{i_{1}}, c_{i_{2}})=(z_{i}, z_{i} \xor m_{i})$}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-5.7) to[out=240,in=110] (1.2,-1.6);
+    \postlevel
+    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
+      \node[anchor=west] at (mess to) {  };
+
+    \postlevel
+    \mess{B}{$r^{*}$}{C}
+      \node[anchor=west] at (mess to) {  };
+    
+    \postlevel
+    \mess{C}{$z^{*}$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c^{*}=(z^{*}, z^{*} \xor m_{0})$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+      		$    $ 
+            \\
+            $    $ }};
+      
+%      \postlevel
+%      \mess{A}{$b' \in {0,1}$}{B}
+%      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+  % \caption{}
+  % \label{fig:}
+\end{figure}
+
+After the last message, $D_{01}$ will reply with a $b' \in \{0,1\}$ which
+expresses which one of the encryption functions has been used; since this result
+can be used for solving the PRF game, the starting assumption fails and the
+lemma is proven.
+
+\end{proof}
+
+\begin{lemma}
+
+    $\H\Y\B_{1} \approx_{c} \H\Y\B_{2}$
+    
+\end{lemma}
+\begin{proof}
+Even if the output of the first  hybrid is $(r_{i}, R(r_{i}) \xor m_{b})$,
+the distribution of the second member of this couple doesn't depend on $m_{b}$,
+hence we can assume that $R(r_{i}) \xor m_{b} \equiv R(r_{i})$.\\
+
+The difference between $\H\Y\B_{1}$ and $\H\Y\B_{2}$ comes if we play the game
+once more and we pick up the same $c_{1}$ of the first game: while in
+$\H\Y\B_{2}$ $r_{2}$ is independent from $r_{1}$ and will be different from the
+previous $r'_{2}$  with probability near to 1, in $\H\Y\B_{1}$ ( if $r_{i}$ is
+the same of the previous game) 
+$R(r_{i})$ will be the same of the previous game (because $R()$ is a
+random function).\\
+
+Anyway, we can show that this "collision" happens with very low probability.\\
+
+Call \textbf{REPEAT}  this event of collision of $r_{i}$ between 2 consecutive
+games.\\
+To show the statement of the lemma, it suffices to show that 
+$P[REPEAT] \in \negl{\lambda} $, therefore the two distributions are
+indistinguishable (or distinguishable with a negligible probability) .\\
+
+In fact, if I make $q$ queries to $\H\Y\B_{1}$, 
+\begin{gather*}
+P[REPEAT]=P[ \exists i, j \in q \text{ such that } r_{i}=r_{j}] \leq \\
+\leq \sum_{i,j \wedge i \not= j}^{} \P [ r_{i}=r_{j} ]   = Col(U_{n}) = \\
+= \sum_{i \wedge j, i \not= j} \sum_{e \in \{0,1\}^{n}} \P [ r_{1}=r_{2}=e ]  = \\
+=\sum_{i \wedge j, i \not= j} \sum_{e \in \{0,1\}^{n}} \P[ r=e ]^{2}  = \\
+= {q \choose 2} 2^{n} \frac{1}{2^{2n}} = \\
+={q\choose 2} 2^{-n} \leq \\
+\leq q^{2}2^{-n} \in \negl{\lambda} 
+\end{gather*} 
+\end{proof}
+
+Since $\H\Y\B_{0} \equiv Game(\lambda, 0)$ but the same proofs can be made for
+$Game(\lambda, 1)$,  
+$ Game(\lambda, 0) \equiv \H\Y\B_{0}(Game(\lambda, 0)) \approx_{c} \H\Y\B_{2} \approx_{c} 
+\H\Y\B'_{0}(Game(\lambda,1)) \equiv Game(\lambda, 1)$
+\end{proof}
+

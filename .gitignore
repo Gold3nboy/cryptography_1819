@@ -1,0 +1,12 @@
+*.pdf
+!main.pdf
+prove_tex/
+books/
+*.aux
+*.log
+*.dvi
+*.out
+*.fdb*
+*.fls*
+*.tz
+*.gz

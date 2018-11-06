@@ -1,0 +1,399 @@
+\chapter*{Lesson 6}
+
+\section{Computationally secure encryption}
+
+\begin{question}
+    How to define the concept of \textbf{computationally secure encryption} ?    
+\end{question}
+
+Find a task/scheme that is computationally hard for an attacker to break
+(supposing the attacker is $ \poly{\lambda} $, we want a scheme which requires
+an amount of time near ,as much as possible, to $superpoly(\lambda)$ to be
+broken).
+
+This scheme should have these properties:
+\begin{itemize}
+    \item \label{prop:owk} \textbf{one wayness} w.r.t. key (given $c=Enc(k,m)$,
+        it should be hard to recover k) 
+    \item \label{prop:owm} \textbf{one wayness}  w.r.t. message (given
+        $c=Enc(k,m)$, hard to obtain the message)
+    \item \label{prop:nol} no \textbf{information leakage} about the message
+\end{itemize}.
+
+Consider the following experiment for $\Pi=(Enc, Dec)$, named 
+
+\[
+    GAME_{\Pi, \A}^{ind}(\lambda, b)
+\]
+
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C^{ind} $} % Increase "5" to widen
+      
+      % Message from Alice to Bob, with precomputations
+      \postlevel
+      \mess{A}{$m_{0}, m \in \M$}{B}
+      \node[anchor=west] at (mess to){};
+
+      \postlevel
+      \mess{B}{c}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+      		$  k \leftarrow\$ \K  $ \\
+            $ b \leftarrow\$ \{0,1\}$ \\
+    $  c \leftarrow\$ Enc(k, m_{b})  $ }};
+      
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      
+      \sdend{}
+   \end{tikzpicture}
+   \label{fig:knowmess}
+\end{figure}
+
+In the image \label{fig:knowmess} $b'$ means that if $m_{b'}=m_{b}$ the
+adversary wins.
+\begin{definition}
+    We say that $\Pi$ is computationally \textbf{one time secure }  if 
+    \[
+        Game_{\Pi, \A}^{ind}(\lambda, 0) \approx_{c} Game_{\Pi, \A}
+        ^{ind}(\lambda,1)
+    \]  
+    or, alternatively $ \forall.PPT.\A \exists \nu(\lambda) \in \negl{\lambda}$
+    \[
+        | \P [ Game_{\Pi, \A}^{ind}(\lambda, 0)=1 ] - \P [ Game_{\Pi,
+        \A}^{ind}(\lambda, 1)=1 ]   |   \leq  \nu(\lambda) 
+    \]\footnote{$Game^{ind}$ refers to the indistinguishability of the messages
+sent by the attacker during the game}
+\end{definition}
+
+
+
+This last definition is compliant with the three properties before exposed, in
+particular:\\
+
+if a scheme is \textbf{one time secure} $\Rightarrow$ the scheme has
+each one of these 3 properties
+
+\begin{itemize}
+    \item \textbf{compliance with point 1} : suppose point 1 is not valid, and
+        $k$ is not hard to discover for $ \Adv $. But then $ \Adv $ is able to perfectly
+        distinguish $m$ and $m_{0}$ with $ \P [ 1 ]  $ every time, and so the
+        scheme couldn't be one time secure;
+    \item \textbf{compliance with point 2} : suppose point 2 is not valid, and
+        then the encrypted message can be easily discovered by $ \Adv $. But
+        then , as before, $ \Adv $ can win every game with $ \P [ 1 ]  $ , so
+        the scheme couldn't be one time secure;
+    \item \textbf{compliance with point 3} : suppose point 3 is not valid, and
+        some information about $m$ is leaked in $c$, for example the first bit
+        of $c$ is the same bit of $m$ . $\Adv $ could forge
+        $m_{0}==m$ such that they have the same bits but just the first is
+        different. When $\Adv $ obtains $c$, he can look at the first bit and
+        distinguish which was the message encrypted. Thus, the scheme wouldn't
+        be one time secure.
+        TO BE REVIEWED.
+\end{itemize}
+What is not \textbf{two time secure} ?
+\begin{construction}
+    Let $G:\{0,1\}^{\lambda} \to \{0,1\}^{l} $. Consider the following schema
+    $\Pi_{\xor}$:
+    \begin{itemize}
+        \item $\K=\{0,1\}^{\lambda} \Rightarrow k \leftarrow\$ \{0,1\}^{\lambda}$
+        \item $Enc(k,m)=G(k) \xor m$, $m \in \{0,1\}^{l}$
+        \item $Dec(k,c)=c \xor G(k)=m$
+    \end{itemize}
+\end{construction}
+This construction isn't 2-time secure.Assume the pair
+\[
+    ( \bar{m}, \bar{c}=G(k) \xor \bar{m}) 
+\]
+is known. Now , given $c=G(k) \xor m$, where $c$ and $m$ are unknown, we can
+force the schema and do the following 
+\[
+    \bar{c}=G(k) \xor m = c \xor m \xor \bar{m} \Rightarrow c \xor \bar{c} = m
+    \xor \bar{m} 
+\]
+ and obtain $m$.
+
+\begin{theorem}
+    If $G$ is a PRG, then $\Pi_{\xor}$ is computationally one-time secure
+\end{theorem}
+
+\begin{proof}
+    We need to show that 
+    \[
+        Game_{\Pi_{\xor}, \A}^{ind}(\lambda, 0)   \approx_{c} Game_{\Pi_{\xor},
+        \A}^{ind}(\lambda, 1)
+    \]
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C $} % Increase "5" to widen
+      
+      % Message from Alice to Bob, with precomputations
+      \postlevel
+      \mess{A}{$m_{0}, m \in \M$}{B}
+      \node[anchor=west] at (mess to){};
+
+      \postlevel
+      \mess{B}{c}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+                  $  k \leftarrow\$ \{0,1\}^{\lambda}  $ \\
+            $ b \leftarrow\$ \{0,1\}$ \\
+    $  c = G(k) \xor m_{b} $ }};
+      
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      
+      \sdend{}
+   \end{tikzpicture}
+   \caption{Game for $\Pi_{\xor}$ schema ($Game_{\Pi_{\xor}, \A}$)}
+   \label{fig:orgame}
+\end{figure}
+
+So first consider the following \textbf{hybrid game} :
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C' $} % Increase "5" to widen
+      
+      % Message from Alice to Bob, with precomputations
+      \postlevel
+      \mess{A}{$m_{0}, m \in \M$}{B}
+      \node[anchor=west] at (mess to){};
+
+      \postlevel
+      \mess{B}{c}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+                  $  u \leftarrow\$ \{0,1\}^{\lambda}  $ \\
+            $ b \leftarrow\$ \{0,1\}$ \\
+    $  c = u \xor m_{b} $ }};
+      
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      
+      \sdend{}
+   \end{tikzpicture}
+   \caption{Hybrid game  ($\H\Y\B_{\Pi_{\xor}, \A}(\lambda, b)$)}
+   \label{fig:hyb2}
+\end{figure}
+
+\hline
+\begin{lemma}
+    $\H\Y\B_{\Pi_{\xor}, \A}(\lambda, 0) \equiv \H\Y\B_{\Pi_{\xor},
+    \A}(\lambda, 1)$
+\end{lemma}
+This is true because distribution of $c$ doesn't depend on $b \in \{0,1\}$.
+
+\begin{lemma}
+    $ \forall b \in \{0,1\}, \H\Y\B_{\Pi_{\xor}, \A}(\lambda, b) \approx_{c}
+    Game_{\Pi, \A}^{ind}(\lambda, b)$
+\end{lemma}
+
+\begin{proof}
+    Simple reduction to PRG, supposing that the statement isn't true.\\
+    This means that there exists $\A'$ capable of distinguish $c=m_{b} \xor G(k)$
+    and $c=m_{b} \xor u$.\\
+    We will prove this first with $b=0$ (the other case is the same).
+\newpage
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{D}{$\A'$}
+      \newinst[3]{A}{$ \A $}
+      \newinst[3]{B}{$C^{prg} $} % Increase "5" to widen
+      
+      % Message from Alice to Bob, with precomputations
+      \postlevel
+      \mess{B}{$z$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+                  $  z \leftarrow\$ G(k) $ for $k \leftarrow\$ \{0,1\}^{\lambda}$
+            \\
+            $  z \leftarrow\$ U_{\lambda + l}  $ }};
+      
+      \mess{D}{$m_{0}, m$}{A}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{A}{$c=m_{0} \xor z$}{D}
+      \node[anchor=west] at (mess to) {  };
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{D}{$(m_{0},z')$}{A}
+      \node[anchor=west] at (mess to) {  };
+
+       \mess{A}{$z'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      
+      \sdend{}
+   \end{tikzpicture}
+   \label{fig:asd1}
+\end{figure}
+If $\A'$ could distinguish these two sources, then $C^{prg}$ could be
+distinguished, but this is impossible.
+\end{proof}
+
+Now , for the two lemmas just seen, we have
+\[
+    Game_{\Pi, \A}^{ind}(\lambda, 0) \approx_{c} 
+    \H\Y\B_{\Pi_{\xor}, \A}(\lambda, 0) \equiv
+    \H\Y\B_{\Pi_{\xor}, \A}(\lambda, 1) \approx_{c} 
+     Game_{\Pi, \A}^{ind}(\lambda, 1)
+\]
+
+\end{proof}
+ 
+\hline
+\section{Pseudorandom functions}
+
+A random function
+\[  R:\{0,1\}^{n} \to \{0,1\}^{l} \].
+is a function that takes in input $x$ and :
+\begin{itemize}
+    \item returns a new $R(x)=y \leftarrow\$ \{0,1\}^{l}$ if $x$ has never been
+        saw before and records that value (so \textbf{ \textit{two distinct inputs can collide} })
+
+    \item returns the recorded $R(x)$ otherwise
+\end{itemize}.
+We could generate these functions, but they occupy too much space: supposing all
+the possible outputs of $R$ have been generated and stored in an array in memory, the
+occupied bits in memory are $2^{n}l$.
+\[  
+    \color{black!50}%
+  
+    \overbracket[0.5pt][5pt]{{\thickspace}%
+    \color{black}\printarray[4em]{0010...}\thickspace}^{l\textrm{ bits}}_{1}\thickspace%
+    \overbracket[0.5pt][5pt]{{\thickspace}%
+    \color{black}\printarray[4em]{1110...}\thickspace}^{l\textrm{ bits}}_{2}\thickspace%
+    \overbracket[0.5pt][5pt]{{\thickspace}%
+      \color{black}\printarray[4em]{0011...}\thickspace}^{l\textrm{ bits}}_{3}\thickspace%
+    \color{black!25}\underbracket[0pt][5.5pt]{{\thickspace}%
+      \printarray[2em]{...,...,...,...}\thickspace}_{}%
+    \overbracket[0.5pt][5pt]{{\thickspace}%
+      \color{black}\printarray[4em]{1111...}\thickspace}^{l\textrm{ bits}}_{2^{n}}\thickspace%
+  \thickspace
+
+\]
+In particular, the family $\R=\{ R:\{0,1\}^{n} \to \{0,1\}^{l} \}$, also
+indicated as $\R(\lambda, n, l)$,  containing
+all the possible random functions has cardinality $2^{2^{n}l}$.\\
+
+\textbf{Intuition:} a pseudo-random function is indistinguishable
+(computationally speaking) from a truly random one.\\
+
+Call $\F=\{ F_{k}:\{0,1\}^{n(\lambda)} \to \{0,1\}^{l(\lambda)} \}_{k \in
+\{0,1\}^{\lambda}}$ the family of pseudorandom functions with key $k$. To give a
+definition of pseudo-random function, consider the following games:
+
+
+
+
+\begin{figure}[!h]
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C $} % Increase "5" to widen
+      \mess{A}{$x$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{z}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+                  $ k \leftarrow\$ \{0,1\}^{\lambda}   $ 
+            \\
+    $ z=F_{k}(x)   $ }};
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+   \end{tikzpicture}
+   %\label{fig:}
+   \sdinit{}
+   \begin{tikzpicture}[scale=.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C $} % Increase "5" to widen
+      \mess{A}{$x$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{z}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+                  $ R \leftarrow\$ \R(\lambda, n, l) $ 
+            \\
+    $  z=R(x)  $ }};
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Real_{\F, \A}(\lambda)$ vs $Rand_{\R, \A}(\lambda) $}
+   %\label{fig:}
+\end{figure}
+
+where $b' \in \{0,1\}$ is a convention and 1 is assigned to $Real$ or $Rand$; so
+in this game the adversary \textbf{recognizes}  which machine he is talking with.
+
+\begin{definition}
+    $\F$ is a PRF family if 
+    \[
+        Real_{\F, \A}(\lambda) \approx_{c} Rand_{\R, \A}(\lambda)
+    \]
+\end{definition}
+
+\begin{exercise}
+    Show that no PRG is secure against \textbf{unbounded attackers} .
+\end{exercise}
+
+\begin{exercise}
+    Show the same (as above) for PRF.
+\end{exercise}
+
+\subsection{GGM Tree}
+
+\begin{construction}
+    Let $G:\{0,1\}^{\lambda} \to \{0,1\}^{2\lambda} $ be a PRG and let us write 
+    \[
+        G(k)=(G_{0}(k), G_{1}(k))
+    \]
+
+    Now consider this tree, called \textbf{GGM tree}, which describes the use of
+    $G(k)$:
+
+    GGM TREE IMAGE
+
+
+    Build $\F=\{ F_{k}:\{0,1\}^{n} \to \{0,1\}^{\lambda} \}$ such that 
+    \[
+        F_{k}(x)=G_{x_{n}}(G_{x_{n-1}}... G_{x_{2}}(G_{x_{1}}(k)))
+    \]
+\end{construction}
+
+For example, in the tree with height $n=3$,  for $x=001$ we have $F_{k}(001)$, which is
+$G_{0}(G_{0}(G_{1}(k)))$.
+

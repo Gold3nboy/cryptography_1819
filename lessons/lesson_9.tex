@@ -1,0 +1,542 @@
+\chapter*{Lesson 9}
+\section{Message Authentication}
+First, remember the $Tag()$ function and how a MAC works.
+Now $Tag()$ is defined using a key $k$, and we call it $Tag_{k}()$.\\
+In particular we are looking for a cool property of a message authentication
+protocol, called \textbf{ \textit{universal unforgeability against
+chosen-message attacks}}, which prevents the attacker from generating a valid
+couple $(m^{*}, \phi^{*})$ after some queries containing messages and receiving
+the related tags.\\
+
+This property is defined through a game called 
+\[
+    Game_{\Pi, \A}^{ufcma}(\lambda)
+\]
+and played in the following manner:
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C_{k \leftarrow\$ \K} $} % Increase "5" to widen
+      
+      \postlevel
+      \mess{A}{$m_{i}$}{B}
+      \node[anchor=east] at (mess from) {  };
+      \postlevel
+      \mess{B}{$\phi_{i}$}{A}
+      \node[anchor=west] at (mess from) {$\phi_{i}=Tag_{k}(m_{i})$};
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      
+   \postlevel 
+   \mess{A}{$(m^{*}, \phi^{*})$}{B}
+   \node[anchor=west] at (mess to) {Output 1 IFF $Tag_{k}(m^{*})=\phi^{*}$ };
+
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Game_{\Pi, \A}^{ufcma}(\lambda)$}
+\end{figure}
+
+with $m^{*}$ which must be a fresh new message never used before and with the
+Adversary $\A$ which doesn't know the key $k$ used in the tag.\\
+
+\begin{definition}
+    $\Pi$ is \textbf{ \textit{ufcma-secure} } if $ \forall.PPT.\A$ 
+    \[
+        \P [ Game_{\Pi, \A}^{ufcma}(\lambda)=1 ] \in \negl{\lambda}  
+    \]
+\end{definition}
+
+Now consider the following theorem:
+\begin{theorem}
+    Let $\F=\{F_{k}:\{0,1\}^{n} \to \{0,1\}^{l}\}_{k \in \{0,1\}^{\lambda}}$ 
+    be a PRF family.\\
+    Then $\Pi$ which uses $Tag_{k}()=F_{k}()$ is a UFCMA-secure
+    MAC with n-bit domain.
+\end{theorem}
+We show that the scheme which uses a PRF is indistinguishable from a scheme
+which uses a random function, and that a MAC scheme which uses a random function
+is breakable by an efficient attacker in negligible time.
+\begin{proof}
+Consider the two following hybrids:
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.6]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C_{k \leftarrow\$ \K} $} % Increase "5" to widen
+      
+      \postlevel
+      \mess{A}{$m_{i}$}{B}
+      \node[anchor=east] at (mess from) {  };
+      \postlevel
+      \mess{B}{$\phi_{i}$}{A}
+      \node[anchor=west] at (mess from) {$\phi_{i}=F(k,m_{i})$};
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      
+   \postlevel 
+   \mess{A}{$(m^{*}, \phi^{*})$}{B}
+   \node[anchor=west] at (mess to) {Output 1 IFF $F(k,m^{*})=\phi^{*}$ };
+
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Game_{\F, \A}^{ufcma}(\lambda)$}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.6]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C_{R \leftarrow\$ \R(\lambda, n, l)} $} % Increase "5" to widen
+      
+      \postlevel
+      \mess{A}{$m_{i}$}{B}
+      \node[anchor=east] at (mess from) {  };
+      \postlevel
+      \mess{B}{$\phi_{i}$}{A}
+      \node[anchor=west] at (mess from) {$\phi_{i}=R(m_{i})$};
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      
+   \postlevel 
+   \mess{A}{$(m^{*}, \phi^{*})$}{B}
+   \node[anchor=west] at (mess to) {Output 1 IFF $R(m^{*})=\phi^{*}$ };
+
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$\H\Y\B^{ufcma}(\lambda)$}
+\end{figure}
+
+\begin{lemma}
+ $Game_{\F, \A}^{ufcma}(\lambda) \approx_{c} \H\Y\B_{1}^{ufcma}(\lambda)$  
+\end{lemma}
+Assume that these two are distinguishable by D.So we could have D' which is
+capable , with the following game, of distinguish a pseudo-random function from
+a true random function:
+\newpage
+
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \D $}
+      \newinst[5]{B}{$ \D_{'} $} % Increase "5" to widen
+      \newinst[4]{C}{$ \C^{prf}_{k \leftarrow\$ \{0,1\}^{\lambda} / R
+      \leftarrow\$ \R(\lambda, n, l)} $}
+
+      \postlevel
+      \mess{A}{$m_{i} \in \M$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$m_{i}$}{C}
+      \node[anchor=west] at (mess to) {  };
+
+      \postlevel
+      \mess{C}{$\phi_{i}$}{B}
+      \node[anchor=west] at (mess from) {\shortstack[l] {
+                  $\phi_{i}= F_{k}(m_{i})$
+                  \\
+                  $\phi_{i}=R(m_{i})$
+          } };
+      \postlevel:
+      \mess{B}{$\phi_{i} $}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-5.7) to[out=240,in=110] (1.2,-1.6);
+    \postlevel
+    \mess{A}{$m^{*}, \phi^{*}$}{B}
+      \node[anchor=west] at (mess to) {  };
+
+      \postlevel((
+    \mess{B}{$m^{*}$}{C}
+      \node[anchor=west] at (mess to) {  };
+    
+    \postlevel
+    \mess{C}{$\phi'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$ \phi^{*}=^{?}\phi'$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+      		$    $ 
+            \\
+            $    $ }};
+    \postlevel
+    \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+      
+    \postlevel
+    \mess{B}{$b'$}{C}
+      \node[anchor=west] at (mess to) {  };
+      
+%      \postlevel
+%      \mess{A}{$b' \in {0,1}$}{B}
+%      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+  % \caption{}
+  % \label{fig:}
+\end{figure}
+
+After D' receive $\phi'$ from C, he has to use the distinguisher D to distinguish the PRF
+function from the random one.\\
+So he says to D if $\phi^{*}=\phi'$ or not, and D now is capable of
+understanding which game he is playing.
+
+\begin{lemma}
+    For all efficient adversaries $ \P [ \H\Y\B_{1}(\lambda)=1 ] \leq 2^{-l}  $
+\end{lemma}
+This is true because attacker has to predict the output $R(m^{*})$ on a fresh
+input $m^{*}$ and to send to the Challenger this couple to win the game.\\
+This can happen, at most, with probability $\frac{1}{2^{l}}$.
+\end{proof}
+
+This was for fixed length messages, since we can encrypt messages long $n$.\\
+In the next subsection, we will see how to create a UFCMA-secure MAC for
+variable length messages.
+
+\section{Domain extension}
+Assume $m=(m_{1}, ..., m_{t}) \in (\{0,1\}^{n})^{t}$for some $t \geq 1$.
+How can we tag m given just $Tag_{k}:\{0,1\}^{n} \to \{0,1\}^{l} $?\\
+
+We can try various attempts:
+\begin{itemize}
+    
+    
+    
+    \item \label{xorall}XOR all blocks: $\phi=Tag_{k}(\bigxor_{i=1}^{t}m_{i})$.\\
+        This is not secure cause given $(m, \phi)$ it is possible to find
+       $m^{*}\not= m$ s.t.
+       \[
+\bigxor m_{i} = \bigxor m_{i}^{*}
+        \]
+        and output this the couple $(m^{*}, \phi)$ to win.
+
+    
+
+
+    \item Let $\phi_{i}=Tag_{k}(m_{i})$ and the final message of the challenge
+        has this form : $(m, \phi=(\phi_{1}, ..., \phi_{t}))$.\\
+        This is not secure. Given $m=(m_{1}, ..., m_{t})$, this message has an
+        unique $\phi=(\phi_{1}, ..., \phi_{t})$, and if I swap $m_{1}$ and
+        $m_{t}$ I obtain a fresh new message, with a fresh new tag
+        $\phi'=(\phi_{t}, \phi_{2}, ..., \phi_{t-1}, \phi_{1})$.
+        Using this new couple, the game is won.
+
+
+
+    \item Try with $\phi_{i}=Tag_{k}(i||m_{i})$, authenticating the position of
+        the block .\\
+        But this is not secure, and can be showed in \textbf{just 2 queries}.
+        (I solved this in class during the break, with $t+1$ queries: $t$ for
+        retrieving the partial tag of the submessage+position , and the last
+        query to merge all the obtained results in a fresh new message. But this
+        solution can be improved.)
+        (UPDATE: I send  $m=m_{1_{1}}, ...m_{1_{t}}$ and I save the
+        corresponding $\phi$. Then I send $m'=m_{2_{1}}, ..., m_{2_{t}}$ and I
+        save the $\phi'$. Now I forge the new fresh prince of Bel Air
+        $m^{*}=m_{1}, m_{2}, m_{2}, ...,m_{2}$
+        and I can forge also a valid $\phi^{*}$ because I have all the
+        signed parts of this new tag. )
+        
+
+\end{itemize}
+
+Now I feel cool in Los Angeles and I want to explore a new \textbf{IDEA}:\\
+the design of a shrinking functions family 
+\[
+   \H= \{ h_{s}:\{0,1\}^{nt} \to \{0,1\}^{n} \}_{s \in \{0,1\}^{\lambda}}
+\]
+which can be used to shrink variable length messages and then apply a PRF on
+them.\\
+This idea is cool, and I consider the induced family
+\[
+    \F(\H)=\{F_{k}(h_{s}(.))\}
+\]
+\begin{question}
+Which are the properties of this family?
+\end{question}
+
+The main problem are \textit{collisions} , since for each $m \in \{0,1\}^{nt}$
+it should be hard to find $m' \not= m$ such that $h_{s}(m)=h_{s}(m')$.\\
+But we know that collisions exist, because we are trying to create a function 
+\[
+    Tag_{k, s}(m)=F_{k}(h_{s}(m))
+\]
+which maps elements in $\{0,1\}^{nt} $ to the elements in $\{0,1\}^{t}$, and
+since the second set is smaller, for the pidgeonhole principle, there will be
+ elements of $\{0,1\}^{t}$ which will be reached by more than one element of
+$\{0,1\}^{nt}$.\\
+
+To overocome this problem, we can consider 2 ways:
+\begin{itemize}
+    \item assume collisions are hard to find given $s \in \{0,1\}^{\lambda}$
+        publicly, and we have a \textit{collision resistant hashing};
+    \item let $s$ be secret, and assume collisions are hard to find because it
+        is hard to know how $h_{s}$ works.
+\end{itemize}
+\begin{definition}
+    $\H$ is called \textbf{ \textit{universal} } family if 
+    \[
+        \forall x, x' \in \{0,1\}^{nt} \text{ such that } x \not= x'
+    \]
+    \[
+        \P_{s \leftarrow\$ \{0,1\}^{\lambda}} [ h_{s}(x)=h_{s}(x') ] \leq \epsilon  
+    \]
+\end{definition}
+For $\epsilon=2^{-n}$ we call it \textbf{perfectly universal}.\\
+For $\epsilon \in \negl{\lambda} $ we call it \textbf{almost universal} (or
+\textbf{AU} ).\\
+
+\begin{exercise}
+    Show that any pairwise independent hash function is perfectly
+    universal.(should I use $Col$ for solving this? What is the difference and
+    when I should use $Col$ instead of one-shot-probability?) \textbf{ASK FOR
+    SOLVING PROPERLY} (Thoughts: when I ask \textit{what's the probability that
+, chosen 2 distinct x-es, their hashes are the same \textbf{on a certain value}?
+}, maybe I have to use one-shot, because one-shot refers to the prob. that the
+two inputs collide on a specific value, even if not specified.\\
+Instead, if I consider \textit{what's the prob. that , chosen 2 distinct x-es,
+their hashes are the same?}, maybe I have to calculate all the possible
+collisions, because I want to know if the 2 inputs can collide in general. )
+\end{exercise}
+
+\begin{theorem}
+    Assuming $\F$ is a PRF with $n-$bit domain and $\H$ is AU, then $\F'=\F(\H)$
+    is a PRF  (and , if used in a MAC as tag function, makes it UFCMA) on
+    $nt-$bit domain (for $t \geq 1$).
+\end{theorem}
+We want to show that $\F'=\F(\H)$ is a PRF , so we want to show that 
+\[
+    Real_{\F, \A}(\lambda) \approx_{c} Rand_{\R', \A}(\lambda)
+\]
+ \begin{proof}
+     Consider these 3 experiments/games:
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C_{k \leftarrow\$ \{0,1\}^{\lambda}, s \leftarrow\$
+      \{0,1\}^{\lambda} }$}
+      
+      \postlevel
+      \mess{A}{$x$}{B}
+      \node[anchor=east] at (mess from) {  };
+      \postlevel
+      \mess{B}{$y$}{A}
+      \node[anchor=west] at (mess from) {$y=F_{k}(h_{s}(x))$};
+
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Real_{\F, \A}(\lambda)$}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C_{R \leftarrow\$ \R(\lambda, n, l), s \leftarrow\$
+      \{0,1\}^{\lambda} }$}
+      
+      \postlevel
+      \mess{A}{$x$}{B}
+      \node[anchor=east] at (mess from) {  };
+      \postlevel
+      \mess{B}{$y$}{A}
+      \node[anchor=west] at (mess from) {$y=R(h_{s}(x))$};
+
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$\H\Y\B_{\R, \A}(\lambda)$}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C_{R'\leftarrow\$ \R(\lambda, n, l)}$}
+      
+      \postlevel
+      \mess{A}{$x$}{B}
+      \node[anchor=east] at (mess from) {  };
+      \postlevel
+      \mess{B}{$y$}{A}
+      \node[anchor=west] at (mess from) {$y=R(x)$};
+
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Rand_{\R', \A}(\lambda)$}
+\end{figure}
+
+\begin{lemma}
+    
+    $Real \approx_{c} \H\Y\B$
+
+\end{lemma}
+\begin{exercise}
+    Prove it!
+\end{exercise}
+
+\begin{lemma}
+    \[
+       \H\Y\B \approx_{c} Rand 
+    \]
+\end{lemma}
+These 2 experiments are very similar but for the encryption step.\\
+If I send 2 consecutives queries to both the experiments, while $Rand$ will
+give me 
+\begin{itemize}
+    \item the same $y$ with the same $x$ or 
+    \item the same $y$ with different $x_{1}\not=x_{2}$ but with very low probability, 
+\end{itemize}
+$\H\Y\B$ could return the same $y$:
+\begin{itemize}
+    \item with the same $x$ input or
+    \item with different $x_{i}\not=x_{j} \Rightarrow h_{s}(x_{i}) 
+        \not= h_{s}(x_{j})$ but with very low
+        probability (because $R$ is a random function), or
+    \item with different $x_{i}\not= x_{j}$ but with the same
+        $h_{s}(x_{i})=h_{s}(x_{j})$,
+\end{itemize}.\\
+We want to show that the last item doesn't happen too often, and that these 2
+experiments are distinct for a negligible factor.\\
+
+\begin{proof}
+    Let \textbf{BAD}  be the event that
+    \[
+        \exists i, j \in [q] \text{ with } i\not= j \text{ s.t. }
+        h_{s}(x_{i})=h_{s}(x_{j})
+    \]
+    As logn as \textbf{BAD} doesn't happen, the function $R$ is run as a
+    sequence of distinct points $R(h_{s}(x_{1})), ..., R(h_{s}(x_{q}))$.\\
+    So in this case the distribution if the 2 games is identical, and it
+    suffices to show that $ \P [ BAD ] \in \negl{\lambda}  $.\\
+
+    The event \textbf{BAD}, which happens during a game made of $q$ queries and
+    $q$ replies ,  is the same as collecting all the $q$ queries, chosing the
+    seed and then looking for collisions. If interpreted in this way, 
+    \begin{gather*}
+        \P [ BAD ] = \P_{s} [ \exists x_{i}\not=x_{j}, h_{s}(x_{i})=
+        h_{s}(x_{j})] \leq \\
+        \leq \sum_{i,j} \underbrace{\P [ h_{s}(x_{i})=h_{s}(x_{j})
+        ]}_{h_{s}\text{ is AU by definition }} \leq \\
+        \leq {q \choose 2} \negl{\lambda} \in \negl{\lambda}    
+    \end{gather*}
+
+\end{proof}
+
+So now we have $Real \approx_{c} \H\Y\B \approx_{c} Rand$
+ \end{proof}
+    
+ Now we want to show a possible shrinking/hash function which can be used in a
+ UFCMA-secure MAC. In order to be used in a UFCMA-secure MAC as the input of a
+ PRF, this function must be part of an \textbf{\textit{almost universal}} family.
+
+ \subsection{$\H$ family using Galois Fields}
+ \begin{construction}
+     Take $ \mathbb{F}=GF(2^{n})$, a \textit{Galois field} of $2^{n}$
+     elements.\\
+     Let $m=(m_{1}, ..., m_{t}) \in \mathbb{F}^{t} $ and $s=(s_{1}, ...,
+     s_{t}) \in \mathbb{F}^{t} $. We state that 
+     \[
+         h_{s}(m)= \sum_{i=1}^{t}s_{i}m_{i}=<s,m>=q_{m}(s)
+        \]
+ \end{construction}
+
+ A generic \textit{galois field} has very interesting properties, like the
+ following :
+ \begin{itemize}
+     \item addition of two elements is like applying the XOR operation on their
+         binary forms;
+     \item multiplication of two elements is like the product $mod 2^{n}$
+ \end{itemize}.
+
+ Now, since this family must be almost universal to be used as part of
+ UFCMA-secure MAC protocol, collisions must happen a negligible amount of
+ time.\\
+ Suppose we have a collision with two different messages:
+\[
+     \sum_{i=1}^{t} m_{i}s_{i}=\sum_{i=1}^{t} m'_{i}s_{i}
+\]
+ Let $\delta_{i}=m_{i}-m'_{i}$, assuming  without loss of generality that
+ $\delta \not= 0$.\\
+ Now we have that, when a collision happens, 
+ \begin{gather*}
+     \sum_{i=1}^{t} m_{i}s_{i}=\sum_{i=1}^{t} m'_{i}s_{i}\Leftrightarrow 
+     \sum_{i=1}^{t} m_{i}s_{i}-\sum_{i=1}^{t} m'_{i}s_{i}=0 \Leftrightarrow \\
+     \sum_{i=1}^{t} \delta_{i}s_{i}=0 
+ \end{gather*}
+ Taking $m, m'$ such that $m \not= m'$ means that $m$ is distinct from $m'$
+ at least for one subsequence $m_{i}\not=m'_{i}$.\\
+ So we can assume, without loss of generality, that $i=1$ is an index (or the
+ only index) which $m$ and $m'$ differ on.\\
+
+ So we can split the last summation in 2 parts, choosing $\delta_{1}s_{1}$ as
+ the first element and $ \sum_{i=2}^{t} \delta_{i}s_{i}$ as second element:\\
+ \begin{gather*}
+         \delta_{1}s_{1}+\sum_{i=2}^{t} \delta_{i}s_{i}=0 \Leftrightarrow \\
+         \delta_{1}s_{1}=-\sum_{i=2}^{t} \delta_{i}s_{i} \Leftrightarrow \\
+         s_{1}=\frac{-\sum_{i=2}^{t} \delta_{i}s_{i}}{\delta_{1}}
+     \end{gather*}
+     and this means that when a collision happens $s_{1}$ must be exactly equal 
+     two the second member of the equation, which is an element of $\mathbb{F}$.
+     But since every seed is chosen at random among $ \mathbb{F} $, what's the
+     probability of picking the element $s_{1}$ which zeroes the above equation
+     ?\\
+     This probability is just $\frac{1}{ \mathbb{F} } = \frac{1}{2^{n}} \in
+     \negl{\lambda} $.
+     \subsubsection{$\H$ with Galois fields elements and polynomials}
+
+ \begin{construction}
+     Take $ \mathbb{F}=GF(2^{n})$, a \textit{Galois field} of $2^{n}$
+     elements.\\
+     Let $m=(m_{1}, ..., m_{t}) \in \mathbb{F}^{t} $ and $s \leftarrow\$ 
+     \mathbb{F}^{t} $. We state that 
+     \[
+         h_{s}(m)= \sum_{i=1}^{t}s^{i-1}m_{i}
+        \]
+ \end{construction}
+
+
+\begin{exercise}
+    Prove that this construction is \textbf{almost universal}.\\
+    (possible proof: to be almost universal, looking at the definition,
+    collisions with $m \not= m'$ must be negligible.\\
+    So consider a collision as above: it must be true that  
+    \[
+     \sum_{i=1}^{t} m_{i}s^{i-1}=\sum_{i=1}^{t} m'_{i}s^{i-1} \Leftrightarrow 
+     \sum_{i=1}^{t} m_{i}s^{i-1}-\sum_{i=1}^{t} m'_{i}s^{i-1}=0 \Leftrightarrow
+     q_{m-m'}(s)=0
+    \]
+    How can we make a polynomial equal to 0? We have to find the \textbf{roots}
+    of the polynomial, which we know are at most the \textbf{grade} of the polynomial . 
+    So, the grade of this polynomial is $t-1$, and the probability of picking a
+    root from $ \mathbb{F} $ as seed of $h_{s}(.)$ is 
+    \[
+        \P [s=root]=\frac{t-1}{2^{n}}   \in \negl{\lambda} 
+    \] )
+\end{exercise}
+ 

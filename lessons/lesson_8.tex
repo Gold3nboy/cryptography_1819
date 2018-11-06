@@ -1,0 +1,360 @@
+\chapter*{Lesson 8}
+\section{Domain extension}
+
+How can we encrypt long messages , say $m=(m_{1}, m_{2}, ..., m_{t})$ where
+for $i \in [t], m_{i} \in \{0,1\}^{n} $?\\
+
+Mode of operation: let's build $P_{k}$, a blockcypher.\\
+
+\subsection{Electronic CodeBook (ECB)}
+
+(In notes, this name is associated with CTR-mode, or \textbf{counter mode}, but
+why?)\\
+The principle is that I have many blocks of information and I encrypt all of
+them individually (maybe in parallel):
+\[
+    c_{i}=P_{k}(m_{i}) \forall i \in [t]
+\]
+and outputs $c_{1}, c_{2}, ..., c_{t}$.\\
+
+If I encrypt the same message, I obtain the same cyphertext. So it's not
+CPA-secure as the encryption function is \textbf{deterministic.} \\
+
+\begin{preview}
+\tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=20pt,inner sep=0pt]
+\tikzstyle{encrypt}=[draw,fill=black!15,rectangle,minimum size=20pt,inner sep=0pt]
+\centering
+\begin{tikzpicture}[h!]
+    \newcommand{\n}{2}
+    \foreach \nr in {0, ..., \n}{
+        \node (r\nr) at (0,{(\n-\nr)*2}) {$r+\nr$};
+        \node (c\nr) at (6,{(\n-\nr)*2}) {$c_{\nr+1}$};
+        \node (F\nr)[encrypt] at (2,{(\n-\nr)*2}) {$F_{k}$};
+        \node (m\nr) at (4,{(\n-\nr)*2+1}) {$m_{\nr}$};
+        \node (x\nr) at (4,{(\n-\nr)*2}) {$\xor$};
+
+        \draw[->,very thick] (r\nr) -- (F\nr);
+        \draw[->,very thick] (m\nr) -- (x\nr);
+        \draw[->,very thick] (F\nr) -- (x\nr);
+        \draw[->,very thick] (x\nr) -- (c\nr);
+    }
+
+   \node (rx) at (0,-1) {$\vdots$};
+   \node (Fx) at (2,-1) {$\vdots$};
+   \node (cx) at (6,-1) {$\vdots$};
+
+        \node (rt) at (0,{(-1)*2}) {$r + t - 1$};
+        \node (ct) at (6,{(-1)*2}) {$c_{t-1}$};
+        \node (Ft)[encrypt] at (2,{(-1)*2}) {$F_{k}$};
+        \node (mt) at (4,{(-1)*2+1}) {$m_{t-1}$};
+        \node (xt) at (4,{(-1)*2}) {$\xor$};
+
+        \draw[->,very thick] (rt) -- (Ft);
+        \draw[->,very thick] (mt) -- (xt);
+        \draw[->,very thick] (Ft) -- (xt);
+        \draw[->,very thick] (xt) -- (ct);
+
+
+
+
+        \node (alala) at (6,6) {$c_{0}=r$};
+        \draw[->,very thick] (r0) -- (alala);
+\end{tikzpicture}
+\end{preview}
+
+In the image, each message is long exactly \textbf{n bits}, and 
+\[
+r \leftarrow\$ \{0,1\}^{n} 
+\]
+so the sums made over $r$ are done in \textbf{mod $2^{n}$}, since $r$ can be a
+number in the range $[0, 2^{n} -1]$.\\
+
+This is also called streamcipher, cause as input flows ECB produces the
+ciphertext.How to decrypt this schema?\\
+Since I know $r_{i}$, if I compute $F_{k}(r_{i})$ I can use the $\xor$-operation
+to calculate the message.\\
+
+\subsection{Cipher block chaining (CBC)}
+================================================================================
+================================================================================
+                    CBC IMAGE
+================================================================================
+================================================================================
+The schema to cipher here is 
+\[ 
+    \forall i \in [1,t] c_{i}=P_{k}(C_{i-1}\xor m_{1})
+\]
+How to decipher?
+\[
+    P_{k}^{-1}(i)= c_{i-1} \xor m_{i}
+\]
+so $m_{i}= P_{k}^{-1}(c_{i}) \xor c_{i-1}$.\\
+
+\begin{theorem}
+    Assume $\F$ ($F_{k}$ in the image above is part of this family) is a PRF,
+    then CTR-mode yields a CPA-secure SKE for variable length messages.
+\end{theorem}.\\
+\textit{Variable length messages}  means that  every message 
+\[
+    m=(m_{1}, ..., m_{t})
+\]
+
+has t subsets, and $t$ can change from message $m$ to another message
+$m'=(m'_{1}, ..., m'_{t'})$.
+Consider the following hybrids:
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.65]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
+      
+      \postlevel
+      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c=(c_{0}=r, c_{1}, ..., c_{t})$}{A}
+      \node[anchor=west] at (mess from) { \shortstack[l] {
+                  $r \leftarrow\$ [r, r+t-1] mod 2^{n}$    
+          \\
+          $c_{i}=F_{k}(r + i -1) \xor m_{i}$
+          }};
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      
+   \postlevel 
+    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
+      \node[anchor=east] at (mess from) { both of length $t$ };
+
+      \postlevel
+      \mess{B}{$r^{*}, c_{1}^{*}, ..., c_{t}^{*}$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+        $r* \leftarrow\$ [r, r+t-1] mod 2^{n}$    
+          \\
+          $c_{i}^{*}=F_{k}(r^{*} + i -1) \xor m_{i}^{*}$
+          }};
+      
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c$}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
+      \postlevel
+      \mess{A}{$b' \in \{0,1\}$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Game_{CTR, \A}^{cpa}(\lambda, b)$}
+\end{figure}
+
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
+      
+      \postlevel
+      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c=(c_{0}=r, c_{1}, ..., c_{t})$}{A}
+      \node[anchor=west] at (mess from) { \shortstack[l] {
+                  $R \leftarrow\$ R(\lambda, n, n)$    
+          \\
+          $c_{i}=R(r + i -1) \xor m_{i}$
+          }};
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      
+   \postlevel 
+    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
+      \node[anchor=east] at (mess from) { both of length $t$ };
+
+      \postlevel
+      \mess{B}{$r^{*}, c_{1}^{*}, ..., c_{t}^{*}$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+        $r* \leftarrow\$ [r, r+t-1] mod 2^{n}$    
+          \\
+          $c_{i}^{*}=R(r^{*} + i -1) \xor m_{i}^{*}$
+          }};
+      
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c$}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
+      \postlevel
+      \mess{A}{$b' \in \{0,1\}$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$\H\Y\B_{1}(\lambda, b)$}
+\end{figure}
+\newpage
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.5]
+      % Define symbols and names for the parties
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
+      
+      \postlevel
+      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c=(c_{0}=r, c_{1}, ..., c_{t})$}{A}
+      \node[anchor=west] at (mess from) { \shortstack[l] {
+                  $c_{i} \leftarrow\$ U_{n}$    
+          }};
+    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
+      
+   \postlevel 
+    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
+      \node[anchor=east] at (mess from) { both of length $t$ };
+
+      \postlevel
+      \mess{B}{$c_{0}^{*}, c_{1}^{*}, ..., c_{t}^{*}$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+                  $c_{i}^{*} \leftarrow\$ U_{n}$    
+          }};
+      
+      % Message from Bob to Alice, with computations by both sides
+      \postlevel
+      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c$}{A}
+      \node[anchor=west] at (mess to) {  };
+    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
+      \postlevel
+      \mess{A}{$b' \in \{0,1\}$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$\H\Y\B_{2}(\lambda, b)$}
+\end{figure}
+
+Now we want to show that $Game_{\Pi, \lambda}^{cpa}(\lambda,0)
+\approx_{c}Game_{\Pi, \lambda}^{cpa}(\lambda,1) $
+\begin{proof}
+
+    \begin{exercise}
+        \begin{lemma}
+        Show that $Game_{\Pi, \lambda}^{cpa}(\lambda,b) \approx_{c} \H\Y\B_{1}
+        (\lambda, b), \forall b \in \{0,1\} $
+        \end{lemma}\\
+        
+        (Since this $Game(\lambda, b)$ is a CPA scheme and the second one is
+        very similar, we can use a distinguisher which plays the CPA game; since
+        this is a lemma, our precondition to "break" during the reduction is
+        the precondition contained in the theorem statement)
+    \end{exercise}
+
+    \begin{lemma}
+        $\H\Y\B_{1}(\lambda,b) \approx_{c} \H\Y\B_{2} (\lambda), \forall b \in
+        \{0,1\}$
+    \end{lemma}
+
+    The two hybrids are identical but for the encryption function, which is
+    completely random in the second one while the first one uses a random
+    function.\\
+    
+    Since  $R(r + i ) \xor m_{i} \approx R(r + i ) $ (because
+    $m_{i}$ doesn't affect the distribution of the result at all), if  $R(r^{*})$ 
+     behaves like a true random extractor , the two hybrids are
+    indistinguishable.\\
+
+    Now, if I examine a simple query and the consecutive challenge query $(q,
+    q^{*})$ in a game in $\H\Y\B_{2}$, the responses will be chosen at random
+    with very low probability of being the same; but in a game in
+    $\H\Y\B_{1}$, the problem comes if the challenger 
+    creates an $r^{*}+ j'$ for $q^{*}$ which overlaps some chosen
+    $r_{i} + j$ previously chosen for $q$.\\
+    This is bad, because $R(r_{i} + j)=R(r^{*} + j')$ since $R$ is a random
+    function, and the probability of outputting the same response ciphertext
+    will be much higher in $\H\Y\B_{1}$.\\
+
+    It's possible to show that these collisions happen very few times
+    (with \textbf{negligible} probability) in $\H\Y\B_{1}$ and  that the two 
+    hybrids are distinct and
+    distinguishable for a negligible factor.\\
+
+    \begin{proof}
+        Let :
+        \begin{itemize}
+            \item $q$= # of encryption queries
+            \item $t_{i}$ = # of blocks for the i-th query
+            \item $t^{*}$ = # of blocks for challenge
+        \end{itemize}
+ and let the function $R$ run: we will have 
+ $R(r*), ...R(r^{*}+t^{*}-1)$ and $R(r_{i}), ..., R(r_{i}+t_{i}-1)$ sequences of random
+ function outputs.
+
+ \begin{definition}
+     \textbf{OVERLAP event}: \exists i, j, j', $r_{i} + j=r^{*} + j'$ (here
+     $j \leq t_{i}$ and $j' \leq t^{*}$), for some query $q_{i}$.
+ \end{definition}
+ 
+ If \textbf{OVERLAP}  does not happen , the sequence $(R(r^{*}), ...,
+ R(r^{*}+t^{*}-1))$ is made of \textbf{ \textit{uniform} } and \textbf{
+ \textit{independent}} values.
+ Thus $\H\Y\B_{1}(b)$ is identical to $\H\Y\B_{2}(b)$ for all $b \in \{0,1\}$
+ .\\
+
+ Now it suffices to show that $ \P [ OVERLAP ] \in \negl{\lambda}  $.\\
+
+ For simplicity, assume $q=$(length of each query) and also $t_{i}=t^{*}=q$.\\
+Let $OVERLAP_{i}$ be the event that the $i-th$ query $r_{i}, ..., r_{i} + q - 1 $ 
+partially or totally overlaps the challenge sequence $r^{*}, ..., r^{*} + q - 1 $.\\
+
+Fix some $r*$.\\
+One can see that $OVERLAP_{i}$ happens if 
+\[
+r^{*}-q+1 \leq r_{i} \leq r^{*} + q - 1
+\]
+, which means that $r_{i}$ should be chosen \textit{at least} in a way that :
+\begin{itemize}
+    \item the sequence $r^{*}, ..., r^{*} + q - 1 $ comes before the sequence $r_{i},
+        ..., r_{i} + q - 1 $, and they overlap just for the last element  $r^{*}
+        + q -1 = r_{i}$ or
+    \item the sequence $r_{i},..., r_{i} + q - 1 $ comes before the sequence the
+        sequence $r^{*}, ..., r^{*} + q - 1 $, and they overlap just for the
+        last element $r_{i} + q - 1 = r^{*}$
+\end{itemize}.\\
+So now
+\[
+    \P [ OVERLAP_{i} ] = \frac{(r^{*} +q - 1) - (r^{*}-q+1) + 1}{2^{n}} =
+    \frac{2q-1}{2^{n}}
+\]
+
+It is obvious that, for definition of \textbf{OVERLAP} , 
+\[
+    \P [ OVERLAP ] \leq \sum_{i=1}^{q} \P [ OVERLAP_{i} ] \leq 2
+    \frac{q^{2}}{2^{n}} \in \negl{\lambda}  
+\]
+
+
+    \end{proof}
+    
+    Since $\H\Y\B_{1} \approx_{c} \H\Y\B_{2}$ and $\H\Y\B_{1}\equiv Game(b)$
+    with $b$ equal to 0 and 1 respectively, we can state that 
+    \[
+        Game(0) \approx_{c} \H\Y\B_{2} \approx_{c} Game(1)
+    \]
+    .
+    
+\end{proof}
+
