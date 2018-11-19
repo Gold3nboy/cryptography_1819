@@ -18,9 +18,17 @@
 \usepackage{calc}
 \usepackage{tikz}
 \hypersetup{colorlinks=false}
+\usepackage{preview}
 
 \makeatletter
-
+\usepackage{framed}
+\usepackage{color}
+\newcommand{\review}[1]{
+  \definecolor{shadecolor}{rgb}{1,1,0} % this is yellow
+  \begin{shaded}
+  REVIEW: #1
+ \end{shaded}
+}
 
 \titlecontents{chapter}[0em]{\lsstyle\smallskip\bfseries}%\vspace{1cm}%
       {\contentslabel[\chaptername~\thecontentslabel]{0em}\hspace{5.6em}}%
@@ -32,9 +40,6 @@
       %next character
 \let\eps\varepsilon
 \newcommand\+{\mkern2mu}
-
-
-
 
 \newcommand{\ie}{\textit{i.e.}, }
 \newcommand{\eg}{\textit{e.g.}, }
@@ -208,6 +213,10 @@
 \newcommand{\negl}[1]{\mathrm{negl}\left({#1}\right)}
 
 \newcommand{\xor}{\oplus}
+
+%https://tex.stackexchange.com/questions/137073/writing-mod-in-congruence-problems-without-leading-space
+\newcommand{\Mod}[1]{\ (\mathrm{mod}\ #1)}
+
 %========================================================================================================
 
 

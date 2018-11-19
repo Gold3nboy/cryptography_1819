@@ -1,0 +1,49 @@
+\section{Textbook RSA}
+This is an \underline{insecure} toy example of the more complex \textit{RSA} (Rivest Shamir Adleman) algorithm.
+The key generation algorithm: $\KGen=\Gen RSA(1^{\lambda})$ outputs $P_k=(n,e)$ and $S_k=d$, then we have
+
+\begin{gather*}
+    Enc(P_k,m)=m^e\Mod{n}\\
+    Dec(S_k,c)=c^d\Mod{n}
+\end{gather*}
+
+Since the output of Enc is deterministic this is \textbf{not CPA secure}! However it can be used with HARD-CORE Predicate.\\
+Preprocess the message to add randomness:
+$$\hat{m}=r||m \text{ where }r\leftarrow\mathdollar\{0,1\}^l$$
+now Enc is not deterministic.\\
+\textbf{Facts:}
+\begin{enumerate}
+    \item $l \in super(log(\lambda))$ otherwise it is possible to bruteforce in PPT.
+    \item If $m\in\{0,1\}$ then I can prove it CPA secure under RSA (just use standard TDP)
+    \item If $m$ is "in the middle" ($\{0,1\} \leq m \leq \{0,1\}^l$) RSA is believed to be secure and is \underline{standardized} (PKCS\#1,5)
+    \item Still not CCA secure!
+\end{enumerate}
+
+\subsection{Trapdoor Permutation from Factoring}
+Let's look at $f(x)=x^2\Mod{n}$ where $f: \Z_n^* \to \QR[n] (\subset \Z_n^*)$, this is not a permutation in general.\\
+Now let's consider the Chinese Reminder Theorem (CRT) representation:
+
+    \begin{gather*}
+        x=(x_p,x_q) \rightarrow x_p\equiv x\Mod{p} , x_q\equiv x\Mod{q}\\
+        f(x)=x^2\Mod{p}; x \from \$ \Z_p^*
+    \end{gather*}
+
+Since $Z_p^*$ is cyclic I can always write:
+
+\begin{gather*}
+    Z_p^*=\{g^0,g^1,g^2,\ldots,g^{\frac{p-1}{2}-1},g^{\frac{(p-1)}{2}},\ldots,g^{p-2} \}\\
+    \QR[p]=\{g^0,g^2,g^4,\ldots,\overbrace{g^{p-3}}^{g^{\frac{pi1}{2}-1} in Z_p^*},\underbrace{g^0}_{g^{\frac{p-1}{2}}in Z_p^*},\ldots\}\\
+    |\QR[p]|=\frac{p-1}{2}
+\end{gather*}
+Moreover since $(g^{\frac{p-1}{2}})^2 \equiv 1 \Mod{p} $ then $g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.\\
+Now assume $p\equiv 3 \Mod{4}$ ([*]$p=4t+3$ CRT), then squaring $Mod{p}$ is a permutation because, given \underline{$y=x^2 \Mod{p}$} if I compute:
+\begin{gather*}
+    (y^{t+1})^2=\underbrace{y^{2t+2}}_{\text{[*] }2t+2=\frac{p-3}{2}+2=\frac{p+1}{2}=\frac{p-1}{2}+1}=(x^2)^{\frac{p-1}{2}+1}=1x^2=x^2\\
+    \implies x=\pm y^{t+1}
+\end{gather*}
+
+But only 1 among the above $\pm y^{t+1}$ is a square, this is because $\frac{p-1}{2}$ is odd.
+
+\begin{lemma}
+    $\forall z, z\in \QR[p]$ IFF $-z\notin \QR[p]$
+\end{lemma}
