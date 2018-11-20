@@ -339,14 +339,17 @@ We have 3 ways to combine these 2 schema to obtain a new one:
             c \leftarrow\$ Enc(k_{1}, \phi \| m)\\
             c^{*}=c
         \end{gather*}
-        
+===============================================================================\\
+DA RIVEDERE: come i $\phi$ sono randomici o no? A guardare la prima parte della
+prossima lezione , sembrerebbe di si.\\
     \item  \textbf{ \textit{Encrypt-then-MAC} } :
         \begin{gather*}
             c \leftarrow\$ Enc(k_{1}, m)\\
-            \phi = Tag(k_{2}, c) \\
+            \phi \leftarrow\$ Tag(k_{2}, c) \\
             c^{*}=(c, \phi)
         \end{gather*}
         
+===============================================================================\\
 \end{enumerate}
 In a paper is clearly stated that the first solution doesn't work taking random
 combination of CPA-secure and MAC schemes, because there are couple which,

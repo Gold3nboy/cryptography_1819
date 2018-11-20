@@ -20,40 +20,47 @@ and outputs $c_{1}, c_{2}, ..., c_{t}$.\\
 If I encrypt the same message, I obtain the same cyphertext. So it's not
 CPA-secure as the encryption function is \textbf{deterministic.}
 
-\begin{figure}[h!]
-\tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=20pt,inner sep=0pt];
-\tikzstyle{encrypt}=[draw,fill=black!15,rectangle,minimum size=20pt,inner
-sep=0pt];
-\centering
-\begin{tikzpicture}
-    \newcommand{\n}{2}
-    \foreach \nr in {0, ..., \n}{
-        \node (r\nr) at (0,{(\n-\nr)*2}) {$r+\nr$};
-        \node (c\nr) at (6,{(\n-\nr)*2}) {$c_{\nr+1}$};
-        \node (F\nr)[encrypt] at (2,{(\n-\nr)*2}) {$F_{k}$};
-        \node (m\nr) at (4,{(\n-\nr)*2+1}) {$m_{\nr}$};
-        \node (x\nr) at (4,{(\n-\nr)*2}) {$\xor$};
-        \draw[->,very thick] (r\nr) -- (F\nr);
-        \draw[->,very thick] (m\nr) -- (x\nr);
-        \draw[->,very thick] (F\nr) -- (x\nr);
-        \draw[->,very thick] (x\nr) -- (c\nr);
-    }
-   \node (rx) at (0,-1) {$\vdots$};
-   \node (Fx) at (2,-1) {$\vdots$};
-   \node (cx) at (6,-1) {$\vdots$};
-        \node (rt) at (0,{(-1)*2}) {$r + t - 1$};
-        \node (ct) at (6,{(-1)*2}) {$c_{t-1}$};
-        \node (Ft)[encrypt] at (2,{(-1)*2}) {$F_{k}$};
-        \node (mt) at (4,{(-1)*2+1}) {$m_{t-1}$};
-        \node (xt) at (4,{(-1)*2}) {$\xor$};
-        \draw[->,very thick] (rt) -- (Ft);
-        \draw[->,very thick] (mt) -- (xt);
-        \draw[->,very thick] (Ft) -- (xt);
-        \draw[->,very thick] (xt) -- (ct);
-        \node (alala) at (6,6) {$c_{0}=r$};
-        \draw[->,very thick] (r0) -- (alala);
-\end{tikzpicture}
-\end{figure}
+\begin{preview}
+    \tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{encrypt}=[draw,fill=black!15,rectangle,minimum size=20pt,inner sep=0pt]
+    \centering
+    \begin{tikzpicture}
+        \newcommand{\n}{2}
+        \foreach \nr in {0, ..., \n}{
+            \node (r\nr) at (0,{(\n-\nr)*2}) {$r+\nr$};
+            \node (c\nr) at (6,{(\n-\nr)*2}) {$c_{\nr+1}$};
+            \node (F\nr)[encrypt] at (2,{(\n-\nr)*2}) {$F_{k}$};
+            \node (m\nr) at (4,{(\n-\nr)*2+1}) {$m_{\nr}$};
+            \node (x\nr) at (4,{(\n-\nr)*2}) {$\xor$};
+
+            \draw[->,very thick] (r\nr) -- (F\nr);
+            \draw[->,very thick] (m\nr) -- (x\nr);
+            \draw[->,very thick] (F\nr) -- (x\nr);
+            \draw[->,very thick] (x\nr) -- (c\nr);
+        }
+
+    \node (rx) at (0,-1) {$\vdots$};
+    \node (Fx) at (2,-1) {$\vdots$};
+    \node (cx) at (6,-1) {$\vdots$};
+
+            \node (rt) at (0,{(-1)*2}) {$r + t - 1$};
+            \node (ct) at (6,{(-1)*2}) {$c_{t-1}$};
+            \node (Ft)[encrypt] at (2,{(-1)*2}) {$F_{k}$};
+            \node (mt) at (4,{(-1)*2+1}) {$m_{t-1}$};
+            \node (xt) at (4,{(-1)*2}) {$\xor$};
+
+            \draw[->,very thick] (rt) -- (Ft);
+            \draw[->,very thick] (mt) -- (xt);
+            \draw[->,very thick] (Ft) -- (xt);
+            \draw[->,very thick] (xt) -- (ct);
+
+
+
+
+            \node (alala) at (6,6) {$c_{0}=r$};
+            \draw[->,very thick] (r0) -- (alala);
+    \end{tikzpicture}
+\end{preview}
 
 In the image, each message is long exactly \textbf{n bits}, and 
 \[
@@ -248,12 +255,9 @@ Now we want to show that $Game_{\Pi, \lambda}^{cpa}(\lambda,0)
         \begin{lemma}
         Show that $Game_{\Pi, \lambda}^{cpa}(\lambda,b) \approx_{c} \H\Y\B_{1}
         (\lambda, b), \forall b \in \{0,1\} $
-        \end{lemma}\\
-        
-        (Since this $Game(\lambda, b)$ is a CPA scheme and the second one is
-        very similar, we can use a distinguisher which plays the CPA game; since
-        this is a lemma, our precondition to "break" during the reduction is
-        the precondition contained in the theorem statement)
+        \end{lemma}
+
+        (Since this $Game(\lambda, b)$ is a CPA scheme and the second one is        very similar, we can use a distinguisher which plays the CPA game; since this is a lemma, our precondition to "break" during the reduction is the precondition contained in the theorem statement)
     \end{exercise}
 
     \begin{lemma}
@@ -288,17 +292,16 @@ Now we want to show that $Game_{\Pi, \lambda}^{cpa}(\lambda,0)
     \begin{proof}
         Let :
         \begin{itemize}
-            \item $q$= $#$ of encryption queries
-            \item $t_{i}$ = $#$ of blocks for the i-th query
-            \item $t^{*}$ = $#$ of blocks for challenge
+            \item $q$= \# of encryption queries
+            \item $t_{i}$ = \# of blocks for the i-th query
+            \item $t^{*}$ = \# of blocks for challenge
         \end{itemize}
  and let the function $R$ run: we will have 
  $R(r*), ...R(r^{*}+t^{*}-1)$ and $R(r_{i}), ..., R(r_{i}+t_{i}-1)$ sequences of random
  function outputs.
 
  \begin{definition}
-     \textbf{OVERLAP event}: $\exists i, j, j', r_{i} + j=r^{*} + j'$ (here
-     $j \leq t_{i}$ and $j' \leq t^{*}$), for some query $q_{i}$.
+     \textbf{OVERLAP event}: $\exists$ i, j, j', $r_{i} + j=r^{*} + j'$ (here $j \leq t_{i}$ and $j' \leq t^{*}$), for some query $q_{i}$.
  \end{definition}
  
  If \textbf{OVERLAP}  does not happen , the sequence $(R(r^{*}), ...,

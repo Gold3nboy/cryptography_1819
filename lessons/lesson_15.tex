@@ -1,0 +1,384 @@
+\chapter*{Lesson 15}
+\section{Public key encryption recap} 
+
+$\mbox{Game}_{\Pi, \mathcal{A}}^{pke-cca}$:
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      \sdbegin{}
+
+      \newinst{A}{$ \mathcal{A} $}     % Adversary
+      % NOTE: the bracketed value expresses the distance between the two entities
+      \newinst[3]{C}{$ C^{\textsc{pke-cca}} $}  % Challenger
+
+      % BEGIN
+
+      % Challenger publishes pk
+      \mess{C}{$pk$}{A}
+      \node[anchor=west] at (mess from) {
+         \shortstack[r] {
+            $ (pk, sk) \pickUAR \mathcal{KG}en(1^\lambda) $
+         }
+      };
+      
+      \postlevel
+
+      % Adversary queries for a decryption
+      \mess{A}{$c'$}{C}
+      \node[anchor=west] at (mess to) {};
+      % Challenger responds with decrypted value
+      \mess{C}{$m'$}{A}
+      \node[anchor=west] at (mess to) {};
+      % Adversary can query polynomially-many times
+      \draw [->] (0.9,-3.3) to[out=200,in=150] (0.9,-2.4);
+
+      \postlevel
+
+      % Adversary starts the challenge by sending two messages
+      \mess{A}{$m_0, m_1$}{C}
+      \node[anchor=west] at (mess to) {};
+      % Challenger flips a coin, encrypts the chosen message and sends the cipherext
+      \mess{C}{$c$}{A}
+      \node[anchor=west] at (mess from) { \shortstack[r] {
+         $ b \pickUAR \{0, 1\} $ \\
+         $ c \pickUAR Enc(pk, m_b) $
+      }};
+      
+      \postlevel
+      
+      % Adversary can still query for other decryptions
+      \mess{A}{$c'$}{C}
+      \node[anchor=west] at (mess to) {};
+      \mess{C}{$m'$}{A}
+      \node[anchor=west] at (mess to) {};
+      \draw [->] (0.9,-6.9) to[out=200,in=150] (0.9,-6.0);
+      
+      \postlevel
+
+      % Adversary guesses which message has been encrypted
+      \mess{A}{$b'$}{C}
+      \node[anchor=west] at (mess to) {
+         \small{Output 1 iff $b' = b$}
+      };
+      
+      \sdend{}
+   \end{tikzpicture}
+   \caption{CCA on a PKE scheme}
+   \label{fig:game_pke-cca}
+\end{figure}
+
+(Reminder): Encryptions are made like this: $Enc(k, m) = (r, F_k(r) \oplus m), r \simeq \mathcal{U}nif(\{0, 1\}^\lambda)$.
+
+Every time an encryption is made, a fresh value $r$ is picked UAR.
+
+\pagebreak
+\subsection{Trapdoor permutation}
+
+A TDP(TrapDoor Permutation) is a OWP family structured has these features:
+
+\begin{itemize}
+   \item A key pair is chosen UAR by a key generator algorithm: $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
+   \item There is a function family $f_{pk} \subseteq (V_{pk} \to V_{pk})$ such that:
+   \begin{itemize}
+      \item Computing $f_{pk}$ is efficient
+      \item Sampling from the domain ($x \pickUAR V_{pk}$) is efficient
+   \end{itemize}
+   \item There is an efficient function $g_{sk}$ that ``inverts'' $f_{pk}$ ($sk$ is the ``trapdoor''): 
+   \begin{equation*}
+      g(sk, f(pk, x)) = x
+   \end{equation*}
+   \item No efficient adversary is able to invert $f_{pk}$ wihout knowing $sk$
+\end{itemize}
+
+Note: Since $pk$ is public, any adversary gets the capability of encrypting messages for free, without requiring n external challenger/oracle!
+
+Therefore, if left deterministic, a TDP is not CPA-secure.
+
+%The idea is to reuse the message as part of the randomness, or more in detail, use its hardcore predicate. The resulting scheme would the look like this:
+Here, in this scheme, we combine randomness and the notion of hardcore predicate $\mathfrak{hc}$:
+
+
+\begin{itemize}
+   \item $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
+   \item $r \pickUAR \Xi_{pk}$
+   \item $c := Enc(pk, m) = (f_{pk}(r), \mathfrak{hc}(r) \oplus m)$
+   \item Correctness: $Dec(sk, c) = \mathfrak{hc}(g_{sk}(c_1)) \oplus c_2$
+   % Exercise: If obscure, do the petty algebra on paper
+\end{itemize}
+
+Theorem: if $(\mathcal{KG}en, f, g)$ is a TDP, and $\mathfrak{hc}$ is hardcore for $f$, then the above scheme is CPA-secure.
+
+Proof: (Execrcise)
+
+\subsection{TDP examples}
+
+One example stems form the factoring problem: let's look again at $\mathbb{Z}_n^\times$, where $n = pq$, $p, q \in \mathbb{P}$;
+
+Theorem (Chinese remainder, or CRT): The following isomorphisms to $\mathbb{Z}_n^\times$ are true:
+
+\begin{itemize}
+   \item $\mathbb{Z}_n \simeq \mathbb{Z}_p \times \mathbb{Z}_q$
+   \item $\mathbb{Z}_n^\times \simeq \mathbb{Z}_p^\times \times \mathbb{Z}_q^\times$
+\end{itemize}
+
+Note that the theorem is more general, and holds for any $p, q$ that are coprime.
+
+How to use this theorem for constructing a PKE scheme:
+
+Reminder (Euler's theorem): $\forall x \in \mathbb{Z}_n \implies x^{\varphi(n)} = x \mod n$
+
+Reminder: $\forall p, q \in \mathbb{P} \implies \varphi(pq) = (p-1)(q-1)$
+
+So let $a$ be the public key such that $\gcd(a, \varphi(n))=1$, then $\exists! b \in \mathbb{Z}_n : ab = 1 \mod \varphi(n)$, $d$ will be our private key.
+
+Define encryption as $f(a, m) = m^a \mod n$, and then decryption as $g(b, c) = c^b \mod n$
+
+Observe that $g(b, f(a, m)) = (m^a)^b = m^{ab} = m \mod n$, because $ab = 1 \mod \varphi(n)$
+
+So we conjecture that the above is a valid TDP-based PKE scheme. This is actually called the ``RSA assumption'':
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      \sdbegin{}
+
+      \newinst{A}{$ \mathcal{A} $}     % Adversary
+      % NOTE: the bracketed value expresses the distance between the two entities
+      \newinst[3]{C}{$ C^{\textsc{rsa}} $}  % Challenger
+
+      % BEGIN
+
+      % Adversary asks for the challenge
+      \postlevel
+      \mess{C}{$n, pk, m^{pk}$}{A}
+      \node[anchor=west] at (mess from) { \shortstack[l] {
+         $ b \pickUAR \{0, 1\} $ \\
+         $ c \pickUAR Enc(pk, m_b) $
+      }};
+
+      % Adversary guesses the plaintext
+      \postlevel
+      \mess{A}{$m'$}{C}
+      \node[anchor=west] at (mess to) {
+         \small{Output 1 iff $m' = m$}
+      };
+      
+      \sdend{}
+   \end{tikzpicture}
+   \caption{Depiction of the RSA assumption}
+   \label{fig:game_pke-rsa}
+\end{figure}
+
+Relation to the factoring problem: $\textsc{rsa} \implies \textsc{fact}$
+
+Proof: Given $p, q$, an adversary can compute $\varphi(n) = (p-1)(q-1)$, and then find the inverse of the public key in $\mathbb{Z}_{pq}^\times$.
+
+It hasn't been proven that $\textsc{fact} \implies \textsc{rsa}$
+
+
+
+
+
+
+
+
+
+\section{Textbook RSA}
+This is an \underline{insecure} toy example of the more complex \textit{RSA} (Rivest Shamir Adleman) algorithm.
+The key generation algorithm: $\KGen=\Gen RSA(1^{\lambda})$ outputs $P_k=(n,e)$ and $S_k=d$, then we have
+
+\begin{gather*}
+    Enc(P_k,m)=m^e\Mod{n}\\
+    Dec(S_k,c)=c^d\Mod{n}
+\end{gather*}
+
+Since the output of Enc is deterministic this is \textbf{not CPA secure}! However it can be used with HARD-CORE Predicate.\\
+Preprocess the message to add randomness:
+$$\hat{m}=r||m \text{ where }r\leftarrow\mathdollar\{0,1\}^l$$
+now Enc is not deterministic.\\
+\textbf{Facts:}
+\begin{enumerate}
+    \item $l \in super(log(\lambda))$ otherwise it is possible to bruteforce in PPT.
+    \item If $m\in\{0,1\}$ then I can prove it CPA secure under RSA (just use standard TDP)
+    \item If $m$ is "in the middle" ($\{0,1\} \leq m \leq \{0,1\}^l$) RSA is believed to be secure and is \underline{standardized} (PKCS\#1,5)
+    \item Still not CCA secure!
+\end{enumerate}
+
+
+
+\subsection{Trapdoor Permutation from Factoring}
+Let's look at $f(x)=x^2\Mod{n}$ where $f: \Z_n^* \to \QR[n] (\subset \Z_n^*)$, this is not a permutation in general.\\
+Now let's consider the Chinese Reminder Theorem (CRT) representation:
+
+    \begin{gather*}
+        x=(x_p,x_q) \rightarrow x_p\equiv x\Mod{p} , x_q\equiv x\Mod{q}\\
+        f(x)=x^2\Mod{p}; x \from \$ \Z_p^*
+    \end{gather*}
+
+Since $Z_p^*$ is cyclic I can always write:
+
+\begin{gather*}
+    Z_p^*=\{g^0,g^1,g^2,\ldots,g^{\frac{p-1}{2}-1},g^{\frac{(p-1)}{2}},\ldots,g^{p-2} \}\\
+    \QR[p]=\{g^0,g^2,g^4,\ldots,\overbrace{g^{p-3}}^{g^{\frac{pi1}{2}-1} in Z_p^*},\underbrace{g^0}_{g^{\frac{p-1}{2}}in Z_p^*},\ldots\}\\
+    |\QR[p]|=\frac{p-1}{2}
+\end{gather*}
+Moreover since $(g^{\frac{p-1}{2}})^2 \equiv 1 \Mod{p} $ then $g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.\\
+Now assume $p\equiv 3 \Mod{4}$ ([*]$p=4t+3$ CRT), then squaring $Mod{p}$ is a permutation because, given \underline{$y=x^2 \Mod{p}$} if I compute:
+\begin{gather*}
+    (y^{t+1})^2=\underbrace{y^{2t+2}}_{\text{[*] }2t+2=\frac{p-3}{2}+2=\frac{p+1}{2}=\frac{p-1}{2}+1}=(x^2)^{\frac{p-1}{2}+1}=1x^2=x^2\\
+    \implies x=\pm y^{t+1}
+\end{gather*}
+
+But only 1 among the above $\pm y^{t+1}$ is a square, this is because $\frac{p-1}{2}$ is odd.
+
+\begin{lemma}
+    $\forall z, z\in \QR[p]$ IFF $-z\notin \QR[p]$
+\end{lemma}
+
+
+
+=======
+\subsection{Rabin's Trapdoor permutation}
+Now we study a one way function built on previous deductions about number
+theory and modular arithmetic.\\
+
+The \textit{Rabin trapdoor permutation} is defined as 
+\[
+    f: \mathbb{Z}^{*}_{n}  \to \mathbb{Z}^{*}_{n}  \newline
+    f(x)=x^{2} \text{ mod } n
+\]
+where $n=p*q$ for primes $p,q=3 mod 4$.\\
+\todo{label related to a previous construction}
+
+We can observe that the image of this function is a subset of $
+\mathbb{Z}^{*}_{n} $.\\
+
+For the \textbf{Chinese remainder theorem}, we can consider values modulo
+$N=pq$ as values modulo $p$ and values modulo $q$.\\
+So now consider
+\[
+    f: \mathbb{Z}^{*}_{p}  \to \mathbb{Z}^{*}_{p}  \newline
+    f(x)=x^{2} \text{ mod } p
+\]
+The image of the function $f$ exactly matches the definition of
+\textbf{quadratic residues}, since 
+\[
+    f \text{'s image set}= \mathbb{QR}_{p}=\{y:y \equiv x^{2} 
+    \text{ mod } p, x \in \mathbb{Z}^{*}_{p}   \} 
+\]
+We can observe the same for $\mathbb{Z}^{*}_{q}$ .\\
+
+So for \textbf{Chinese remainder theorem} it is possible to state that $f$ maps
+as follows
+\[
+    x= (x_{p}, x_{q}) \mapsto (x^{2}_{p}, x^{2}_{q})
+\]
+
+As before, the image of $f$ is exactly
+\[
+    \mathbb{QR}_{n} = \{ y: \exists x : y=x^{2} \text{ mod } n\}
+\]
+
+For the previous observations, it's possible to state the following \textbf{Fact:}
+\[
+y \leftarrow \mathbb{QR}_{n} \Leftrightarrow y \in \mathbb{QR}_{p} \wedge y \in
+\mathbb{QR}_{q} 
+\]
+
+This is important because if we try to invert the function $f$, among the
+hypotetical 4 possible values
+\[
+    f^{-1}(y)=\{ (x_{p}, x_{q}),(-x_{p}, x_{q}),(x_{p},- x_{q})(-x_{p},- x_{q})\}
+\]\label{les15:outoffour}
+only 1 out of these above 4 values is a quadratic residue because only one of
+$-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.
+\todo{label to previous fact}
+
+Therefore, we have that the Rabin's TDP is a permutation, and that the
+cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.\\
+
+Furthermore, with the following claim we can state that the Rabin cryptosystem
+is as secure as the hardness of factoring.
+
+\begin{claim}
+    Given $x, z$ such that $x^{2}\text{ mod} n \equiv z^{2} \text{ mod } n
+    \equiv y$ mod $n$,
+\[
+    x\not= \pm z \Rightarrow \text{ we can factor } n
+\]
+\end{claim}
+\begin{proof}
+    For the previous statement \ref{les15:outoffour}, since $f^{-1}(y)$
+    has only one value out of four, summing two distinct elements $x, z$
+    in the domain of function $f$ generates only 2 possible values:
+    \[
+        x + z \in \{(0,2x_{q}), (2x_{p}, 0)\}
+    \]
+
+    Now assume $x + z = (2x_{p}, 0)$ without loss of generality, since the proof
+    for the other case is the same.\\
+    We have that $x+z \equiv 0$ mod $q$ and $x+z \not\equiv 0 $ mod $p$.\\
+
+    But then $gcd( x+z , n)=q$, and we obtain $q$.
+\end{proof}
+
+\begin{theorem}
+    Squaring mod $n$ (where $n$ is a \textit{bloom integer}\footnote{ a bloom
+    integer $n$ is $n=p,q$ for $p,q=3 mod 4$, as the definition of Rabin's TDP})
+    is a \textbf{trapdoor permutation} under factioring.
+\end{theorem}
+
+In other words
+\[
+    \text{Factoring is hard } \Rightarrow \text{ inverting $f(x)$ is hard}
+\]
+The following proof is by contraddiction.
+\begin{proof}
+    Assume that exists an adversary PPT such that
+    \[
+        \P [ x^{2}=y:(p,q,n) \leftarrow\$ Genbloom(1^{\lambda}), y \leftarrow\$
+        \mathbb{QR}_{n}, x \leftarrow \A(y)  ] \geq \frac{1}{poly(\lambda)}  
+    \]
+    But then we can build the following reduction:
+
+    \todo{check the correctness of the image}
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[2.5]{B}{$ \A_{fact} $}
+      \newinst[2]{C}{$\C_{(p,q,n) \leftarrow\$ Genbloom \wedge p,q \equiv 3
+      \text{ mod } 4}$}
+      
+            \postlevel
+            \mess{C}{$n=pq$}{B}
+            \node[anchor=west] at (mess to) {  };
+      
+      \postlevel
+      \mess{B}{$n,y$}{A}
+      \node[anchor=west] at (mess from) {\shortstack[l]{
+      $ x \leftarrow\$ \mathbb{Z}^{*}_{n} $
+      \\
+      $ y=x^{2} $ mod $n$
+      }  };
+
+      \postlevel
+      \mess{A}{$z$}{B}
+      \node[anchor=west] at (mess to) {\shortstack[l]{
+              $ f(z)=f(x) $ 
+             }};
+
+
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+\end{figure}
+
+\end{proof}
+
+

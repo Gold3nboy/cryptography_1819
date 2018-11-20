@@ -25,12 +25,177 @@ Consider $\Pi$ as
     So we have an $\A'$ which can win the \textbf{auth} challenge of $\Pi$.\\
     On the other hand, we have a $\Pi_{2}$ schema which uses an \textbf{euf-cma}
     $Tag(.,.)$ function.\\
-    So, by reduction, we show that ...
+    So, by reduction, we show that 
+    
 
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.7]
+      \sdbegin{}
+      \newinst{A}{$ \A^{auth} $}
+      \newinst[4]{B}{$ \A_{k \leftarrow\$ \{0,1\}^{\lambda} 
+      } $}
+      \newinst[4]{C}{$\C^{eufcma}_{k_{2} \leftarrow\$ \{0,1\}^{\lambda} 
+      }$ }
 
+      \postlevel
+      \mess{A}{$m$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c \leftarrow\$ Enc(k_{1}, m)$}{C}
+      \node[anchor=west] at (mess to) {};
+      \postlevel
+      \mess{C}{$\phi$}{B}
+      \node[anchor=west] at (mess from) {$\phi \leftarrow\$ Tag(k_{2}, c)$};
+      \postlevel
+      \mess{B}{$(c, \phi)$}{A}
+      \node[anchor=west] at (mess to) {  };
+\draw [->] (1.2,-5.9) to[out=240,in=110] (1.2,-1.3);
 
+      \postlevel
+      \mess{A}{$(c^{*}, \phi^{*})$}{B}
+      \node[anchor=west] at (mess to) {  };
+      \postlevel
+      \mess{B}{$c^{*}, \phi^{*}$}{C}
+      \node[anchor=west] at (mess to) { };
 
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+\end{figure}
+The game returns 1 IFF
+\[
+    c^{*} \leftarrow\$ Enc(k_{1}, . ) \wedge \phi^{*} \leftarrow\$ Tag(k_{2}, c^{*}) \wedge (c^{*}, \phi) \not\in \{ (c, \phi ) \} 
+\]
 
+From $A^{auth}$ perspective, all the couples $(c_{i}, \phi_{i})$ received are
+made with the following schema:
+\[
+    c_{i} \in Enc(k_{1}, m \in \M) \wedge \phi_{i}\leftarrow\$ Enc(k_{2}, c_{i})
+\]
+Since $\A^{auth}$ wins $Game^{auth}$, the challenge couple $(c^{}{*}, \phi^{*})$
+which breaks $Game^{auth}$ will be produced to be decrypted as
+\[
+    Dec(k, (c^{*}, \phi^{*})) \rightarrow Dec(k_{1}, c^{*}) \in \M \wedge
+    Dec(k_{2}, \phi^{*})=c^{*}
+\]
+But if this happens , then $\A$ can use the same challenge couple of $\A^{auth}$
+to win $Game^{ufcma}$, which is impossible.\\
 
+It could happen that, for $c^{*}=c$ previously seen, $\phi^{*}$ is a new
+fresh tag, never seen before.
+Just in this case the $auth$ game would be valid because $(c^{*}, \phi^{*})$ would
+have never been seen before, but \textbf{not } the eufcma game, because $c^{*}$
+was previously sent to the challenger.\\
 \end{proof}
     
+Now we want an ufcma secure scheme able to resist against message-tag challenge
+couples where the tag is fresh but the message has been already requested to the
+challenger.\\
+\section{Pseudorandom permutations}
+Pseudorandom permutations are like PRFs, but efficiently invertible.
+Consider the following family of functions:
+\[
+    \F=\{ F_{k}: \{0,1\}^{n} \to \\{0,1\}^{n} \}_{k \in \{0,1\}^{\lambda} }
+\]
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.45]
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[4]{B}{$ C_{k\leftarrow\$\{0,1\}^{\lambda} 
+      } $}
+
+      \postlevel
+      \mess{A}{$x$}{B}
+      \node[anchor=west] at (mess to) {};
+      \postlevel
+      \mess{B}{$y$}{A}
+      \node[anchor=west] at (mess from) {$y=F_{k}(x)$  };
+\draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.6);
+      \postlevel
+      \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+
+
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Real_{\F, \A}(\lambda)$}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}[scale=0.45]
+      \sdbegin{}
+      \newinst{A}{$ \A $}
+      \newinst[4]{B}{$C_{P \leftarrow\$ \P(\lambda, n, n)} $}
+
+      \postlevel
+      \mess{A}{$x$}{B}
+      \node[anchor=west] at (mess to) {};
+      \postlevel
+      \mess{B}{$y$}{A}
+      \node[anchor=west] at (mess from) {$y=P(x)$  };
+\draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.6);
+      \postlevel
+      \mess{A}{$b'$}{B}
+      \node[anchor=west] at (mess to) {  };
+
+
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+   \caption{$Ideal_{\P, \A}(\lambda)$}
+\end{figure}
+
+
+
+and the two games are indistinguishable
+\[
+    Real_{\F, \A}(\lambda) \approx_{c} Ideal_{\F, \A}(\lambda)
+\]
+\subsection{Feistel Network}
+Let $F:\{0,1\}^{n} \to \{0,1\}^{n} $ and $\psi_{F}$ the invertible function
+\begin{gather*}
+    \psi_{F}(\overbrace{x}^{\text{n bits}}, \overbrace{y}^{\text{n bits}})= (y,
+    x \xor F(y))=(x', y')\\
+    \psi^{-1}_{F}(\overbrace{x'}^{\text{n bits}}, \overbrace{y'}^{\text{n
+    bits}})= (F(x') \xor y', x')=(x, y)
+\end{gather*}
+Is this function pseudorandom?\\
+This is not pseudorandom, because the first n bits of the output of $\psi_{F}$
+are always equal to $y$, while in a PRF the probability that, given two
+different $(x, y)$ and $(x', y)$ in input, the first bits are equal is very
+low.\\
+
+===========================================================================\\
+FEISTEL IMAGE\\
+===========================================================================\\
+The $l-th$ level outputs something like 
+\[
+    \psi_{F}[l](x,y)=\psi_{F_{k_{l}}}(\psi_{F_{k_{l-1}}}(...(\psi_{F_{k_{1}}}(x,y))...))
+\]
+Two XORed rounds of this function don't create a PRP. In particular, imagine 2 queries 
+$(x, y)$ and $(x', y)$ such that
+\[
+    \psi_{F, F'}(x,y) \xor  \psi_{F,F'}(x',y)=(x \xor F(y) \xor x' \xor F(y),
+    \ldots)
+\]
+Since for 2 random queries with the same $y$, the first member of the output is
+always equal to  $x \xor x'$ with probability 1, this XORed rounds cannot
+constitute a PRP (which, instead, for 2 queries with the same second member
+outputs a first member equal to $x \xor x'$ with negligible probability).\\
+
+\begin{lemma}
+    For every \textbf{unbounded}  distinguisher making $q \in poly(\lambda)$
+    queries, the following are statistically close as long as $y_{1}, \ldots,
+    y_{q}$ are \textbf{ \textit{y-nique} } , i.e. $ \forall i \not= j, y_{i}
+    \not= y_{j}$
+\end{lemma}
+figures
+
