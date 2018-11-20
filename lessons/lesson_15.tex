@@ -4,69 +4,67 @@
 $\mbox{Game}_{\Pi, \mathcal{A}}^{pke-cca}$:
 
 \begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      \sdbegin{}
+    \centering
+    \sdinit{}
+    \begin{tikzpicture}
+        \sdbegin{}
 
-      \newinst{A}{$ \mathcal{A} $}     % Adversary
-      % NOTE: the bracketed value expresses the distance between the two entities
-      \newinst[3]{C}{$ C^{\textsc{pke-cca}} $}  % Challenger
+        \newinst{A}{$ \mathcal{A} $}     % Adversary
+        % NOTE: the bracketed value expresses the distance between the two entities
+        \newinst[3]{C}{$ C^{\textsc{pke-cca}} $}  % Challenger
 
-      % BEGIN
+        % BEGIN
 
-      % Challenger publishes pk
-      \mess{C}{$pk$}{A}
-      \node[anchor=west] at (mess from) {
-         \shortstack[r] {
-            $ (pk, sk) \pickUAR \mathcal{KG}en(1^\lambda) $
-         }
-      };
+        % Challenger publishes pk
+        \mess{C}{$pk$}{A}
+        \node[anchor=west] at (mess from) {
+            \small{$(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$}
+        };
       
-      \postlevel
+        \postlevel
 
-      % Adversary queries for a decryption
-      \mess{A}{$c'$}{C}
-      \node[anchor=west] at (mess to) {};
-      % Challenger responds with decrypted value
-      \mess{C}{$m'$}{A}
-      \node[anchor=west] at (mess to) {};
-      % Adversary can query polynomially-many times
-      \draw [->] (0.9,-3.3) to[out=200,in=150] (0.9,-2.4);
+        % Adversary queries for a decryption
+        \mess{A}{$c'$}{C}
+        \node[anchor=west] at (mess to) {};
+        % Challenger responds with decrypted value
+        \mess{C}{$m'$}{A}
+        \node[anchor=west] at (mess to) {};
+        % Adversary can query polynomially-many times
+        \draw [->] (0.9,-3.3) to[out=200,in=150] (0.9,-2.4);
+        
+        \postlevel
+        
+        % Adversary starts the challenge by sending two messages
+        \mess{A}{$m_0, m_1$}{C}
+        \node[anchor=west] at (mess to) {};
+        % Challenger flips a coin, encrypts the chosen message and sends the cipherext
+        \mess{C}{$c$}{A}
+        \node[anchor=west] at (mess from) { \shortstack[l]{
+            $ b \pickUAR \{0, 1\} $ \\
+            $ c \pickUAR Enc(pk, m_b) $
+        }};
+      
+        \postlevel
+      
+        % Adversary can still query for other decryptions
+        \mess{A}{$c'$}{C}
+        \node[anchor=west] at (mess to) {};
+        \mess{C}{$m'$}{A}
+        \node[anchor=west] at (mess to) {};
+        \draw [->] (0.9,-6.9) to[out=200,in=150] (0.9,-6.0);
+      
+        \postlevel
 
-      \postlevel
-
-      % Adversary starts the challenge by sending two messages
-      \mess{A}{$m_0, m_1$}{C}
-      \node[anchor=west] at (mess to) {};
-      % Challenger flips a coin, encrypts the chosen message and sends the cipherext
-      \mess{C}{$c$}{A}
-      \node[anchor=west] at (mess from) { \shortstack[r] {
-         $ b \pickUAR \{0, 1\} $ \\
-         $ c \pickUAR Enc(pk, m_b) $
-      }};
+        % Adversary guesses which message has been encrypted
+        \mess{A}{$b'$}{C}
+        \node[anchor=west] at (mess to) {
+            \small{Output 1 iff $b' = b$}
+        };
       
-      \postlevel
-      
-      % Adversary can still query for other decryptions
-      \mess{A}{$c'$}{C}
-      \node[anchor=west] at (mess to) {};
-      \mess{C}{$m'$}{A}
-      \node[anchor=west] at (mess to) {};
-      \draw [->] (0.9,-6.9) to[out=200,in=150] (0.9,-6.0);
-      
-      \postlevel
-
-      % Adversary guesses which message has been encrypted
-      \mess{A}{$b'$}{C}
-      \node[anchor=west] at (mess to) {
-         \small{Output 1 iff $b' = b$}
-      };
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{CCA on a PKE scheme}
-   \label{fig:game_pke-cca}
+        \sdend{}
+    \end{tikzpicture}
+    \caption{CCA on a PKE scheme}
+    \label{fig:game_pke-cca}
 \end{figure}
 
 (Reminder): Encryptions are made like this: $Enc(k, m) = (r, F_k(r) \oplus m), r \simeq \mathcal{U}nif(\{0, 1\}^\lambda)$.
@@ -79,17 +77,17 @@ Every time an encryption is made, a fresh value $r$ is picked UAR.
 A TDP(TrapDoor Permutation) is a OWP family structured has these features:
 
 \begin{itemize}
-   \item A key pair is chosen UAR by a key generator algorithm: $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
-   \item There is a function family $f_{pk} \subseteq (V_{pk} \to V_{pk})$ such that:
-   \begin{itemize}
-      \item Computing $f_{pk}$ is efficient
-      \item Sampling from the domain ($x \pickUAR V_{pk}$) is efficient
-   \end{itemize}
-   \item There is an efficient function $g_{sk}$ that ``inverts'' $f_{pk}$ ($sk$ is the ``trapdoor''): 
-   \begin{equation*}
-      g(sk, f(pk, x)) = x
-   \end{equation*}
-   \item No efficient adversary is able to invert $f_{pk}$ wihout knowing $sk$
+    \item A key pair is chosen UAR by a key generator algorithm: $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
+    \item There is a function family $f_{pk} \subseteq (V_{pk} \to V_{pk})$ such that:
+    \begin{itemize}
+        \item Computing $f_{pk}$ is efficient
+        \item Sampling from the domain ($x \pickUAR V_{pk}$) is efficient
+    \end{itemize}
+    \item There is an efficient function $g_{sk}$ that ``inverts'' $f_{pk}$ ($sk$ is the ``trapdoor''): 
+    \begin{equation*}
+        g(sk, f(pk, x)) = x
+    \end{equation*}
+    \item No efficient adversary is able to invert $f_{pk}$ wihout knowing $sk$
 \end{itemize}
 
 Note: Since $pk$ is public, any adversary gets the capability of encrypting messages for free, without requiring n external challenger/oracle!
@@ -101,11 +99,11 @@ Here, in this scheme, we combine randomness and the notion of hardcore predicate
 
 
 \begin{itemize}
-   \item $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
-   \item $r \pickUAR \Xi_{pk}$
-   \item $c := Enc(pk, m) = (f_{pk}(r), \mathfrak{hc}(r) \oplus m)$
-   \item Correctness: $Dec(sk, c) = \mathfrak{hc}(g_{sk}(c_1)) \oplus c_2$
-   % Exercise: If obscure, do the petty algebra on paper
+    \item $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
+    \item $r \pickUAR \Xi_{pk}$
+    \item $c := Enc(pk, m) = (f_{pk}(r), \mathfrak{hc}(r) \oplus m)$
+    \item Correctness: $Dec(sk, c) = \mathfrak{hc}(g_{sk}(c_1)) \oplus c_2$
+    % Exercise: If obscure, do the petty algebra on paper
 \end{itemize}
 
 Theorem: if $(\mathcal{KG}en, f, g)$ is a TDP, and $\mathfrak{hc}$ is hardcore for $f$, then the above scheme is CPA-secure.
@@ -119,8 +117,8 @@ One example stems form the factoring problem: let's look again at $\mathbb{Z}_n^
 Theorem (Chinese remainder, or CRT): The following isomorphisms to $\mathbb{Z}_n^\times$ are true:
 
 \begin{itemize}
-   \item $\mathbb{Z}_n \simeq \mathbb{Z}_p \times \mathbb{Z}_q$
-   \item $\mathbb{Z}_n^\times \simeq \mathbb{Z}_p^\times \times \mathbb{Z}_q^\times$
+    \item $\mathbb{Z}_n \simeq \mathbb{Z}_p \times \mathbb{Z}_q$
+        \item $\mathbb{Z}_n^\times \simeq \mathbb{Z}_p^\times \times \mathbb{Z}_q^\times$
 \end{itemize}
 
 Note that the theorem is more general, and holds for any $p, q$ that are coprime.
@@ -140,36 +138,36 @@ Observe that $g(b, f(a, m)) = (m^a)^b = m^{ab} = m \mod n$, because $ab = 1 \mod
 So we conjecture that the above is a valid TDP-based PKE scheme. This is actually called the ``RSA assumption'':
 
 \begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      \sdbegin{}
+    \centering
+    \sdinit{}
+    \begin{tikzpicture}
+        \sdbegin{}
 
-      \newinst{A}{$ \mathcal{A} $}     % Adversary
-      % NOTE: the bracketed value expresses the distance between the two entities
-      \newinst[3]{C}{$ C^{\textsc{rsa}} $}  % Challenger
+        \newinst{A}{$ \mathcal{A} $}     % Adversary
+        % NOTE: the bracketed value expresses the distance between the two entities
+        \newinst[3]{C}{$ C^{\textsc{rsa}} $}  % Challenger
 
-      % BEGIN
+        % BEGIN
 
-      % Adversary asks for the challenge
-      \postlevel
-      \mess{C}{$n, pk, m^{pk}$}{A}
-      \node[anchor=west] at (mess from) { \shortstack[l] {
-         $ b \pickUAR \{0, 1\} $ \\
-         $ c \pickUAR Enc(pk, m_b) $
-      }};
+        % Adversary asks for the challenge
+        \postlevel
+        \mess{C}{$n, pk, m^{pk}$}{A}
+        \node[anchor=west] at (mess from) { \shortstack[l]{
+            $ b \pickUAR \{0, 1\} $ \\
+            $ c \pickUAR Enc(pk, m_b) $
+        }};
 
-      % Adversary guesses the plaintext
-      \postlevel
-      \mess{A}{$m'$}{C}
-      \node[anchor=west] at (mess to) {
-         \small{Output 1 iff $m' = m$}
-      };
+        % Adversary guesses the plaintext
+        \postlevel
+        \mess{A}{$m'$}{C}
+        \node[anchor=west] at (mess to) {
+            \small{Output 1 iff $m' = m$}
+        };
       
-      \sdend{}
-   \end{tikzpicture}
-   \caption{Depiction of the RSA assumption}
-   \label{fig:game_pke-rsa}
+        \sdend{}
+    \end{tikzpicture}
+    \caption{Depiction of the RSA assumption}
+    \label{fig:game_pke-rsa}
 \end{figure}
 
 Relation to the factoring problem: $\textsc{rsa} \implies \textsc{fact}$
