@@ -1,0 +1,154 @@
+\chapter*{Lesson 15}
+\section{PKE from DDH(Public Key Infrastructure)}
+\subsubsection{El Gamal Encryption}
+Let's define a new $\Pi$=(KGen, Enc, Dec). Generate the needed (\textbf{public}) parameters $(G,g,q)\leftarrow\$GroupGen(1^{\lambda})$\footnote{G could be any "valid" group such as $\QR[p]$ or an Elliptic Curve}.\\
+The KeyGen algorithm is defined as follows:
+\begin{itemize}
+    \item Pick $x\leftarrow\$\Z_q$
+    \item Output $P_k=h=g^x$, $S_k=x$
+\end{itemize}
+The Enc($m,P_k$) algorithm will:
+\begin{itemize}
+    \item Pick $r\leftarrow\$\Z_q$
+    \item Output $c=(c_1,c_2)=(g^r,h^rm)$\footnote{We need $r$ because we want to (re)randomize $c$}
+\end{itemize}
+Then Dec($c,S_k$) will simply:
+\begin{itemize}
+    \item Compute $\frac{c_2}{c_1^x}=\frac{h^r m}{g^{rx}}=m$
+\end{itemize}
+\begin{theorem}
+    Under DDH the above $\Pi$ is CPA secure.
+\end{theorem}
+\begin{proof}
+    Consider the two following games $H_0(\lambda,b)$ and $H_1(\lambda, b)$ defined as follows.
+    (b can be fixed without loss of generality)\\
+    
+    \newpage
+    $H_0(\lambda,b):$
+    \begin{figure}[htp]
+        \centering
+        \sdinit{}
+        \begin{tikzpicture}
+           \sdbegin{}
+           \newinst{A}{$ \A $}
+           \newinst[4]{B}{$ \C^{pke} $}
+           
+           \postlevel
+           \mess{B}{$h$}{A}
+           \node[anchor=west] at (mess from) { \shortstack[l]{
+               $h=g^x=P_k$\\
+               $x\leftarrow\$\Z_q,r\leftarrow\$\Z_q$}};
+           \postlevel
+           \mess{A}{$(m_0,m_1)\in \G$}{B}
+           \node[anchor=west] at (mess to) {  };
+           \postlevel
+           \mess{B}{$ c $}{A}
+           \node[anchor=west] at (mess from) { $c=(c_1,c_2)=(g^r,h^r m)_b$ };
+           \postlevel
+           \mess{A}{$b'$}{B}
+           \node[anchor=west] at (mess to) {  };
+          
+           \sdend{}
+           \sdend{}
+        \end{tikzpicture}
+    \end{figure}
+
+    $H_1(\lambda,b):$
+    \begin{figure}[h]
+        \centering
+        \sdinit{}
+        \begin{tikzpicture}
+           \sdbegin{}
+           \newinst{A}{$ \A $}
+           \newinst[4]{B}{$ \C^{pke} $}
+           
+           \postlevel
+           \mess{B}{$h$}{A}
+           \node[anchor=west] at (mess from) { \shortstack[l]{
+               $h=g^x=P_k$\\
+               $x\leftarrow\$\Z_q,z\leftarrow\$\Z_q,r\leftarrow\$\Z_q$}};
+           \postlevel
+           \mess{A}{$(m_0,m_1)\in \G$}{B}
+           \node[anchor=west] at (mess to) {  };
+           \postlevel
+           \mess{B}{$ c $}{A}
+           \node[anchor=west] at (mess from) { $c=(c_1,c_2)=(g^r,g^z m)_b$ };
+           \postlevel
+           \mess{A}{$b'$}{B}
+           \node[anchor=west] at (mess to) {  };
+          
+           \sdend{}
+           \sdend{}
+        \end{tikzpicture}
+    \end{figure}
+
+    \textbf{Note:} it is important to note that we can measure the advantage of $\A$, so fixed its output $Adv_{\A}(\lambda)=|\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=0}_{"\A loses"}]-\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=1]}_{"\A wins"}|$. The advantage will be $\geq \frac{1}{2}$ (random guessing).\\
+
+    \underline{Proof techinique:}
+    $H_0(\lambda,0) \approx_c H_0(\lambda,1)\equiv H_1(\lambda,0) \approx_c H_1(\lambda,1)$
+    $$\implies H_0(\lambda,0) \approx_c H_1(\lambda,1)$$
+
+    \begin{lemma}
+        $\forall b \in \{0,1\}, H_0(\lambda,0) \approx_c H_0(\lambda,1)$\\
+        Fix b. (Reduction to DDH)\\
+        Assume $\exists$ PPT D which is able to distinguish $H_0(\lambda,b)$ and $H_1(\lambda,b)$ with non negl. probability.
+    \end{lemma}
+
+    \newpage
+    \begin{proof}
+
+        Consider the following Game:
+
+        \begin{figure}[h!]
+            \centering
+            \sdinit{}
+            \begin{tikzpicture}
+               \sdbegin{}
+               \newinst{A}{$ \D $}
+               \newinst[4]{B}{$ \D'_{DDH} $}
+               \newinst[4]{C}{$ \C_{DDH} $}
+
+               \postlevel
+               \mess{C}{$(X,Y,Z)$}{B}
+               \node[anchor=west] at (mess from) { \shortstack[l]{
+                   $X=g^x, Y=g^y$\\
+                   $Z=g^{xr}$ or $Z=g^z$}};
+               \postlevel
+               \mess{B}{$h=X$}{A}
+               \node[anchor=west] at (mess to) {  };
+               \postlevel
+               \mess{A}{$ (m_0,m_1) $}{B}
+               \node[anchor=west] at (mess from) { };
+               \postlevel
+               \mess{B}{$(Y,Z m_b)$}{A}
+               \node[anchor=west] at (mess to) {  };
+               \postlevel
+               \mess{A}{$b'$}{B}
+               \node[anchor=west] at (mess to) {  };
+               \postlevel
+               \mess{B}{$b'$}{C}
+               \node[anchor=west] at (mess to) {  };
+              
+               \sdend{}
+               \sdend{}
+            \end{tikzpicture}
+        \end{figure}
+
+        \textbf{Contradiction}: $\D$ should be able to compute $log_g$ to distinguish the message.
+
+    \end{proof}
+
+    \begin{lemma}
+        $H_1(\lambda,0)\equiv H_1(\lambda,1)$
+    \end{lemma}
+    \begin{proof}
+        This follows from the fact that:
+        $(g^x,(g^r,g^z m_0))\equiv (g^x,(g^r,U_{\lambda}) \equiv \\ \equiv (g^x,(g^r,g^z m_1)))$
+    \end{proof}
+    
+    \begin{lemma}
+        $H_1(\lambda,1)\equiv H_0(\lambda,1)$
+    \end{lemma}
+    This is proved in the exact same way as \textbf{Lemma 20.} As a matter of fact it is the second part of the proof (where $b$ is fixed to 1).
+    
+\end{proof}

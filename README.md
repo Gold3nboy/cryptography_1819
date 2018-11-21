@@ -46,3 +46,4 @@ If you don't like something/everything/life, please contact me so we can try to 
 * pairing theorems/claims/facts/exercises with Proofs unequivocally
 ### Minor issues
 * refs should have a certain name while pointing to sections with other names
+* could be useful to have an acronym table
