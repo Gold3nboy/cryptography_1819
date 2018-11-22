@@ -2,196 +2,178 @@
 
 \section{Stretching a PRG}
 \begin{theorem}
-    If there exists a PRG $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + 1}$ ,
-    then $ \forall l(\lambda) \in \poly{\lambda} $
-    there exists a PRG with stretch $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda +
-    l(\lambda)} $ 
+    If there exists a PRG $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + 1}$ , then $ \forall l(\lambda) \in \poly{\lambda} $ there exists a PRG with stretch $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + l(\lambda)}$ 
 \end{theorem}
 
 \begin{proof}
-    So, consider this algorithm/construction:\\
+    Consider this algorithm/construction:
     \begin{enumerate}
         \item Let $s_{0} \leftarrow\$ \{ 0,1\}^{\lambda}$
         \item $ \forall i \in [l] $ , let $(s_{i}, b_{i}) = G(s_{i-1})$
         \item Output $b_{1}, b_{2}, ..., b_{l}, s_{l}$ , so the output is a
             string of bit $\lambda + l(\lambda)$ long
-    \end{enumerate}.\\
-    Following this algorithm, we should obtain the following representation of
-    $G^{l}$:
+    \end{enumerate}
+
+    Following this algorithm, we should obtain the following representation of $G^{l}$:
     \begin{figure}[h!]
-        
-\tikzstyle{int}=[draw, minimum size=2em]
-\tikzstyle{dots}=[minimum size=2em]
-\tikzstyle{init} = [pin edge={-to,thin,black}]
+        \tikzstyle{int}=[draw, minimum size=2em]
+        \tikzstyle{dots}=[minimum size=2em]
+        \tikzstyle{init} = [pin edge={-to,thin,black}]
 
-\begin{tikzpicture}[node distance=2.5cm,auto,>=latex']
-    \node [int, pin={[init]above:$b_{1}$}] (a) {$G$};
-    \node (b) [left of=a,node distance=1.5cm, coordinate] {a};
+        \begin{tikzpicture}[node distance=2.5cm,auto,>=latex']
+            \node [int, pin={[init]above:$b_{1}$}] (a) {$G$};
+            \node (b) [left of=a,node distance=1.5cm, coordinate] {a};
 
-    \node [int, pin={[init]above:$b_{2}$}] (c) [right of=a,node distance=2cm] {$G$};
-    \node [dots] (d) [right of=c,node distance=1.5cm] {$...$};
+            \node [int, pin={[init]above:$b_{2}$}] (c) [right of=a,node distance=2cm] {$G$};
+            \node [dots] (d) [right of=c,node distance=1.5cm] {$...$};
 
-    \node [int, pin={[init]above:$b_{i+1}$}] (e) [right of=d,node distance=2cm] {$G$};
-    \node [dots] (f) [right of=e,node distance=2cm] {$...$};
-    \node [int, pin={[init]above:$b_{l}$}] (g) [right of=f,node distance=2cm] {$G$};
+            \node [int, pin={[init]above:$b_{i+1}$}] (e) [right of=d,node distance=2cm] {$G$};
+            \node [dots] (f) [right of=e,node distance=2cm] {$...$};
+            \node [int, pin={[init]above:$b_{l}$}] (g) [right of=f,node distance=2cm] {$G$};
 
-    \node [] (end) [right of=g, node distance=2cm]{};
+            \node [] (end) [right of=g, node distance=2cm]{};
 
-    \path[->] (b) edge node {$s_{0}$} (a);
-    \path[->] (a) edge node {$s_{1}$} (c);
-    \path[->] (c) edge node {$s_{2}$} (d);
-    \path[->] (d) edge node {$s_{i}$} (e);
-    \path[->] (e) edge node {$s_{i+1}$} (f);
+            \path[->] (b) edge node {$s_{0}$} (a);
+            \path[->] (a) edge node {$s_{1}$} (c);
+            \path[->] (c) edge node {$s_{2}$} (d);
+            \path[->] (d) edge node {$s_{i}$} (e);
+            \path[->] (e) edge node {$s_{i+1}$} (f);
 
-    \path[->] (f) edge node {$s_{l-1}$} (g);
-    \draw[->] (g) edge node {$s_{l}$} (end) ;
-\end{tikzpicture}
-\caption{graphical representation of $G^{l}$}
-\label{fig:gpowerl}
-\end{figure}.
+            \path[->] (f) edge node {$s_{l-1}$} (g);
+            \draw[->] (g) edge node {$s_{l}$} (end) ;
+        \end{tikzpicture}
+        \caption{graphical representation of $G^{l}$}
+        \label{fig:gpowerl}
+    \end{figure}
 
-To show that the theorem is valid, we will use a proof by contraddiction: trying
-to show that $G^{\lambda}$ is not a PRG, we will see that G should be not a PRG,
-contraddicting the theorem.\\
+    To show that the theorem is valid, we will use a proof by contraddiction: trying to show that $G^{\lambda}$ is not a PRG, we will see that G should be not a PRG, contraddicting the theorem.
 
-Different sources give different interpretations of this proof. As of now , the
-following one is an outline of the proof that seems to make sense, more or less.
-This proof should , however, be marked as TO BE REVIEWED.\\
+    Different sources give different interpretations of this proof. As of now, the following one is an outline of the proof that seems to make sense, more or less. This proof should, however, be marked as TO BE REVIEWED.
 
-The step points of this proof are:
-\begin{enumerate}
-    \item\label{p:one} Prove that $H_{\lambda}^{i} \approx_{c} H_{\lambda}^{i+1}$ , $ \forall
-        i \in [0,l]$ ;
-    \item \label{p:two}Prove the \textbf{hybrid argument}: if $X \approx_{c} Y$ and $Y
-        \approx_{c} Z$, then $X \approx_{c} Z$ ;
-    \item \label{p:three}with the hybrid argument, prove that 
-        \[
-            G^{l}(U_{\lambda})= H_{\lambda}^{0} \approx_{c} 
-            H_{\lambda}^{1} \approx_{c} ... \approx_{c} 
-            H_{\lambda}^{l} = U_{l+\lambda}
-        \] 
-    \item \label{p:four} now, since $H_{\lambda}^{i}
-        \approx_{c} U_{\lambda + l}$,
-         it's possible to use the contraddiction
-        (masked as a proof by reduction)
-\end{enumerate}.\\
-
-To prove point \ref{p:one}, define the following names:
-\begin{itemize}
-    \item $H_{\lambda}^{0} := G^{l}(U_{\lambda})$
-    \item 
-            \[  H_{\lambda}^{i}:=\begin{cases}
-                        b_1 , ..., b_{i} \leftarrow\$ \{0,1\} \\
-                        s_{i} \leftarrow \{0,1\}^{\lambda} \\
-                        (b_{i+1}, ..., b_{l}, s_{l}) := G^{l-i}(s_{i})
-                        \end{cases} 
+    The step points of this proof are:
+    \begin{enumerate}
+        \item \label{p:one} Prove that $H_{\lambda}^{i} \approx_{c} H_{\lambda}^{i+1}$ , $ \forall i \in [0,l]$ ;
+        \item \label{p:two} Prove the \textbf{hybrid argument}: if $X \approx_{c} Y$ and $Y \approx_{c} Z$, then $X \approx_{c} Z$ ;
+        \item \label{p:three} With the hybrid argument, prove that:
+            \[
+                G^{l}(U_{\lambda})= H_{\lambda}^{0} \approx_{c} 
+                H_{\lambda}^{1} \approx_{c} ... \approx_{c} 
+                H_{\lambda}^{l} = U_{l+\lambda}
             \] 
-            
+        \item \label{p:four} Now, since $H_{\lambda}^{i} \approx_{c} U_{\lambda + l}$, it's possible to use the contradiction, masked as a proof by reduction.
+    \end{enumerate}
 
-    \item  $H_{\lambda}^{l} := U_{\lambda + l}$
-\end{itemize}.\\
+    To prove point \ref{p:one}, define the following names:
+    \begin{itemize}
+        \item $H_{\lambda}^{0} := G^{l}(U_{\lambda})$
+        \item $H_{\lambda}^{i}:=
+            \begin{cases}
+                b_1 , ..., b_{i} \leftarrow\$ \{0,1\} \\
+                s_{i} \leftarrow \{0,1\}^{\lambda} \\
+                (b_{i+1}, ..., b_{l}, s_{l}) := G^{l-i}(s_{i})
+            \end{cases}$
+        \item  $H_{\lambda}^{l} := U_{\lambda + l}$
+    \end{itemize}
 
-So $H^{i}$ is just taking in input the number $x_{i}$ , executing $l-i$ times
-$G$ and obtaining a sequence of bytes.\\
+    So $H^{i}$ is just taking in input the number $x_{i}$, executing $l-i$ times $G$ and obtaining a sequence of bytes.
 
-Now, just have a look at those figures:
-
+    Now, just have a look at those figures:
 
     \begin{figure}[h!]
-        
-\tikzstyle{int}=[draw, minimum size=2em]
-\tikzstyle{dots}=[minimum size=2em]
-\tikzstyle{empty}=[minimum size=2em]
-\tikzstyle{init} = [pin edge={-to,thin,black}]
 
-\begin{tikzpicture}[node distance=2.5cm,auto,>=latex']
-    \node [empty, pin={[init]above:$b_{1}$}] (a) {};
+        \tikzstyle{int}=[draw, minimum size=2em]
+        \tikzstyle{dots}=[minimum size=2em]
+        \tikzstyle{empty}=[minimum size=2em]
+        \tikzstyle{init} = [pin edge={-to,thin,black}]
 
-    \node [empty, pin={[init]above:$b_{2}$}] (c) [right of=a,node distance=1cm] {};
+        \begin{tikzpicture}[node distance=2.5cm,auto,>=latex']
+            \node [empty, pin={[init]above:$b_{1}$}] (a) {};
 
-    \node [dots, pin={[init]above:$...$}] (r) [right of=c,node distance=1cm] {};
-    \node [int, pin={[init]above:$b_{i+1}$}] (d) [right of=r,node distance=2cm] {$G$};
-    \node [int, pin={[init]above:$b_{i+2}$}] (e) [right of=d,node distance=2cm] {$G$};
-    \node [dots] (f) [right of=e,node distance=2cm] {$...$};
-    \node [int, pin={[init]above:$b_{l}$}] (g) [right of=f,node distance=2cm] {$G$};
+            \node [empty, pin={[init]above:$b_{2}$}] (c) [right of=a,node distance=1cm] {};
 
-    \node [] (end) [right of=g, node distance=2cm]{};
+            \node [dots, pin={[init]above:$...$}] (r) [right of=c,node distance=1cm] {};
+            \node [int, pin={[init]above:$b_{i+1}$}] (d) [right of=r,node distance=2cm] {$G$};
+            \node [int, pin={[init]above:$b_{i+2}$}] (e) [right of=d,node distance=2cm] {$G$};
+            \node [dots] (f) [right of=e,node distance=2cm] {$...$};
+            \node [int, pin={[init]above:$b_{l}$}] (g) [right of=f,node distance=2cm] {$G$};
 
-    \path[->] (r) edge node {$s_{i}$} (d);
-    \path[->] (d) edge node {$s_{i+1}$} (e);
-    \path[->] (e) edge node {$s_{i+2}$} (f);
+            \node [] (end) [right of=g, node distance=2cm]{};
 
-    \path[->] (f) edge node {$s_{l-1}$} (g);
-    \draw[->] (g) edge node {$s_{l}$} (end) ;
-\end{tikzpicture}
-\caption{$H_{\lambda}^{i}$}
-\begin{tikzpicture}
-    \draw[line width=0.2 mm] (0,0) -- (12,0);
-\end{tikzpicture}
-      
-\tikzstyle{int}=[draw, minimum size=2em]
-\tikzstyle{dots}=[minimum size=2em]
-\tikzstyle{empty}=[minimum size=2em]
-\tikzstyle{init} = [pin edge={-to,thin,black}]
+            \path[->] (r) edge node {$s_{i}$} (d);
+            \path[->] (d) edge node {$s_{i+1}$} (e);
+            \path[->] (e) edge node {$s_{i+2}$} (f);
 
-\begin{tikzpicture}[node distance=2.5cm,auto,>=latex']
-    \node [empty, pin={[init]above:$b_{1}$}] (a) {};
+            \path[->] (f) edge node {$s_{l-1}$} (g);
+            \draw[->] (g) edge node {$s_{l}$} (end) ;
+        \end{tikzpicture}
 
-    \node [empty, pin={[init]above:$b_{2}$}] (c) [right of=a,node distance=1cm] {};
+        \caption{$H_{\lambda}^{i}$}
 
-    \node [dots, pin={[init]above:$...$}] (r) [right of=c,node distance=1cm] {};
-    \node [empty, pin={[init]above:$b_{i+1}$}] (d) [right of=r,node distance=2cm] {};
-    \node [int, pin={[init]above:$b_{i+2}$}] (e) [right of=d,node distance=2cm] {$G$};
-    \node [dots] (f) [right of=e,node distance=2cm] {$...$};
-    \node [int, pin={[init]above:$b_{l}$}] (g) [right of=f,node distance=2cm] {$G$};
+        \begin{tikzpicture}
+            \draw[line width=0.2 mm] (0,0) -- (12,0);
+        \end{tikzpicture}
 
-    \node [] (end) [right of=g, node distance=2cm]{};
+        \tikzstyle{int}=[draw, minimum size=2em]
+        \tikzstyle{dots}=[minimum size=2em]
+        \tikzstyle{empty}=[minimum size=2em]
+        \tikzstyle{init} = [pin edge={-to,thin,black}]
 
-    \path[->] (d) edge node {$s_{i+1}$} (e);
-    \path[->] (e) edge node {$s_{i+2}$} (f);
+        \begin{tikzpicture}[node distance=2.5cm,auto,>=latex']
+            \node [empty, pin={[init]above:$b_{1}$}] (a) {};
 
-    \path[->] (f) edge node {$s_{l-1}$} (g);
-    \draw[->] (g) edge node {$s_{l}$} (end) ;
-\end{tikzpicture}
-\caption{$H_{\lambda}^{i+1}$}
-\end{figure}.\\
+            \node [empty, pin={[init]above:$b_{2}$}] (c) [right of=a,node distance=1cm] {};
 
-$H^{i}$ and $H^{i+1}$ differ just for the input given to the $(i+1)$-th step of the
-algorithm:
-\begin{itemize}
-    \item in $H^{i}$, this input is pseudorandom;
-    \item in $H^{i+1}$, this input comes from $U_{\lambda}$
-\end{itemize}.\\
+            \node [dots, pin={[init]above:$...$}] (r) [right of=c,node distance=1cm] {};
+            \node [empty, pin={[init]above:$b_{i+1}$}] (d) [right of=r,node distance=2cm] {};
+            \node [int, pin={[init]above:$b_{i+2}$}] (e) [right of=d,node distance=2cm] {$G$};
+            \node [dots] (f) [right of=e,node distance=2cm] {$...$};
+            \node [int, pin={[init]above:$b_{l}$}] (g) [right of=f,node distance=2cm] {$G$};
 
-Now consider a function \footnote{\small{Why do we define $f_{i}$? Such that we know that
-the first input given to $G$ in the function will be considered $s_{i+1}$.}}
-\[
-    f_{i}(s_{i+1},b_{i+1})=
-    \left\{
-        \begin{array}
-            \left{b_{1}, ..., b_{i} \leftarrow \$ \{0,1\}}\\
-            \forall j \in \{i+2, l\}, G(s_{j-1})=\{s_{j}, b_{j}\} \\
-            \text{output :=} \{b_{1}, ..., b_{l}, s_{l}\}
-        \end{array}
-    \right.
-\]
+            \node [] (end) [right of=g, node distance=2cm]{};
 
-Given this function , it's possible to notice that:
-\begin{itemize}
-    \item $f_{i}(U_{\lambda + 1})$ has the same distribution of $H^{i+l}$
-    \item $f_{i}(G(U_{\lambda}))$ has the same distribution of $H^{i}$
-\end{itemize}.\\
-Given \ref{lem:tria}, since by definition 
-\[
-    G(U_{\lambda}) \approx_{c} U_{\lambda + 1}
-\]
-then also
-\[
-    f_{i}(G(U_{\lambda })) \approx_{c} f_{i}(U_{\lambda + 1}) 
-\]
-and so $H^{i} \approx_{c} H^{i + 1}$ .\\
+            \path[->] (d) edge node {$s_{i+1}$} (e);
+            \path[->] (e) edge node {$s_{i+2}$} (f);
 
-Now ,to prove \ref{p:two} :
+            \path[->] (f) edge node {$s_{l-1}$} (g);
+            \draw[->] (g) edge node {$s_{l}$} (end) ;
+        \end{tikzpicture}
+        \caption{$H_{\lambda}^{i+1}$}
+    \end{figure}.
+
+    $H^{i}$ and $H^{i+1}$ differ just for the input given to the $(i+1)$-th step of the algorithm:
+    \begin{itemize}
+        \item in $H^{i}$, this input is pseudorandom;
+        \item in $H^{i+1}$, this input comes from $U_{\lambda}$
+    \end{itemize}
+
+    Now consider a function \footnote{\small{Why do we define $f_{i}$? Such that we know that
+    the first input given to $G$ in the function will be considered $s_{i+1}$.}}
+    \[
+        f_{i}(s_{i+1},b_{i+1})=
+            \begin{cases}
+                {b_{1}, ..., b_{i} \leftarrow \$ \{0,1\}} \\
+                \forall j \in \{i+2, l\}, G(s_{j-1})=\{s_{j}, b_{j}\} \\
+                \text{output :=} \{b_{1}, ..., b_{l}, s_{l}\}
+            \end{cases}
+    \]
+
+    Given this function, it's possible to notice that:
+    \begin{itemize}
+        \item $f_{i}(U_{\lambda + 1})$ has the same distribution of $H^{i+l}$
+        \item $f_{i}(G(U_{\lambda}))$ has the same distribution of $H^{i}$
+    \end{itemize}.
+
+    Given \ref{lem:tria}, since by definition 
+    \[
+        G(U_{\lambda}) \approx_{c} U_{\lambda + 1}
+    \]
+    then also
+    \[
+        f_{i}(G(U_{\lambda })) \approx_{c} f_{i}(U_{\lambda + 1}) 
+    \]
+    and so $H^{i} \approx_{c} H^{i + 1}$ .\\
+
+    Now ,to prove \ref{p:two} :
 
 \begin{align}
     X \approx_{c} Z \Rightarrow \\
