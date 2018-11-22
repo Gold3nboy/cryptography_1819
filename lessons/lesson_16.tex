@@ -152,3 +152,133 @@ Then Dec($c,S_k$) will simply:
     This is proved in the exact same way as \textbf{Lemma 20.} As a matter of fact it is the second part of the proof (where $b$ is fixed to 1).
     
 \end{proof}
+
+\subsubsection{Properties of of El Gamal \textsc{pke} scheme}
+
+Some useful observations can be made about this scheme:
+\begin{itemize}
+    \item It is \textbf{homomorphic}: Given two ciphertexts $(c_1, c_2)$ and $(c_1', c_2')$, then doing the product between them yields another valid ciphertext:
+    % I'd like to expand a bit more here, or else it may stay a bit obscure...
+    \begin{align*}
+        & (c_1\cdot c_1', c_2\cdot c_2') \\
+        =\;& (g^{r+r'}, h^{r+r'}(m\cdot m')) \\
+    \end{align*}
+    thus, decrypting $c\cdot c'$, gives $m\cdot m'$.
+
+    \item It is \textbf{re-randomizable}: Given a ciphertext $(c_1, c_2)$, and $r' \pickUAR \mathbb{Z}_q$, then computing $(g^{r'}\cdot c_1, h^{r'}\cdot c_2)$ results in a ``fresh'' encryption for the same message: the random value used at the encryption step will change from the original $r$ to $r+r'$
+\end{itemize}
+
+These properties of the El Gamal scheme can be desirable in some use cases, where a message must be kept secret to the second party. In fact, there are some \textsc{pke} schemes which are designed to be \textbf{fully homomorphic}, i.e. they are homomorphic for any kind of function.
+
+Consider the following use case: a client $C$ has an object $x$ and wants to apply a function $f$ over it, but it lacks the computational power to execute it. There is another subject $S$, which is able to efficiently compute $f$, so the goal is to let it compute $f(x)$ but the client wishes to keep $x$ secret from him. This can be achieved using a \textsc{fh-pke} scheme as follows:
+
+% QUESTION: Why use a PKE scheme (and not a SKE)? Are there some advantages-shortcomings?
+
+\begin{figure}[h!]
+    \centering
+    \sdinit{}
+    \begin{tikzpicture}
+        \sdbegin{}
+
+        % Parties
+        \newinst{Client}{$C$}     %Client
+        \newinst[4]{Server}{$S$}  %Server
+
+        \postlevel
+
+        % Client encrypts object and sends application request
+        \mess{Client}{$f, c$}{Server}
+        \node[anchor=east] at (mess from) { \shortstack[r]{
+            Object: $x$ \\
+            Function: $f$ \\
+            $(pk, sk) \pickUAR \mathcal{KG}en$ \\
+            $c \pickUAR Enc(pk, x)$
+        }};
+
+        \postlevel
+
+        % Server replies with the obtained image, then client decrypts the result
+        \mess{Server}{$f(c)$}{Client}
+        \node[anchor=east] at (mess to) { \shortstack[r]{
+            $f(x) = Dec(sk, f(c))$
+        }};
+
+        \sdend{}
+    \end{tikzpicture}
+    \caption{Delegated secret computation}
+    \label{seq:delseccomp}
+\end{figure}
+
+However one important consideration must be made: All these useful characteristics expose an inherent malleability of any fully homomorphic scheme: any attacker can manipulate ciphertexts efficiently, and with some predictable results. This compromises even \textsc{cpa} security of such schemes.
+
+\subsection{Cramer-Shoup \textsc{pke} scheme}
+
+% Not sure if CS is defined over DDH, or this is the DDH variant of CS, making CS more abstract
+This scheme is based on the standard \textsc{ddh} assumption, and has the advantage of being \textsc{cca} secure. A powerful tool, called \textbf{Designated Verifier Non-Interactive Zero-Knowledge}, or alternatively \textbf{Hash-Proof System}, is used here.
+
+\subsubsection{Proof systems}
+
+Let $L$ be a Turing-recognizable language in $NP$, and a predicate $\mathcal{R} \in X \times Y \to \{0, 1\}$ such that:
+\begin{equation*}
+    L := \{y \in Y : \exists x \in X \: \mathcal{R}(x, y) = 1\}
+\end{equation*}
+where $x$ is called a ``witness'' of $y$.
+
+% AP181122-1554: CAUTION FRAGMENTED
+In our instance, let $y = pq, x = (p,q)$
+
+$\Pi = (\mathcal{S}etup, \mathcal{P}rove, \mathcal{V}erify)$
+
+$(\omega, \tau) \pickUAR \mathcal{S}etup(1^\lambda)$, where $\omega$ is the \textbf{Common Reference String}, and $\tau$ is the \textbf{trapdoor}.
+
+Additional notes:
+\begin{itemize}
+    \item $\omega$ is public ($ = pk$)
+    \item $\tau$ is part of the secret key
+    \item $\tau = (x, y) : \mathcal{R}(x, y) = 1$ %May be false
+    \item There is presumably a common third-party, which samples from the setup and publishes $\omega$, while giving $\tau$ to only B. %Why? Can't B do the setup and publish omega directly?
+\end{itemize}
+
+
+\begin{figure}[h!]
+    \centering
+    \sdinit{}
+    \begin{tikzpicture}
+        \sdbegin{}
+
+        % Parties
+        \newinst{A}{$A$}     %Prover
+        \newinst[4]{B}{$B$}  %Verifier
+
+        \postlevel
+
+        % Client encrypts object and sends application request
+        \mess{A}{$\pi = \mathcal{P}rove(\omega, y, x)$}{B}
+        \node[anchor=west] at (mess to) { \shortstack[l]{
+            Object: $x$ \\
+            Function: $f$ \\
+            $(pk, sk) \pickUAR \mathcal{KG}en$ \\
+            $c \pickUAR Enc(pk, x)$
+        }};
+
+        \sdend{}
+    \end{tikzpicture}
+    \caption{Overview of Cramer-Shoup operation}
+    \label{seq:csoverview}
+\end{figure}
+
+Proof system - purpose: a way to convince $B$ that $A$ knows something
+
+Can compute the proof in two different ways, this is the core notion of $ZK$
+
+No $\tau \implies ZK$
+
+\subsubsection{Properties}
+
+\begin{itemize}
+    \item \textit{(implicit, against malicious Bob)} \textbf{Zero-knowledge}: Proof for $x$ can be simulated without knowing $x$ itself
+    \item \textit{(stronger, against malicious ALice)} \textbf{Soundness}: It is hard to produce a valid proof for any $y \notin L$
+    \item \textit{honest people} \textbf{Completeness}: $\forall y \in L, \forall (\omega, \tau) \pickUAR \mathcal{S}etup(1^\lambda):$
+    
+    $\mathcal{P}rove(\omega, x, y) = \mathcal{V}erify(\tau, y)$
+\end{itemize}
