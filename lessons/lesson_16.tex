@@ -1,4 +1,4 @@
-\chapter*{Lesson 15}
+\chapter*{Lesson 16}
 \section{PKE from DDH(Public Key Infrastructure)}
 \subsubsection{El Gamal Encryption}
 Let's define a new $\Pi$=(KGen, Enc, Dec). Generate the needed (\textbf{public}) parameters $(G,g,q)\leftarrow\$GroupGen(1^{\lambda})$\footnote{G could be any "valid" group such as $\QR[p]$ or an Elliptic Curve}.\\
@@ -239,6 +239,7 @@ Additional notes:
     \item There is presumably a common third-party, which samples from the setup and publishes $\omega$, while giving $\tau$ to only B. %Why? Can't B do the setup and publish omega directly?
 \end{itemize}
 
+\todo{B operations in the image }
 
 \begin{figure}[h!]
     \centering
@@ -282,3 +283,53 @@ No $\tau \implies ZK$
     
     $\mathcal{P}rove(\omega, x, y) = \mathcal{V}erify(\tau, y)$
 \end{itemize}
+
+\todo{to review and understand/better}
+
+\subsubsection{t-universality}
+\begin{definition}
+    Let $\Pi$ be DV-NIKZ\footnote{Designated verifier non-interactive
+    zero-knowledge}.\\
+We say it is \textit{t-universal} if for any distinct 
+\[
+    y_{1}, \ldots, y_{t} \text{ s.t. } y_{i}\not\in L ( \forall i \in [t])
+\]
+we have 
+\[
+    ( \omega, Ver(\tau, y_{1}), \ldots, Ver(\tau, y_{t}))=(\omega, v_{1},
+    \ldots, v_{t})
+\]
+where $(\omega, \tau) \leftarrow\$ Setup(1^{\lambda})$ and $v_{1}, \ldots, v_{t}
+\leftarrow\$ \P$ where $\P$ should be the proofs' space.
+\end{definition}
+
+\subsubsection{Enriching DV-NIKZ}
+Can we enrich DV-NIKZ with labels $l \in \{0,1\}^{*}$?\\
+
+Suppose to have the following:
+\[
+    L'=L \| \{0,1\}^{*}=\{(y,l): y \in L \wedge l \in \{0,1\}^{*}\}
+\]
+Then our scheme changes :
+$Prove(\omega, (y,l), x)=\Pi; Ver(\tau, (y, l)) $
+and , for \textit{t-universality} , now we can consider 2 distinct $(y_{i},
+l_{i})$.
+\subsubsection{Membership Hard Language (MH)}
+\begin{definition}
+    Language $L$ is \textit{ \textbf{MH}}if $ \exists  \bar{L}$ such that:
+    \begin{enumerate}
+        \item $L \cap \bar{L} = \O$
+        \item $ \exists$ PPT \textit{Samp} outputting $y \leftarrow\$ \Y$
+            together with $x \in \bar{\X}$ such that 
+            \[
+              R(y,x)=1  
+            \]
+            (it's possible
+            to say that $Samp(1^{\lambda}) \leftarrow\$ (y,x)$)
+        \item $ \exists$ PPT $\bar{Samp}$ outputting $y \leftarrow\$ \bar{L}$
+        \item $\{y:(y,x) \leftarrow\$ Samp(1^{\lambda})\} \approx_{c} \{y:y
+            \leftarrow\$ \bar{Samp}(1^{\lambda})\}$
+    \end{enumerate}
+    
+\end{definition}
+
