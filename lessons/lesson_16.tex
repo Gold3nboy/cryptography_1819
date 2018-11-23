@@ -1,27 +1,37 @@
 \chapter*{Lesson 16}
-\section{PKE from DDH(Public Key Infrastructure)}
-\subsubsection{El Gamal Encryption}
-Let's define a new $\Pi$=(KGen, Enc, Dec). Generate the needed (\textbf{public}) parameters $(G,g,q)\leftarrow\$GroupGen(1^{\lambda})$\footnote{G could be any "valid" group such as $\QR[p]$ or an Elliptic Curve}.\\
+\section{\textsc{Pke} schemes over \textsc{ddh} assumption}
+\subsection{El Gamal scheme}
+Let's define a new $\Pi=$ (KGen, Enc, Dec). Generate the needed (\textbf{public}) parameters $(G,g,q)\pickUAR GroupGen(1^{\lambda})$\footnote{G could be any "valid" group such as $\QR[p]$ or an Elliptic Curve}.
+
 The KeyGen algorithm is defined as follows:
 \begin{itemize}
-    \item Pick $x\leftarrow\$\Z_q$
-    \item Output $P_k=h=g^x$, $S_k=x$
+    \item Pick $x \pickUAR \mathbb{Z}_q$
+    \item Output the key pair $(pk, sk)$ as $(g^x, x)$
 \end{itemize}
-The Enc($m,P_k$) algorithm will:
+The encryption routine Enc($pk, m$) will:
 \begin{itemize}
-    \item Pick $r\leftarrow\$\Z_q$
-    \item Output $c=(c_1,c_2)=(g^r,h^rm)$\footnote{We need $r$ because we want to (re)randomize $c$}
+    \item Pick $r\pickUAR \mathbb{Z}_q$
+    \item Output $c=(c_1, c_2)=(g^r, pk^r \cdot m)$\footnote{We need $r$ because we want to re-randomize $c$}
 \end{itemize}
-Then Dec($c,S_k$) will simply:
+The decryption routine Dec($sk, c$) will:
 \begin{itemize}
-    \item Compute $\frac{c_2}{c_1^x}=\frac{h^r m}{g^{rx}}=m$
+    \item Compute $\hat{m} = c_1^{-sk} \cdot c_2$
 \end{itemize}
+Correctness of this scheme follows from some algeraic steps:
+\begin{align*}
+    \hat{m} &= Dec(sk, Enc(pk, m)) \\
+    &= Dec(x, Enc(g^x, m)) \\
+    &= Dec(x, (g^r, (g^x)^r \cdot m)) \\
+    &= (g^r)^{-x} \cdot (g^x)^r \cdot m \\
+    &= m
+\end{align*}
+
 \begin{theorem}
-    Under DDH the above $\Pi$ is CPA secure.
+    Assuming \textsc{ddh}, the El Gamal scheme is \textsc{cpa}-secure.
 \end{theorem}
+
 \begin{proof}
-    Consider the two following games $H_0(\lambda,b)$ and $H_1(\lambda, b)$ defined as follows.
-    (b can be fixed without loss of generality)\\
+    Consider the two following games $H_0(\lambda,b)$ and $H_1(\lambda, b)$ defined as follows. Observe that b can be fixed without loss of generality.
     
     \newpage
     $H_0(\lambda,b):$
@@ -29,27 +39,33 @@ Then Dec($c,S_k$) will simply:
         \centering
         \sdinit{}
         \begin{tikzpicture}
-           \sdbegin{}
-           \newinst{A}{$ \A $}
-           \newinst[4]{B}{$ \C^{pke} $}
+            \sdbegin{}
+            \newinst{A}{$ \A $}
+            \newinst[4]{B}{$ \C^\textsc{pke} $}
            
-           \postlevel
-           \mess{B}{$h$}{A}
-           \node[anchor=west] at (mess from) { \shortstack[l]{
-               $h=g^x=P_k$\\
-               $x\leftarrow\$\Z_q,r\leftarrow\$\Z_q$}};
-           \postlevel
-           \mess{A}{$(m_0,m_1)\in \G$}{B}
-           \node[anchor=west] at (mess to) {  };
-           \postlevel
-           \mess{B}{$ c $}{A}
-           \node[anchor=west] at (mess from) { $c=(c_1,c_2)=(g^r,h^r m)_b$ };
-           \postlevel
-           \mess{A}{$b'$}{B}
-           \node[anchor=west] at (mess to) {  };
-          
-           \sdend{}
-           \sdend{}
+            \mess{B}{$pk$}{A}
+            \node[anchor=west] at (mess from) { \shortstack[l]{
+                $x \pickUAR \mathbb{Z}_q$ \\
+                $pk = g^x$
+            }};
+
+            \postlevel
+            \mess{A}{$(m_0,m_1)\in \G$}{B}
+            \node[anchor=west] at (mess to) { };
+            \mess{B}{$ c = (c_1, c_2)$}{A}
+            \node[anchor=west] at (mess from) {  \shortstack[l]{
+                $r \pickUAR \mathbb{Z}_q$ \\
+                $b \pickUAR \{0, 1\}$ \\
+                $(c_1,c_2)=(g^r,(g^x)^r m_b)$
+            }};
+
+            \postlevel
+            \mess{A}{$b'$}{B}
+            \node[anchor=west] at (mess to) { \shortstack[l]{
+                \textsc{Output} 1 iff $b=b'$
+            }};
+
+            \sdend{}
         \end{tikzpicture}
     \end{figure}
 
@@ -58,31 +74,41 @@ Then Dec($c,S_k$) will simply:
         \centering
         \sdinit{}
         \begin{tikzpicture}
-           \sdbegin{}
-           \newinst{A}{$ \A $}
-           \newinst[4]{B}{$ \C^{pke} $}
+            \sdbegin{}
+            \newinst{A}{$ \A $}
+            \newinst[4]{B}{$ \C^\textsc{pke} $}
            
-           \postlevel
-           \mess{B}{$h$}{A}
-           \node[anchor=west] at (mess from) { \shortstack[l]{
-               $h=g^x=P_k$\\
-               $x\leftarrow\$\Z_q,z\leftarrow\$\Z_q,r\leftarrow\$\Z_q$}};
-           \postlevel
-           \mess{A}{$(m_0,m_1)\in \G$}{B}
-           \node[anchor=west] at (mess to) {  };
-           \postlevel
-           \mess{B}{$ c $}{A}
-           \node[anchor=west] at (mess from) { $c=(c_1,c_2)=(g^r,g^z m)_b$ };
-           \postlevel
-           \mess{A}{$b'$}{B}
-           \node[anchor=west] at (mess to) {  };
-          
-           \sdend{}
-           \sdend{}
+            \mess{B}{$pk$}{A}
+            \node[anchor=west] at (mess from) { \shortstack[l]{
+                $x \pickUAR \mathbb{Z}_q$ \\
+                $pk = g^x$
+            }};
+
+            \postlevel
+            \mess{A}{$(m_0,m_1)\in \G$}{B}
+            \node[anchor=west] at (mess to) { };
+            \mess{B}{$ c = (c_1, c_2)$}{A}
+            \node[anchor=west] at (mess from) {  \shortstack[l]{
+                $r \pickUAR \mathbb{Z}_q$ \\
+                $z \pickUAR \mathbb{Z}_q$ \\
+                $(c_1,c_2)=(g^r,g^z m_b)$
+            }};
+
+            \postlevel
+            \mess{A}{$b'$}{B}
+            \node[anchor=west] at (mess to) { \shortstack[l]{
+                \textsc{Output} 1 iff $b=b'$
+            }};
+
+            \sdend{}
         \end{tikzpicture}
     \end{figure}
 
-    \textbf{Note:} it is important to note that we can measure the advantage of $\A$, so fixed its output $Adv_{\A}(\lambda)=|\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=0}_{"\A loses"}]-\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=1]}_{"\A wins"}|$. The advantage will be $\geq \frac{1}{2}$ (random guessing).\\
+    \textbf{Note:} it is important to note that we can measure the advantage of $\A$, so fixed its output $Adv_{\A}(\lambda) = |\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=0}_{"\A\ loses"}]-\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=1]}_{"\A\ wins"}|$. The advantage will be $\geq \frac{1}{2}$ (random guessing).
+
+    \todo{Here the 1/2 value may refer to how the Katz-Lindell book exposes their proofs by leaving arbitrary choice of $b$ to the challengers, thus limiting the probability of the adversaries' success by 1/2.
+    
+    Venturi prefers to fix $b$ beforehand, without loss of generality, meaning the whole proof can be stated by setting b to either 0 or 1, and mantain its validity without changing anything else. In this way, he somehow bounds the probability of success to be $\leq \mathcal{N}egl(\lambda)$}
 
     \underline{Proof techinique:}
     $H_0(\lambda,0) \approx_c H_0(\lambda,1)\equiv H_1(\lambda,0) \approx_c H_1(\lambda,1)$
@@ -94,7 +120,6 @@ Then Dec($c,S_k$) will simply:
         Assume $\exists$ PPT D which is able to distinguish $H_0(\lambda,b)$ and $H_1(\lambda,b)$ with non negl. probability.
     \end{lemma}
 
-    \newpage
     \begin{proof}
 
         Consider the following Game:
@@ -105,8 +130,8 @@ Then Dec($c,S_k$) will simply:
             \begin{tikzpicture}
                \sdbegin{}
                \newinst{A}{$ \D $}
-               \newinst[4]{B}{$ \D'_{DDH} $}
-               \newinst[4]{C}{$ \C_{DDH} $}
+               \newinst[2]{B}{$ \D'_{DDH} $}
+               \newinst[2]{C}{$ \C_{DDH} $}
 
                \postlevel
                \mess{C}{$(X,Y,Z)$}{B}
@@ -195,6 +220,7 @@ Consider the following use case: a client $C$ has an object $x$ and wants to app
             $c \pickUAR Enc(pk, x)$
         }};
 
+        \postlevel
         \postlevel
 
         % Server replies with the obtained image, then client decrypts the result
