@@ -1,0 +1,55 @@
+\chapter*{Lesson 17}
+
+\section{Construction of a \textsc{cca}-secure \textsc{pke}}
+
+This section exposes a construction of a \textsc{cca}-secure \textsc{pke} scheme, using hash-proof systems, membership-hardness, and the $n$-universality property.
+
+Let $\Pi_1, \Pi_2$ be two distinct hash-proof systems for some \textsc{np} language $L$ and the range of $Prove_2$ supports labels ($L'=L||\{0, 1\}^\ell$).
+
+Construct the \textsc{cca} scheme as follows: $\Pi := (\mathcal{KG}en, Enc, Dec)$
+\begin{itemize}
+    \item $ (\overbrace{(\omega_1,\omega_2)}^{pk}, \overbrace{(\tau_1,\tau_2)}^{sk}) \pickUAR \mathcal{KG}en(1^\lambda)\;,\;\;\;\;(\omega_1, \tau_1) \pickUAR Setup_1(1^\lambda), (\omega_2, \tau_2) \pickUAR Setup_2(1^\lambda)$
+    \item Encryption routine: $Enc((\omega_1, \omega_2), m)$
+    \begin{itemize}
+        \item $ (y, x) \pickUAR Sample_1(1^\lambda)$
+        \item $ \pi_1 \pickUAR Prove_1(\omega_1, y, x)$
+        \item $ l := \pi_1 \cdot m$
+        \item $ \pi_2 \pickUAR Prove_2(\omega_2, (y, l), x)$
+        \item $ c := (c_1, c_2) = ((y, l), \pi_2)$
+    \end{itemize}
+    \item Decryption routine: $Dec((\tau_1, \tau_2), (c_1, c_2))$
+    \begin{itemize}
+        \item $\hat{\pi}_2 = Verify_2(\tau_2, c_1))$
+        \item $\textsc{if } \hat{\pi}_2 \neq c_2 \textsc{ then output false}$
+        \item Recall: $c_1 = (y, l)$
+        \item $\hat{\pi}_1 = Verify_1(\tau_1, y)$
+        \item $\textsc{output } l \cdot \hat{\pi}_1^{-1}$
+    \end{itemize}
+\end{itemize}
+
+Correctness (assume $\hat{\pi}_i = \pi_i \forall i$):
+\begin{align*}
+    \hat{m} &= Dec(sk, Enc(pk, m)) \\
+    &= Dec((\tau_1, \tau_2), Enc((\omega_1, \omega_2), m)) \\
+    &= Dec((\tau_1, \tau_2), ((y, l), \pi_2)) \\
+    &= l \cdot \hat{\pi}_1^{-1} \\
+    &= \pi_1 \cdot m \cdot \hat{\pi}_1^{-1} \\
+    &= m
+\end{align*}
+
+Some additional notes (may be incorrect):
+\begin{itemize}
+    \item The message space of the second prover is the range of the first prover.
+    \item The message space of the first prover is a multiplicative group
+    \item The message space of the second prover is a polylogarithmic language in ($\lambda$)
+\end{itemize}
+
+Theorem: Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$ is Membership-hard, then the above scheme is \textsc{cca}-secure.
+
+Proof: Five different games will be defined:
+
+\todo{"I diagrammi arriveranno con un ritardo che preciserò al più presto. Mi scuso per il disagio."
+
+- Trenitalia style}
+
+%==================================================
