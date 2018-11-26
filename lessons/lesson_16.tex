@@ -17,7 +17,7 @@ The decryption routine Dec($sk, c$) will:
 \begin{itemize}
     \item Compute $\hat{m} = c_1^{-sk} \cdot c_2$
 \end{itemize}
-Correctness of this scheme follows from some algeraic steps:
+Correctness of this scheme follows from some algebric steps:
 \begin{align*}
     \hat{m} &= Dec(sk, Enc(pk, m)) \\
     &= Dec(x, Enc(g^x, m)) \\
@@ -104,11 +104,12 @@ Correctness of this scheme follows from some algeraic steps:
         \end{tikzpicture}
     \end{figure}
 
-    \textbf{Note:} it is important to note that we can measure the advantage of $\A$, so fixed its output $Adv_{\A}(\lambda) = |\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=0}_{"\A\ loses"}]-\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=1]}_{"\A\ wins"}|$. The advantage will be $\geq \frac{1}{2}$ (random guessing).
+    % The reasoning was a bit cloudy, hope now it is clearer
+    \textbf{Note:} it is important to note that we can measure the advantage of $\A$, so fixed its output $Adv_{\A}(\lambda) = |\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=0}_{"\A\ loses"}]-\underbrace{Pr[\overbrace{\A\rightarrow 1}^{b'=1}|b=1]}_{"\A\ wins"}|$. Since $b$ is fixed the above formula will give a value $\lambda \ in negl$, generally the advantage of an adversary is: $\frac{1}{2}+\lambda$ (random guessing + a negligible factor). %maybe this is a repetition but I think I never wrote it anywhere else
 
-    \todo{Here the 1/2 value may refer to how the Katz-Lindell book exposes their proofs by leaving arbitrary choice of $b$ to the challengers, thus limiting the probability of the adversaries' success by 1/2.
+    % \todo{Here the 1/2 value may refer to how the Katz-Lindell book exposes their proofs by leaving arbitrary choice of $b$ to the challengers, thus limiting the probability of the adversaries' success by 1/2.
     
-    Venturi prefers to fix $b$ beforehand, without loss of generality, meaning the whole proof can be stated by setting b to either 0 or 1, and mantain its validity without changing anything else. In this way, he somehow bounds the probability of success to be $\leq \mathcal{N}egl(\lambda)$}
+    % Venturi prefers to fix $b$ beforehand, without loss of generality, meaning the whole proof can be stated by setting b to either 0 or 1, and mantain its validity without changing anything else. In this way, he somehow bounds the probability of success to be $\leq \mathcal{N}egl(\lambda)$}
 
     \underline{Proof techinique:}
     $H_0(\lambda,0) \approx_c H_0(\lambda,1)\equiv H_1(\lambda,0) \approx_c H_1(\lambda,1)$

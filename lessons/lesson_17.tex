@@ -53,3 +53,58 @@ Proof: Five different games will be defined:
 - Trenitalia style}
 
 %==================================================
+
+\review{referencing something from another part of lesson 17}
+
+\subsection{Instantiation of U-HPS (Universal Hash Proof System)}
+$\exists r$ using a DDH language such that
+$L_{DDH}=\{(c_1,c_2), \exists r | c_1=g_1^r, c_2=g_2^r\}$
+
+Given a group $\G$ of order $q$ with $(g_1,g_2)$ as generators:
+$$G_2=g^x , g_1=g , r=g $$ $$ (g,g^x,g^y,g^{xy})$$
+
+% not sure if this is U-HPS or something random
+Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
+
+\begin{itemize}
+    \item $Setup(1^\lambda)$: Pick $x_1,x_2 \leftarrow\$ \Z_q$ and define:\\ $\omega=h_1=g_1^{x_1}g_2^{x_2}$, $\tau=(x_1,x_2)$
+    \item $Prove(\omega, \underbrace{(c_1,c_2)}_{y}, r)$ output $\Pi=\omega^2$
+    \item $Verify(\tau, \underbrace{(c_1,c_2)}_{y})$ output $\widetilde{\Pi}=c_1^{x_1}c_2^{x_2}$ %pretty shitty tilde here, I need a bigger tilde to cover the full length of Pi -> \usepackage{stackengine} \usepackage{scalerel} added in macro
+\end{itemize}
+
+\textbf{Correctness:} $\Pi=\omega^2=(g_1^{x_1}g_2^{x_2})^r=g_1^{rx_1}g_2^{rx_2}=c_1^{x_1}c_2^{x_2}=\widetilde{\Pi}$
+
+\begin{theorem}
+    If $(c_1,c_2)\notin L_DDH$ the distribution $(\omega=h_1, \widetilde{\Pi}=Verify(\tau,(c_1,c_2)))$ is indistinguishable form a truly random string.
+\end{theorem}
+
+\begin{proof}
+    Define a \textbf{MAP} $\mu(\overbrace{x_1,x_2}^{random})=(\omega,\Pi)=(g_1^{x_1},g_2^{x_2},c_1^{x_1},c_2^{x_2})$ it suffices to prove that $\mu$ is injective. This can easily be done with some constrains:
+    $\mu'(x_1,x_2)=log_{g_1}(\mu(x_1,x_2))=(log_{g_1}(\omega),log_{g_1}(\Pi)$\\
+    For $r_1\neq r_2$ then $c_1=g_1^{r_1},c_2=g_2^{r_2}=g^{\alpha r_2}$. For $\alpha=log_{g_2}g_1$ then $\Pi=c_1^{x_1}c_2^{x_2}=g_1^{r_1x_1}g_2^{r_1x_1+\alpha r_2x_2}$.\\
+    \[\mu'(x_1,x_2)=
+        \begin{pmatrix}
+            z_1\\
+            z_2
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            1 & \alpha \\
+            r_1 & r_2\alpha 
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            x_1\\
+            x_2
+        \end{pmatrix}
+    \]
+
+    \[ \text{Since Det}
+    \begin{pmatrix}
+        1 & \alpha \\
+        r_1 & r_2\alpha 
+    \end{pmatrix}=
+    \alpha(r_2-r_1)\neq 0
+    \text{ the map is injective.}
+    \] 
+\end{proof}
