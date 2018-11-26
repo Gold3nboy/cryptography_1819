@@ -1,0 +1,111 @@
+%Copyright 2018, Andrea Proietto
+%Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+%
+%The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+%
+%THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+%=============================================
+% This is a reduced version of a larger package, and contains an environment definition that enables quick drawing of cryptographic games, with the purpose of being as least intrusive, and most readable as possibile to the document writer/programmer.
+%It is partially founded on the work of "asmeikal", found in GitHub: (https://github.com/asmeikal/crypto16)
+
+\ProvidesPackage{notation}[2018/09/21 v0.2-crypto The Notation]
+
+\RequirePackage[underline=false]{pgf-umlsd}
+\RequirePackage{tikz}
+\RequirePackage{xparse}
+
+% Arguments: Identifier (used as label) | description | challengername
+\NewDocumentEnvironment{cryptogame}{mmm}
+{ % Crypto-game BEGIN
+\begin{figure}[h!]
+    \centering
+
+    %%%%%%%%%%COPIED - sdinit
+    % From http://tex.stackexchange.com/questions/98525/pgf-umlsd-and-externalize
+    \pgfdeclarelayer{umlsd@background}%
+    \pgfdeclarelayer{umlsd@threadlayer}%
+    \pgfsetlayers{umlsd@background,umlsd@threadlayer,main}%
+    %%%%%%%%%%%%
+
+
+    % From http://tex.stackexchange.com/questions/164707/how-to-use-greek-letters-in-pgf-umlsd-or-generally-terms-starting-with
+    \renewcommand{\mess}[4][0]{
+        \stepcounter{seqlevel}
+        \path (##2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+        \addtocounter{seqlevel}{##1}
+        \path (##4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+        \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]{##3};
+        \node (\detokenize{##3} from) at (mess from) {};
+        \node (\detokenize{##3} to) at (mess to) {};
+    }
+
+
+    %Drawing commands
+    \newcommand{\send}[3]{
+        \mess{A}{##2}{C}
+        \node[anchor=east] at (mess from) {##1};
+        \node[anchor=west] at (mess to) {##3};
+    }
+    \newcommand{\receive}[3]{
+        \mess{C}{##2}{A}
+        \node[anchor=west] at (mess from) {##1};
+        \node[anchor=east] at (mess to) {##3};
+    }
+
+    \begin{tikzpicture}
+
+        %%%%%%%%%%%%%COPIED - sdbegin
+        \setlength{\unitlength}{1cm}%
+        \tikzstyle{sequence}=[coordinate]%
+        \tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum height=0.8cm, minimum width=1.6cm, fill=white, drop shadow={opacity=1,fill=black}]%
+        \ifpgfumlsdroundedcorners%
+            \tikzstyle{inststyle}+=[rounded corners=3mm]%
+        \fi%
+        \tikzstyle{blockstyle}=[anchor=north west]%
+        \tikzstyle{blockcommentstyle}=[anchor=north west, font=\small]%
+        \tikzstyle{dot}=[inner sep=0pt,fill=black,circle,minimum size=0.2pt]%
+        \global\def\unitfactor{0.6}%
+        \global\def\threadbias{center}%
+        % reset counters
+        \setcounter{preinst}{0}%
+        \setcounter{instnum}{0}%
+        \setcounter{threadnum}{0}%
+        \setcounter{seqlevel}{0}%
+        \setcounter{callevel}{0}%
+        \setcounter{callselflevel}{0}%
+        \setcounter{blocklevel}{0}%
+        % origin
+        \node[coordinate] (inst0) {};%
+        %%%%%%%%%%%%%%
+
+        %Add the game's participants
+        \newinst{A}{A}     %Adversary
+        \newinst[2.5]{C}{$\textrm{C}^{\textsc{#3}}$}  %Challenger
+
+
+}
+{ % Crypto-game END
+
+        %%%%%%%%%%%%%%% COPIED - sdend
+        \begin{pgfonlayer}{umlsd@background}
+            \ifnum\value{instnum}>0
+                \foreach \t [evaluate=\t] in {1,...,\theinstnum}{
+                    \draw[dotted] (inst\t) -- ++(0,-\theseqlevel*\unitfactor-2.2*\unitfactor);
+                }
+            \fi
+            \ifnum\value{threadnum}>0
+                \foreach \t [evaluate=\t] in {1,...,\thethreadnum}{
+                    \path (thread\t)+(0,-\theseqlevel*\unitfactor-0.1*\unitfactor) node (threadend) {};
+                    \tikzstyle{threadstyle}+=[threadcolor\t]
+                    \drawthread{thread\t}{threadend}
+                }
+            \fi
+        \end{pgfonlayer}
+        %%%%%%%%%%%%%%%
+
+    \end{tikzpicture}
+    \caption{#2}
+    \label{cryptogame:#1}
+\end{figure}
+}
