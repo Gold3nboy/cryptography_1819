@@ -1,4 +1,4 @@
-\chapter*{ Lesson 4}
+\chapter*{Lesson 4}
 
 \section{Negligible function}
 
@@ -58,119 +58,91 @@ Let $\nu : \mathbb{N} \to [0,1]$ be a function. Then it is deemed \textbf{neglig
 \end{solution}
 
 
-\section{ONE WAY FUNCTION}
-A OWF is a function "hard to invert".
-\begin{definition}
-    
-The function 
+\section{One-Way Functions}
 
-\begin{equation}
-    f:\{0,1\}^{n(\lambda)} \to {0,1}^{n(\lambda)} 
-\end{equation}
+A One-Way Function (\textsc{owf}) is a function that is ``easy to compute'', but ``hard to invert''.
 
-is a OWF, if 
-\begin{equation}
-    \forall  PPT  \A   \exists   \nu(\lambda) \in \negl{x}
-\end{equation}
-such that
+\begin{definition}    
+    Let $f : \{0,1\}^{n(\lambda)} \to {0,1}^{n(\lambda)}$ be a function. Then it is a \textsc{owf} iff:
 
-\begin{equation}
-    \P [ GAME_{f,A}^{owf} (\lambda)=1 ] \le \nu(\lambda)   
-\end{equation}
+    \begin{equation}
+        \forall\; \textsc{ppt}\; \A\;
+        \exists\nu(\lambda) \in \negl{x} :
+        \Pr \left[ \textsc{Game}_{f,A}^\textsc{owf} (\lambda) = 1 \right]
+        \leq \nu(\lambda)
+    \end{equation}
 
 \end{definition}
 
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C^{owf} $} % Increase "5" to widen
-      
-      \postlevel
-      \mess{B}{y}{A}
-      \node[anchor=west] at (mess from) {\shortstack[r]{$ x \leftarrow
-       \$ \{0,1\}^{n} $ \\
-        $ y=f(x)$}};
-      
-      \postlevel
-      \mess{A}{x}{B}
-      \node[anchor=west] at (mess to) { \small{Output=1 iff $f(x')=y$ } };
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{Game for OWF}
-   \label{fig:game_owf}
-\end{figure}
+\begin{cryptogame}{owfdef}{One-Way Function hardness}{owf}
+    \receive{\shortstack[l]{
+        $x \pickUAR \{0,1\}^{n}$ \\
+        $y = f(x)$}}
+    {$y$}
+    {}
+
+    \postlevel
+
+    \send{}
+    {$x'$}
+    {\textsc{Output 1 iff} $f(x')=y$}
+
+\end{cryptogame}
+
+Do note that the game does not look for the equality $x' = x$, but rather for the equality of their images computed by $f$.
+
+\pagebreak
 
 \begin{exercise}
-Show that $\exists  \Adv$
-inefficient and wins with probability 1 ,  and exists $\Adv$ efficient winning
-with probability $2^{-n}$ .
+    \
+    \begin{enumerate}
+        \item Show that there exists an inefficient adversary that wins $\textsc{Game}^\textsc{owf}$ with probability 1
+        \item Show that there exists an efficient adversary that wins $\textsc{Game}^\textsc{owf}$ with probability $2^{-n}$
+    \end{enumerate}
 \end{exercise}
 
-\newpage
 
-\section{One way puzzle}
-A one-way function can be thought as a function which is very efficient in
-generating puzzles, and these puzzles are very hard to solve.\\
-Furthermore, the person generating the puzzle knows a solution to it and can
-efficiently verify the validity of (possible other) solutions to the puzzle.\\
+\subsubsection{One-Way puzzles}
+A one-way function can be thought as a function which is very efficient in generating puzzles that are very hard to solve. Furthermore, the person generating the puzzle knows a solution to it and can efficiently verify the validity of (possible other) solutions to the puzzle.
 
-For a give couple  $(P_{GEN},P_{VER})$ of a puzzle generator and a puzzle
-verifier, we have :
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C $} % Increase "5" to widen
-      
-      % Message from Alice to Bob, with precomputations
-      \postlevel
-      \mess{B}{y}{A}
-      \node[anchor=west] at (mess from) {$(x,y)\leftarrow \P_{GEN}$};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{x}{B}
-      \node[anchor=west] at (mess to) {$ \P_{VER}(x,y) = 1 $};
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{One way puzzle scheme}
-   \label{fig:owp}
-\end{figure}
+For a given couple $(\mathcal{P}_\textsc{gen},\mathcal{P}_\textsc{ver})$ of a puzzle generator and a puzzle verifier, we have:
 
-So, we can say that One-way Puzzle is a problem in
-NP(because solutions are easy to verify ), while not in P(because a solution is
-hard to provide).\\
+\begin{cryptogame}{owpuzzle}{The puzzle game}{puzzle}
+    \receive{$(x, y) \pickUAR \mathcal{P}_\textsc{gen}$}
+    {$y$}
+    {}
 
-\section {  Impagliazzo Worlds}
-Suppose to have Gauss, a genius child, and his professor. The professor gives to
-Gauss some mathematical problems, and Gauss wants to solve them all.\\
-Immagine now that, if using one-way functions, the problem is $f(x)$ , and the
-solution to the problem is $x$.\\
-According to Impagliazzo, we live in one of these possible worlds:
+    \postlevel
+
+    \send{}
+    {$x'$}
+    {\textsc{Output} $\mathcal{P}_\textsc{ver}(x', y)$}
+
+\end{cryptogame}
+
+So, we can say that one-way Puzzle is a problem in \textsc{np} (because solutions are easy to verify ), but not in \textsc{p} (because a solution is
+hard to provide).
+
+\subsection{Impagliazzo's Worlds}
+
+Suppose to have Gauss, a genius child, and his professor. The professor gives to Gauss some mathematical problems, and Gauss wants to solve them all.
+
+Imagine now that, if using one-way functions, the problem is $f(x)$, and its solution is $x$. According to Impagliazzo, we live in one of these possible worlds:
 \begin{itemize}
-    \item Algorithmica , where P=NP , and all the problems easy to verify
-        are also easy to solve, (so the Professor can try as hard as possible to
-        break the scheme, but without success, since Gauss will solve them all
-        using the verification procedure to compute the solution);
-    \item Heuristica, NP problems are hard to solve in the worst case but
-        easy on average , (so the professor , with some effort, can create a
-        game difficult enough, but Gauss will solve it anyway; here there are
-        some problems that the professor cannot find a solution to);
-    \item Pessiland, NP problems are hard on average but no one-way
-        functions exist
-    \item Minicrypt , OWF exist but we don not have public-key cryptography,
-    \item Cryptomania, public-key cryptography is possible,  i.e. two
-        parties can exchange secret messages over open channels.
+    \item \textit{Algorithmica}: $\textsc{P} = \textsc{NP}$, meaning all efficiently verifiable problems are also efficiently solvable. 
+    
+    The Professor can try as hard as possible to create a hard scheme, but he won't succeed because Gauss will always be able to efficiently break it using the verification procedure to compute the solution
+
+    \item \textit{Heuristica}: \textsc{NP} problems are hard to solve in the worst case but easy on average. 
+    
+    The professor, with some effort, can create a game difficult enough, but Gauss will solve it anyway; here there are some problems that the professor cannot find a solution to
+
+    \item \textit{Pessiland}: \textsc{NP} problems are hard on average but no one-way functions exist
+    
+    \item \textit{Minicrypt}: One-way functions exist but public-key cryptography is impractical
+    
+    \item \textit{Cryptomania}: public-key cryptography is possible: two parties can exchange secret messages over open channels
 \end{itemize}
     
 \section{Computational Indistinguishability}
