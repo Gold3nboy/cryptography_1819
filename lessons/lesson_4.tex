@@ -1,77 +1,60 @@
 \chapter*{ Lesson 4}
+
 \section{Negligible function}
-What is exactly a negligible function ?\\
-Below here there is a possible interpretation of this notion:\\
-"In real life, we can just consider adversaries with limited computational power;
- even if every non-perfectly secure authentication scheme can resist to
- unbounded computational power, the true unbounded computational power doesn't
- exist at all. So, it's reasonable to consider just "bounded"
- adversaries.\\
-So consider a scheme $\pi$  where the only attack against it is brute force
-attack. We consider $\pi$ to be secure if it cannot be broken by a brute force
-attack in polynomial time.\\
-The idea of \textbf{negligible probability } encompasses this exact notion. In $\pi$
-, let's say that we have a polynomial-bounded adversary. \\
-Brute force attack is not an option.\\
-But instead of brute force, the adversary can guess (a polynomial
-number of) random values and hope to chance upon the right one. In this case, we
-define security using negligible functions: The probability of success has to be
-smaller than the reciprocal of any polynomial function.\\
-And this makes a lot of sense: If the success probability for an individual
-guess is a reciprocal of a polynomial function, then the adversary can try a
-polynomial amount of guesses and succeed with high probability. In sum then, if
-the overall success rate is $\frac{1}{poly(\lambda)}$ then we consider this a
-feasible attack and the scheme is insecure.\\ So, we require that the success
-probability must be less than the reciprocal of every polynomial function.  This
-way, even if the adversary tries $poly(\lambda)$ guesses, it will not be
-significant since it will only have tried:
-$\frac{poly(\lambda)}{superpoly(\lambda)}$\footnote{If we design a function hard
-for $superpoly(  \lambda)$ possible attempts and the attacker completed $poly(
-    \lambda)$ attempts, he has just $ \P [ \frac{poly(\lambda)}{superpoly(\lambda)} ]   $
-of founding the key to break the scheme}
-As $\lambda$ grows, the denominator grows far faster than the numerator and the
-success probability will not be significant."
-\footnote{https://crypto.stackexchange.com/questions/5832/what-exactly-is-a-negligible-and-non-negligible-function}
-\\~\\
-A Negligible  function
-$\nu: \mathbb{N} \rightarrow [0,1]$
-  is s.t.
-  $\forall p( \lambda ) \in poly( \lambda)$
- then 
- $\nu( \lambda) \in \mathcal{O}(\frac{1}{p( \lambda})$
+
+What is exactly a negligible function? Below here there is a possible interpretation of this notion:
+\begin{quotation}
+    ``In real life, we can just consider adversaries with limited computational power; even if every non-perfectly secure authentication scheme can resist to unbounded computational power, the true unbounded computational power doesn't exist at all. So, it's reasonable to consider just bounded adversaries.
+
+    So consider a scheme $\Pi$ where the only attack against it is brute-force attack. We consider $\Pi$ to be secure if it cannot be broken by a brute-force attack in polynomial time.
+
+    The idea of \textbf{negligible probability} encompasses this exact notion. In $\Pi$, let's say that we have a polynomial-bounded adversary. Brute force attack is not an option.
+
+    But instead of brute force, the adversary can try (a polynomial number of) random values and hope to guess the right one. In this case, we define security using negligible functions: The probability of success has to be smaller than the reciprocal of any polynomial function.
+
+    And this makes a lot of sense: if the success probability for an individual guess is a reciprocal of a polynomial function, then the adversary can try a polynomial amount of guesses and succeed with high probability. If the overall success rate is $\frac{1}{poly(\lambda)}$ then we consider this attempt a feasible attack to the scheme, which makes the latter insecure.
+
+    So, we require that the success probability must be less than the reciprocal of every polynomial function. This way, even if the adversary tries $poly(\lambda)$ guesses, it will not be significant since it will only have tried: $\frac{poly(\lambda)}{superpoly(\lambda)}$\footnote{If we design a function hard for $superpoly(\lambda)$ possible attempts and the attacker completed $poly(\lambda)$ attempts, he has just $ \P [\frac{poly(\lambda)}{superpoly(\lambda)}] $ of finding the key to break the scheme}
+
+    As $\lambda$ grows, the denominator grows far faster than the numerator and the success probability will not be significant.\footnote{https://crypto.stackexchange.com/questions/5832/what-exactly-is-a-negligible-and-non-negligible-function}''
+
+\end{quotation}
+
+\subsubsection{Definition}
+Let $\nu : \mathbb{N} \to [0,1]$ be a function. Then it is deemed \textbf{negligible} iff:
+\begin{equation*}
+    \forall p(\lambda) \in poly(\lambda) \implies \nu(\lambda) \in o(\frac{1}{p(\lambda)})
+\end{equation*}
 
 \begin{exercise}
-    
+    Let $p(\lambda), p'(\lambda) \in poly(\lambda)$ and $\nu(\lambda), \nu'(\lambda) \in \negl\lambda$. Then prove the following:
 
-    Let
-    $p( \lambda) , p( \lambda ') \in poly(y)$
-    and 
-    $\nu( \lambda), \nu'(\lambda) \in \negl (\lambda)$
-      .\\
-Then prove
-    \begin{equation}
-        p( \lambda) * p'( \lambda) \in  \poly(\lambda)
-    \end{equation}
-    
-     
-   \begin{equation}
-        \nu( \lambda) + \nu ' ( \lambda)  \in \negl( \lambda) 
-   \end{equation}
-      
+    \begin{enumerate}
+        \item $p(\lambda) \cdot p'( \lambda) \in  \poly(\lambda)$
+        \item $\nu(\lambda) + \nu'(\lambda) \in \negl\lambda$
+    \end{enumerate} 
 \end{exercise}
 
-\begin{solution}[4.2]
-   We need to show that for any $c \in \mathbb{N} $ , we can find $n_{0}$ such
-   that $ \forall n >  n_{0} $ , $h(n) \leq n^{-c}$. So, consider an arbitrary
-   $c \in \mathbb{N} $ .
-Then, since $c+1 \in \mathbb{N} $ , and since $f$ and $g$ are negligible, there
-exists $n_{f}$ and $n_{g}$ such that:$ \forall n \geq n_{f}$,
-$f(n) \leq n^{-(c+1)}$ and $ \forall n \geq n_{g}$, $g(n) \leq n^{-(c+1)}$ .\\
+\begin{solution}[1.1]
 
-Choose $n_{0}=max(n_{f}, n_{g})$.\\
-Then, $ \forall n \geq  n_{0}$ we have $h(n)=f(n)+g(n) \leq n^{-(c+1)} +
-n^{-(c+1)} = 2n^{-(c+1)}$ (since $n \geq n_{0} \geq 2$).
-Thus $h(n) \leq n^{-c}$ and $h(n)$ is negligible.
+    \todo{Questa soluzione usa disuguaglianze deboli; per essere negligibile una funzione dev'essere strettamente minore di un polinomiale inverso. Da approfondire}
+
+    We need to show that for any $c \in \mathbb{N} $, then there is $n_{0}$ such that $\forall n > n_{0} \implies h(n) \leq n^{-c}$.
+    
+    So, consider an arbitrary $c \in \mathbb{N}$. Then, since $c+1 \in \mathbb{N} $, and both $f$ and $g$ are negligible, there exists $n_{f}$ and $n_{g}$ such that:
+    \begin{align*}
+        \forall n \geq n_{f} &\implies f(n) \leq n^{-(c+1)} \\
+        \forall n \geq n_{g} &\implies g(n) \leq n^{-(c+1)}
+    \end{align*}
+
+    Fix $n_{0} = \max(n_{f}, n_{g})$. Then, since $n \geq n_{0} \geq 2$, $\forall n \geq n_{0}$ we have:
+    \begin{align*}
+        h(n) &= f(n)+g(n) \\
+        &\leq n^{-(c+1)} + n^{-(c+1)} \\
+        &= 2n^{-(c+1)} \\
+        &\leq n^{-c}
+    \end{align*}
+    Thus we conclude $h(n)$ is negligible.
 \end{solution}
 
 
