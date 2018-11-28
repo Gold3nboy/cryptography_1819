@@ -44,16 +44,135 @@ Some additional notes (may be incorrect):
     \item The message space of the second prover is a polylogarithmic language in ($\lambda$)
 \end{itemize}
 
-Theorem: Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$ is Membership-hard, then the above scheme is \textsc{cca}-secure.
+\begin{theorem} 
+    Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$
+    is Membership-hard, then the above scheme is \textsc{cca}-secure.
+\end{theorem}
 
-Proof: Five different games will be defined:
-
+\begin{proof}
+ Five different games will be defined:
 \todo{"I diagrammi arriveranno con un ritardo che preciserò al più presto. Mi scuso per il disagio."
 
 - Trenitalia style}
 
+\end{proof}
+
 %==================================================
 
+\begin{lemma}
+    \[
+        \forall b, G_{0}(\lambda, b) \equiv G_{1}(\lambda, b)   
+    \]
+\end{lemma}
+
+\begin{proof}
+    This follows by the correctness of $\Pi_{1}$ and $\Pi_{2}$
+    \begin{gather*}
+        \Pi_{1}=\tau_{1}=Ver_{1}(\tau, y)\\
+         \Pi_{2}= \tilde{\Pi}_{2}=Ver_{2}(\tau, y)
+    \end{gather*}
+    with probability 1 over the choice of $(\omega_{1}, \tau_{1}) \leftarrow\$
+    Setup_{1}(1^{\lambda})$
+    
+    \begin{gather*}
+        \Pi_{1} \leftarrow Prove_{1}(\omega, y, x), (\omega_{2},
+        \tau_{1})\leftarrow\$ Setup_{2} (1^{\lambda})\\
+        \Pi_{2} \leftarrow Prove(\omega_{2}, (y, l), x) \forall y \in L , l \in
+        \P_{1}
+    \end{gather*}
+    
+\end{proof}
+
+\begin{lemma}
+    \[
+        \forall b, G_{1}(\lambda, b) \approx_{c} G_{2}(\lambda, b)   
+    \]
+\end{lemma}
+\begin{proof}
+    Straight forward reduction from membership hardness.
+\end{proof}
+
+\begin{lemma}
+    \[
+        \forall b, G_{2}(\lambda , b) \approx_{c} G_{3}(\lambda, b)
+    \]
+\end{lemma}
+\todo{I'm not completely sure the next proof is complete}
+\begin{proof}
+    Recall that the difference between $G_{2}$ and $G_{3}$ is that 
+    \[
+        (g^{(i)}, l^{(i)}, \Pi_{2}^{(i)})\text{ such that }y^{(i)}\not\in L 
+    \]
+    are answered $\perp$ in $G_{3}$, instead in $G_{2}$
+    \[
+        \perp \text{ comes out as output} \Leftrightarrow
+        \tilde{\Pi}^{(i)}_{2}=Ver(\tau, y^{(i)}\not=\Pi^{(i)}_{2})
+    \]
+
+    It's possible to distinguish \textbf{two cases} , looking at $c=(y, l,
+    \Pi_{2})$ :
+\begin{enumerate}
+    \item if $(y^{(i)}, l^{(i)})=(y,l)$ and
+        $\tilde{\Pi}^{(i)}_{2}=\Pi^{(i)}_{2}$, it outputs $\perp$ if  in the
+        decryption scheme ($\Pi^{(i)}_{2} \not= \tilde{\Pi}^{(i)}_{2}$) it
+        outputs $\perp$.\\
+
+    \item \footnote{when decryption oracle doesn't output the challenge}
+        otherwise $(y^{(i)}, l^{(i)})\not= (y,l)$ if $y^{(i)}\not\in L$ we want
+        that $\Pi^{(i)}_{2}$ doesn't output exactly $Ver_{2}(\tau, (y^{(i)},
+        l^{(i)}))$, but it should output $\perp$.
+\end{enumerate}
+
+\textbf{EVENT BAD:} If we look at the view of $\A$, the only information he
+knows is 
+\[
+    (\omega_{2}, \tilde{\Pi}_{2}=Ver_{2}(\tau_{2}, y))
+\]
+for $y \not\in L$.\\
+The value 
+\[
+Ver_{2}(\tau_{2}, (y^{(i)}, x^{(i)}))
+\]
+for $y^{(i)} \in L$ and
+$(y^{(i)}, l^{(i)})\not=(y, l)$ is random.\\
+So, 
+\[
+\P [ BAD ] =2^{-|\P_{2}|} 
+\]
+
+\end{proof}
+
+\begin{lemma}
+    \[
+        \forall b , G_{3}(\lambda, b)\equiv G_{4}(\lambda, b)   
+    \]
+\end{lemma}
+
+\begin{proof}
+    If we look at the view of $\A$, the only information known about $\tau_{1}$
+    is $\omega_{1}$, since the decryption oracle only computes for $y^{(i)} \in
+    L$
+    \[
+        Ver_{1}(\tau, y^{(i)})=Prove_{1}(\omega_{1}, y^{(i)}, x^{(i)})
+    \]
+
+    By 1-universality, $\Pi=Ver_{1}(\tau ,y)$ for any $y \in L$ is random.
+\end{proof}
+
+\begin{lemma}
+    \[
+        G_{4}(\lambda, 0)\equiv G_{4}(\lambda, 1)   
+    \]
+\end{lemma}
+\begin{proof}
+    The challenge ciphertext is independent of $b$.
+\end{proof}
+
+
+
+
+
+%==================================================
 \review{referencing something from another part of lesson 17}
 
 \subsection{Instantiation of U-HPS (Universal Hash Proof System)}
