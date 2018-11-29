@@ -176,17 +176,20 @@ So,
 \review{referencing something from another part of lesson 17}
 
 \subsection{Instantiation of U-HPS (Universal Hash Proof System)}
-$\exists r$ using a DDH language such that
-$L_{DDH}=\{(c_1,c_2), \exists r | c_1=g_1^r, c_2=g_2^r\}$
+\textbf{MHL(Membership Hard Language) from DDH}
 
-Given a group $\G$ of order $q$ with $(g_1,g_2)$ as generators:
-$$G_2=g^x , g_1=g , r=g $$ $$ (g,g^x,g^y,g^{xy})$$
+$\exists r$ using a DDH language such that $L_{DDH}=\{(c_1,c_2), \exists r | c_1=g_1^r, c_2=g_2^r\}$
+
+% impaginare meglio
+Given a group $\G$ of order $q$ with $(g_1,g_2)$ as generators, we will have $(g_1,g_2,c_1,c_2)$ but if we impose $g_1=g$ and $g_2=g^a$ then the previous construction becomes $(g,g^a,c_1,c_2)$. But for definition $c_1=g_1^{r_1}$ and $c_2=g_2^{r_2}$ then I can write $(g,g^a,g^r,g^{ar})$.
+% Make sense?! no
+%$$g_2=g^x , g_1=g , r=g $$ $(g,g^x,g^y,g^{xy}), $
 
 % not sure if this is U-HPS or something random
 Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
 
 \begin{itemize}
-    \item $Setup(1^\lambda)$: Pick $x_1,x_2 \leftarrow\$ \Z_q$ and define:\\ $\omega=h_1=g_1^{x_1}g_2^{x_2}$, $\tau=(x_1,x_2)$
+    \item $Setup(1^\lambda)$: Pick $x_1,x_2 \leftarrow\$ \Z_q$ and define:\\ $\omega=h_1=(g_1^{x_1},g_2^{x_2}$), $\tau=(x_1,x_2)$
     \item $Prove(\omega, \underbrace{(c_1,c_2)}_{y}, r)$ output $\Pi=\omega^2$
     \item $Verify(\tau, \underbrace{(c_1,c_2)}_{y})$ output $\widetilde{\Pi}=c_1^{x_1}c_2^{x_2}$ %pretty shitty tilde here, I need a bigger tilde to cover the full length of Pi -> \usepackage{stackengine} \usepackage{scalerel} added in macro
 \end{itemize}
@@ -194,10 +197,13 @@ Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
 \textbf{Correctness:} $\Pi=\omega^2=(g_1^{x_1}g_2^{x_2})^r=g_1^{rx_1}g_2^{rx_2}=c_1^{x_1}c_2^{x_2}=\widetilde{\Pi}$
 
 \begin{theorem}
-    If $(c_1,c_2)\notin L_DDH$ the distribution $(\omega=h_1, \widetilde{\Pi}=Verify(\tau,(c_1,c_2)))$ is indistinguishable form a truly random string.
+    Above construction defines a 1-universal DVNIZK for $L_{DDH}$
 \end{theorem}
 
 \begin{proof}
+
+    \textit{We want to prove that if we take any $(c_1,c_2)\notin L_DDH$ the distribution $(\omega=h_1, \widetilde{\Pi}=Verify(\tau,(c_1,c_2)))$ uniformly distributed.}
+
     Define a \textbf{MAP} $\mu(\overbrace{x_1,x_2}^{random})=(\omega,\Pi)=(g_1^{x_1},g_2^{x_2},c_1^{x_1},c_2^{x_2})$ it suffices to prove that $\mu$ is injective. This can easily be done with some constrains:
     $\mu'(x_1,x_2)=log_{g_1}(\mu(x_1,x_2))=(log_{g_1}(\omega),log_{g_1}(\Pi)$\\
     For $r_1\neq r_2$ then $c_1=g_1^{r_1},c_2=g_2^{r_2}=g^{\alpha r_2}$. For $\alpha=log_{g_2}g_1$ then $\Pi=c_1^{x_1}c_2^{x_2}=g_1^{r_1x_1}g_2^{r_1x_1+\alpha r_2x_2}$.\\
@@ -226,4 +232,92 @@ Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
     \alpha(r_2-r_1)\neq 0
     \text{ the map is injective.}
     \] 
+
+\end{proof}
+
+\begin{itemize}
+    \item $Setup(1^\lambda)$: \begin{itemize}
+        \item Pick $x_3,x_4,x_5,x_6 \leftarrow\$ \Z_q$ and define:
+        \begin{itemize}
+            \item $\omega=(h_2,h_3,s)=(g_1^{x_3},g_2^{x_4},g_1^{x_5},g_2^{x_6},s)$ where $s$ is a \textbf{seed} for a CRH$\rightarrow \H=\{H_s\}$ %\item $\tau=(x_3,x_4,x_5,x_6)$
+        \end{itemize}
+    \end{itemize}
+    \item $Prove(\omega, (c_1,c_2,l), r)$ \begin{itemize}
+        \item Compute $\beta=H_s(c_1,c_2,l)\in \Z_p$
+        \item Output $\Pi=h_2^rh_3^{r\beta}$
+    \end{itemize}
+    \item $Verify(\tau, (c_1,c_2,l))$\begin{itemize}
+        \item Compute $\beta=H_s(c_1,c_2,l)\in \Z_q$
+        \item Output $\widetilde{\Pi}=c_1^{x_3+\beta x_5}c_2^{x_4+\beta x_6}$
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Correctness:}\\ $\Pi=h_2^rh_3^{r\beta}=(g_1^{x_3}g_2^{x_4})^r(g_1^{x_5}g_2^{x_6})^r=c_1^{x_3}c_2^{x_4}c_1^{\beta x_5}c_2^{\beta x_6}=c_1^{x_3+\beta x_5}c_2^{x_4+\beta x_6}=\widetilde{\Pi}$
+
+\begin{theorem}
+    The above construction define a 2-universal DVNIZK for $L_{DDH}$    
+\end{theorem}
+
+\begin{proof}
+    \textit{Same goal and procedure as before}\\
+    - Take any $(c_1,c_2) \notin L_{DDH}$\\
+    - Fix $(c_1,c_2,l)\neq (c_1',c_2',l')$ s.t. $(c_1,c_2),(c_1',c_2')\notin L_{DDH}$ which means:
+    \begin{itemize}
+        \item $(c_1,c_2)=(g_1^{r_1}g_2^{r_2})$ \tikzmark{start}
+        \item $(c_1',c_2')=(g_1^{r_1'}g_2^{r_2'})$ \tikzmark{end}
+        \item $\beta=H_s(c_1,c_2,l)$
+        \item $\beta'=H_s(c'_1,c'_2,l')$
+    \end{itemize}
+    \begin{tikzpicture}[remember picture,overlay]
+        \draw[decorate,decoration={brace,raise=12pt}]
+          ([yshift=2ex]{{pic cs:end}|-{pic cs:start}}) --
+            node[xshift=15pt,anchor=west] {$r_1\neq r_2$ and $r'_1\neq r'_2$} 
+          ([yshift=-0.5ex]pic cs:end);
+    \end{tikzpicture}
+    - Let's define a MAP
+    \begin{gather*}
+        \mu'(x_3,x_4,x_5,x_6)=(\omega, \widetilde{\Pi}=Ver(\tau,(c_1,c_2,l)),\widetilde{\Pi'}=Ver(\tau,(c_1',c_2',l')))= \\
+        =(\underbrace{(h_2,h_3)}_{\omega},c_1^{x_3+\beta x_5}c_2^{x_4+\beta x_6},c_1'^{x_3+\beta'x_5}c_2'^{x_4+\beta'x_6}= \\
+        =((g_1^{x_3}g_2^{x4},g_1^{x_5}g_2^{x_6}),g_1^{r_1x_3+\beta r_1x_5}g_2^{r_2x_4+\beta r_2x_6},g_1^{r'_1x_3+\beta' r_1'x_5}g_2^{r_2'x_4+\beta'r_2'x_6})
+    \end{gather*}
+    But I can rewrite $g_2$ as $g_2=g_1^{\alpha}$ since they are generators. So:
+    \begin{gather*}
+        ((g_1^{x_3+\alpha x_4},g_1^{x_5+\alpha x_6}),g_1^{r_1x_3+\beta r_1x_5}g_1^{\alpha(r_2x_4+\beta r_2x_6)},g_1^{r'_1x_3+r'_1\beta' x_5}g_1^{\alpha(r'_2x_4+\beta' r'_2x_6)})=\\
+        = ((g_1^{x_3+\alpha x_4},g_1^{x_5+\alpha x_6}),g_1^{r_1x_3+\alpha r_2x_4+\beta r_1x_5 +\alpha\beta r_2x_6},g_1^{r'_1x_3+ \alpha r'_2x_4 +r'_1\beta' x_5 + \alpha\beta' r'_2x_6})=
+    \end{gather*}
+    \[
+        \begin{pmatrix}
+            z_1\\
+            z_2\\
+            z_3\\
+            z_4
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            1 & \alpha & 0 & 0 \\
+            0 & 0 & 1 & \alpha \\
+            r_1 & \alpha r_2 & \beta r_1 & \alpha\beta r_2 \\
+            r'_1 & \alpha r'_2 & \beta' r'_1 & \alpha\beta' r'_2
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            x_3\\
+            x_4\\
+            x_5\\
+            x_6
+        \end{pmatrix}
+    \]
+
+    \[ \text{Since Det}
+    \begin{pmatrix}
+        .&.&.&. \\
+        .&.&.&.\\
+        .&.&.&.\\
+        .&.&.&. 
+    \end{pmatrix}=
+    \alpha^2(r_2-r_1)(r'_2-r'_1)(\beta-\beta')\neq 0
+    \]
+    \centering\textbf{IFF:}\\
+    $\overbrace{r_2\neq r_1 ,r'_2\neq r'_1}^{\text{for construction}},\beta \neq \beta' \rightarrow$ this last condition is true because we picked $H_s$ collision resistant.\\
+    Otherwise $H_s$ computed on different elements($(c_1,c_2,l)$ and $(c'_1,c'_2,l')$) will have to output the same $\beta( = \beta')$.
 \end{proof}
