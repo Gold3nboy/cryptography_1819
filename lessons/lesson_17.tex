@@ -44,205 +44,331 @@ Some additional notes (may be incorrect):
     \item The message space of the second prover is a polylogarithmic language in ($\lambda$)
 \end{itemize}
 
-Theorem: Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$ is Membership-hard, then the above scheme is \textsc{cca}-secure.
 
-Proof: Five different games will be defined, from $\textsc{Game}_{\Pi, A}^0$ up to $\textsc{Game}_{\Pi, A}^4$; the first game will be an analogous formalization of how the above \textsc{pke} scheme works. It shall be proven that, for either fixed b in $\{0, 1\}$:
-\begin{equation*}
-    \textsc{Game}_{\Pi, A}^0(\lambda, b) = \textsc{Game}_{\Pi, A}^1(\lambda, b) \approx_C \textsc{Game}_{\Pi, A}^2(\lambda, b) \approx_S \textsc{Game}_{\Pi, A}^3(\lambda, b) = \textsc{Game}_{\Pi, A}^4(\lambda, b)
-\end{equation*}
-and finally that $\textsc{Game}_{\Pi, A}^4(\lambda, 0) = \textsc{Game}_{\Pi, A}^4(\lambda, 1)$, therefore concluding that $\textsc{Game}_{\Pi, A}^0(\lambda, 0) \approx_C \textsc{Game}_{\Pi, A}^0(\lambda, 1)$, and proving this scheme is \textsc{cca}-secure.
 
-\todo{Non sono per niente sicuro riguardo all'origine di $x$ ed $y$, né tantomeno dove sia definito il sampler per essi}
 
-The games are defined as follows:
 
-% Game 0
-\begin{cryptogame}{pkecca0}{Original \textsc{cca} game}{pke-cca}
+\begin{theorem}
+    Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$ is Membership-hard, then the above scheme is \textsc{cca}-secure.
+\end{theorem}
 
-    % Challenger generates key pair and publishes the public key
-    \receive{$((\omega_1, \omega_2), (\tau_1, \tau_2)) \pickUAR \mathcal{KG}en(1^\lambda)$}
-    {$(\omega_1, \omega_2)$}
-    {}
+\begin{proof}
+    Five different games will be defined, from $\textsc{Game}_{\Pi, A}^0$ up to $\textsc{Game}_{\Pi, A}^4$; the first game will be an analogous formalization of how the above \textsc{pke} scheme works. It shall be proven that, for either fixed b in $\{0, 1\}$:
+    \begin{equation*}
+        \textsc{Game}_{\Pi, A}^0(\lambda, b) = \textsc{Game}_{\Pi, A}^1(\lambda, b) \approx_C \textsc{Game}_{\Pi, A}^2(\lambda, b) \approx_S \textsc{Game}_{\Pi, A}^3(\lambda, b) = \textsc{Game}_{\Pi, A}^4(\lambda, b)
+    \end{equation*}
+    and finally that $\textsc{Game}_{\Pi, A}^4(\lambda, 0) = \textsc{Game}_{\Pi, A}^4(\lambda, 1)$, therefore concluding that $\textsc{Game}_{\Pi, A}^0(\lambda, 0) \approx_C \textsc{Game}_{\Pi, A}^0(\lambda, 1)$, and proving this scheme is \textsc{cca}-secure.
 
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
+    \todo{Non sono per niente sicuro riguardo all'origine di $x$ ed $y$, né tantomeno dove sia definito il sampler per essi}
 
-    \postlevel
+    The games are defined as follows:
 
-    % Adversary asks for a challenge
-    \send{}{$m_0, m_1$}{}
-    %Challenger replies with an encrypted message
-    \receive{\shortstack[l]{
-        $(x, y) \pickUAR Sample_1$ \\
-        $\pi_1 \pickUAR Prove_1(\omega_1, y, x)$ \\
-        $b \pickUAR \{0, 1\}$ \\
-        $\pi_2 \pickUAR Prove_2(\omega_2, (y, (\pi_1 \cdot m_b)), x)$ }}
-    {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
-    {}
+    % Game 0
+    \begin{cryptogame}{pkecca0}{Original \textsc{cca} game}{pke-cca}
+    
+        % Challenger generates key pair and publishes the public key
+        \receive{$((\omega_1, \omega_2), (\tau_1, \tau_2)) \pickUAR \mathcal{KG}en(1^\lambda)$}
+        {$(\omega_1, \omega_2)$}
+        {}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR Sample_1$ \\
+            $\pi_1 \pickUAR Prove_1(\omega_1, y, x)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Prove_2(\omega_2, (y, (\pi_1 \cdot m_b)), x)$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    % Game 1: Use verifiers instead of provers
+    \begin{cryptogame}{pkecca1}{Use verifiers}{1}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR Sample_1$ \\
+            $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    % Game 2: Sample (y, x(?)) outside the language instead of inside
+    \begin{cryptogame}{pkecca2}{Sample statements outside the language}{2}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR \overline{Sample}_1$ \\
+            $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    \todo{ Non è stato chiaro sull'origine di x ed y, inoltre mi manca da scrivere le query di decifratura}
+    
+    % Game 3: Decryption queries return false whenever y is not in the language
+    \begin{cryptogame}{pkecca3}{Modify decryption queries}{3}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR \overline{Sample}_1$ \\
+            $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    % Game 4: pi1 is chosen UAR
+    \begin{cryptogame}{pkecca4}{$\pi_1$ is chosen \textsc{uar}}{4}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{ \shortstack[l]{
+            $\pi_1 \pickUAR Im(Prove_1)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Prove_2(\omega_2, (y, (\pi_1 \cdot m_b)), x)$
+        }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}{}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
 
-    \postlevel
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary guesses which message has been encrypted
-    \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
-
-\end{cryptogame}
-
-% Game 1: Use verifiers instead of provers
-\begin{cryptogame}{pkecca1}{Use verifiers}{1}
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary asks for a challenge
-    \send{}{$m_0, m_1$}{}
-    %Challenger replies with an encrypted message
-    \receive{\shortstack[l]{
-        $(x, y) \pickUAR Sample_1$ \\
-        $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
-        $b \pickUAR \{0, 1\}$ \\
-        $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
-    {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
-    {}
-
-    \postlevel
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary guesses which message has been encrypted
-    \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
-
-\end{cryptogame}
-
-% Game 2: Sample (y, x(?)) outside the language instead of inside
-\begin{cryptogame}{pkecca2}{Sample statements outside the language}{2}
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary asks for a challenge
-    \send{}{$m_0, m_1$}{}
-    %Challenger replies with an encrypted message
-    \receive{\shortstack[l]{
-        $(x, y) \pickUAR \overline{Sample}_1$ \\
-        $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
-        $b \pickUAR \{0, 1\}$ \\
-        $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
-    {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
-    {}
-
-    \postlevel
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary guesses which message has been encrypted
-    \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
-
-\end{cryptogame}
-
-\todo{ Non è stato chiaro sull'origine di x ed y, inoltre mi manca da scrivere le query di decifratura}
-
-% Game 3: Decryption queries return false whenever y is not in the language
-\begin{cryptogame}{pkecca3}{Modify decryption queries}{3}
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary asks for a challenge
-    \send{}{$m_0, m_1$}{}
-    %Challenger replies with an encrypted message
-    \receive{\shortstack[l]{
-        $(x, y) \pickUAR \overline{Sample}_1$ \\
-        $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
-        $b \pickUAR \{0, 1\}$ \\
-        $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
-    {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
-    {}
-
-    \postlevel
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary guesses which message has been encrypted
-    \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
-
-\end{cryptogame}
-
-% Game 4: pi1 is chosen UAR
-\begin{cryptogame}{pkecca4}{$\pi_1$ is chosen \textsc{uar}}{4}
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary asks for a challenge
-    \send{}{$m_0, m_1$}{}
-    %Challenger replies with an encrypted message
-    \receive{ \shortstack[l]{
-        $\pi_1 \pickUAR Im(Prove_1)$ \\
-        $b \pickUAR \{0, 1\}$ \\
-        $\pi_2 \pickUAR Prove_2(\omega_2, (y, (\pi_1 \cdot m_b)), x)$
-    }}
-    {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}{}
-
-    \postlevel
-
-    % Adversary can query the challenger for polynomially-many decryptions
-    \send{}{}{}
-    \receive{}{}{}
-
-    \postlevel
-
-    % Adversary guesses which message has been encrypted
-    \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
-
-\end{cryptogame}
+\end{proof}
 
 %==================================================
 
+\begin{lemma}
+    \[
+        \forall b, G_{0}(\lambda, b) \equiv G_{1}(\lambda, b)   
+    \]
+\end{lemma}
+
+\begin{proof}
+    This follows by the correctness of $\Pi_{1}$ and $\Pi_{2}$
+    \begin{gather*}
+        \Pi_{1}=\tau_{1}=Ver_{1}(\tau, y)\\
+         \Pi_{2}= \tilde{\Pi}_{2}=Ver_{2}(\tau, y)
+    \end{gather*}
+    with probability 1 over the choice of $(\omega_{1}, \tau_{1}) \leftarrow\$
+    Setup_{1}(1^{\lambda})$
+    
+    \begin{gather*}
+        \Pi_{1} \leftarrow Prove_{1}(\omega, y, x), (\omega_{2},
+        \tau_{1})\leftarrow\$ Setup_{2} (1^{\lambda})\\
+        \Pi_{2} \leftarrow Prove(\omega_{2}, (y, l), x) \forall y \in L , l \in
+        \P_{1}
+    \end{gather*}
+    
+\end{proof}
+
+\begin{lemma}
+    \[
+        \forall b, G_{1}(\lambda, b) \approx_{c} G_{2}(\lambda, b)   
+    \]
+\end{lemma}
+\begin{proof}
+    Straight forward reduction from membership hardness.
+\end{proof}
+
+\begin{lemma}
+    \[
+        \forall b, G_{2}(\lambda , b) \approx_{c} G_{3}(\lambda, b)
+    \]
+\end{lemma}
+\todo{I'm not completely sure the next proof is complete}
+\begin{proof}
+    Recall that the difference between $G_{2}$ and $G_{3}$ is that 
+    \[
+        (g^{(i)}, l^{(i)}, \Pi_{2}^{(i)})\text{ such that }y^{(i)}\not\in L 
+    \]
+    are answered $\perp$ in $G_{3}$, instead in $G_{2}$
+    \[
+        \perp \text{ comes out as output} \Leftrightarrow
+        \tilde{\Pi}^{(i)}_{2}=Ver(\tau, y^{(i)}\not=\Pi^{(i)}_{2})
+    \]
+
+    It's possible to distinguish \textbf{two cases} , looking at $c=(y, l,
+    \Pi_{2})$ :
+\begin{enumerate}
+    \item if $(y^{(i)}, l^{(i)})=(y,l)$ and
+        $\tilde{\Pi}^{(i)}_{2}=\Pi^{(i)}_{2}$, it outputs $\perp$ if  in the
+        decryption scheme ($\Pi^{(i)}_{2} \not= \tilde{\Pi}^{(i)}_{2}$) it
+        outputs $\perp$.\\
+
+    \item \footnote{when decryption oracle doesn't output the challenge}
+        otherwise $(y^{(i)}, l^{(i)})\not= (y,l)$ if $y^{(i)}\not\in L$ we want
+        that $\Pi^{(i)}_{2}$ doesn't output exactly $Ver_{2}(\tau, (y^{(i)},
+        l^{(i)}))$, but it should output $\perp$.
+\end{enumerate}
+
+\textbf{EVENT BAD:} If we look at the view of $\A$, the only information he
+knows is 
+\[
+    (\omega_{2}, \tilde{\Pi}_{2}=Ver_{2}(\tau_{2}, y))
+\]
+for $y \not\in L$.\\
+The value 
+\[
+Ver_{2}(\tau_{2}, (y^{(i)}, x^{(i)}))
+\]
+for $y^{(i)} \in L$ and
+$(y^{(i)}, l^{(i)})\not=(y, l)$ is random.\\
+So, 
+\[
+\P [ BAD ] =2^{-|\P_{2}|} 
+\]
+
+\end{proof}
+
+\begin{lemma}
+    \[
+        \forall b , G_{3}(\lambda, b)\equiv G_{4}(\lambda, b)   
+    \]
+\end{lemma}
+
+\begin{proof}
+    If we look at the view of $\A$, the only information known about $\tau_{1}$
+    is $\omega_{1}$, since the decryption oracle only computes for $y^{(i)} \in
+    L$
+    \[
+        Ver_{1}(\tau, y^{(i)})=Prove_{1}(\omega_{1}, y^{(i)}, x^{(i)})
+    \]
+
+    By 1-universality, $\Pi=Ver_{1}(\tau ,y)$ for any $y \in L$ is random.
+\end{proof}
+
+\begin{lemma}
+    \[
+        G_{4}(\lambda, 0)\equiv G_{4}(\lambda, 1)   
+    \]
+\end{lemma}
+\begin{proof}
+    The challenge ciphertext is independent of $b$.
+\end{proof}
+
+
+
+
+
+%==================================================
 \review{referencing something from another part of lesson 17}
 
 \subsection{Instantiation of U-HPS (Universal Hash Proof System)}
-$\exists r$ using a DDH language such that
-$L_{DDH}=\{(c_1,c_2), \exists r | c_1=g_1^r, c_2=g_2^r\}$
+\textbf{MHL(Membership Hard Language) from DDH}
 
-Given a group $\G$ of order $q$ with $(g_1,g_2)$ as generators:
-$$G_2=g^x , g_1=g , r=g $$ $$ (g,g^x,g^y,g^{xy})$$
+$\exists r$ using a DDH language such that $L_{DDH}=\{(c_1,c_2), \exists r | c_1=g_1^r, c_2=g_2^r\}$
+
+% impaginare meglio
+Given a group $\G$ of order $q$ with $(g_1,g_2)$ as generators, we will have $(g_1,g_2,c_1,c_2)$ but if we impose $g_1=g$ and $g_2=g^a$ then the previous construction becomes $(g,g^a,c_1,c_2)$. But for definition $c_1=g_1^{r_1}$ and $c_2=g_2^{r_2}$ then I can write $(g,g^a,g^r,g^{ar})$.
+% Make sense?! no
+%$$g_2=g^x , g_1=g , r=g $$ $(g,g^x,g^y,g^{xy}), $
 
 % not sure if this is U-HPS or something random
 Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
 
 \begin{itemize}
-    \item $Setup(1^\lambda)$: Pick $x_1,x_2 \leftarrow\$ \Z_q$ and define:\\ $\omega=h_1=g_1^{x_1}g_2^{x_2}$, $\tau=(x_1,x_2)$
+    \item $Setup(1^\lambda)$: Pick $x_1,x_2 \leftarrow\$ \Z_q$ and define:\\ $\omega=h_1=(g_1^{x_1},g_2^{x_2}$), $\tau=(x_1,x_2)$
     \item $Prove(\omega, \underbrace{(c_1,c_2)}_{y}, r)$ output $\Pi=\omega^2$
     \item $Verify(\tau, \underbrace{(c_1,c_2)}_{y})$ output $\widetilde{\Pi}=c_1^{x_1}c_2^{x_2}$ %pretty shitty tilde here, I need a bigger tilde to cover the full length of Pi -> \usepackage{stackengine} \usepackage{scalerel} added in macro
 \end{itemize}
@@ -250,10 +376,13 @@ Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
 \textbf{Correctness:} $\Pi=\omega^2=(g_1^{x_1}g_2^{x_2})^r=g_1^{rx_1}g_2^{rx_2}=c_1^{x_1}c_2^{x_2}=\widetilde{\Pi}$
 
 \begin{theorem}
-    If $(c_1,c_2)\notin L_DDH$ the distribution $(\omega=h_1, \widetilde{\Pi}=Verify(\tau,(c_1,c_2)))$ is indistinguishable form a truly random string.
+    Above construction defines a 1-universal DVNIZK for $L_{DDH}$
 \end{theorem}
 
 \begin{proof}
+
+    \textit{We want to prove that if we take any $(c_1,c_2)\notin L_DDH$ the distribution $(\omega=h_1, \widetilde{\Pi}=Verify(\tau,(c_1,c_2)))$ uniformly distributed.}
+
     Define a \textbf{MAP} $\mu(\overbrace{x_1,x_2}^{random})=(\omega,\Pi)=(g_1^{x_1},g_2^{x_2},c_1^{x_1},c_2^{x_2})$ it suffices to prove that $\mu$ is injective. This can easily be done with some constrains:
     $\mu'(x_1,x_2)=log_{g_1}(\mu(x_1,x_2))=(log_{g_1}(\omega),log_{g_1}(\Pi)$\\
     For $r_1\neq r_2$ then $c_1=g_1^{r_1},c_2=g_2^{r_2}=g^{\alpha r_2}$. For $\alpha=log_{g_2}g_1$ then $\Pi=c_1^{x_1}c_2^{x_2}=g_1^{r_1x_1}g_2^{r_1x_1+\alpha r_2x_2}$.\\
@@ -282,4 +411,92 @@ Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
     \alpha(r_2-r_1)\neq 0
     \text{ the map is injective.}
     \] 
+
+\end{proof}
+
+\begin{itemize}
+    \item $Setup(1^\lambda)$: \begin{itemize}
+        \item Pick $x_3,x_4,x_5,x_6 \leftarrow\$ \Z_q$ and define:
+        \begin{itemize}
+            \item $\omega=(h_2,h_3,s)=(g_1^{x_3},g_2^{x_4},g_1^{x_5},g_2^{x_6},s)$ where $s$ is a \textbf{seed} for a CRH$\rightarrow \H=\{H_s\}$ %\item $\tau=(x_3,x_4,x_5,x_6)$
+        \end{itemize}
+    \end{itemize}
+    \item $Prove(\omega, (c_1,c_2,l), r)$ \begin{itemize}
+        \item Compute $\beta=H_s(c_1,c_2,l)\in \Z_p$
+        \item Output $\Pi=h_2^rh_3^{r\beta}$
+    \end{itemize}
+    \item $Verify(\tau, (c_1,c_2,l))$\begin{itemize}
+        \item Compute $\beta=H_s(c_1,c_2,l)\in \Z_q$
+        \item Output $\widetilde{\Pi}=c_1^{x_3+\beta x_5}c_2^{x_4+\beta x_6}$
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Correctness:}\\ $\Pi=h_2^rh_3^{r\beta}=(g_1^{x_3}g_2^{x_4})^r(g_1^{x_5}g_2^{x_6})^r=c_1^{x_3}c_2^{x_4}c_1^{\beta x_5}c_2^{\beta x_6}=c_1^{x_3+\beta x_5}c_2^{x_4+\beta x_6}=\widetilde{\Pi}$
+
+\begin{theorem}
+    The above construction define a 2-universal DVNIZK for $L_{DDH}$    
+\end{theorem}
+
+\begin{proof}
+    \textit{Same goal and procedure as before}\\
+    - Take any $(c_1,c_2) \notin L_{DDH}$\\
+    - Fix $(c_1,c_2,l)\neq (c_1',c_2',l')$ s.t. $(c_1,c_2),(c_1',c_2')\notin L_{DDH}$ which means:
+    \begin{itemize}
+        \item $(c_1,c_2)=(g_1^{r_1}g_2^{r_2})$ \tikzmark{start}
+        \item $(c_1',c_2')=(g_1^{r_1'}g_2^{r_2'})$ \tikzmark{end}
+        \item $\beta=H_s(c_1,c_2,l)$
+        \item $\beta'=H_s(c'_1,c'_2,l')$
+    \end{itemize}
+    \begin{tikzpicture}[remember picture,overlay]
+        \draw[decorate,decoration={brace,raise=12pt}]
+          ([yshift=2ex]{{pic cs:end}|-{pic cs:start}}) --
+            node[xshift=15pt,anchor=west] {$r_1\neq r_2$ and $r'_1\neq r'_2$} 
+          ([yshift=-0.5ex]pic cs:end);
+    \end{tikzpicture}
+    - Let's define a MAP
+    \begin{gather*}
+        \mu'(x_3,x_4,x_5,x_6)=(\omega, \widetilde{\Pi}=Ver(\tau,(c_1,c_2,l)),\widetilde{\Pi'}=Ver(\tau,(c_1',c_2',l')))= \\
+        =(\underbrace{(h_2,h_3)}_{\omega},c_1^{x_3+\beta x_5}c_2^{x_4+\beta x_6},c_1'^{x_3+\beta'x_5}c_2'^{x_4+\beta'x_6}= \\
+        =((g_1^{x_3}g_2^{x4},g_1^{x_5}g_2^{x_6}),g_1^{r_1x_3+\beta r_1x_5}g_2^{r_2x_4+\beta r_2x_6},g_1^{r'_1x_3+\beta' r_1'x_5}g_2^{r_2'x_4+\beta'r_2'x_6})
+    \end{gather*}
+    But I can rewrite $g_2$ as $g_2=g_1^{\alpha}$ since they are generators. So:
+    \begin{gather*}
+        ((g_1^{x_3+\alpha x_4},g_1^{x_5+\alpha x_6}),g_1^{r_1x_3+\beta r_1x_5}g_1^{\alpha(r_2x_4+\beta r_2x_6)},g_1^{r'_1x_3+r'_1\beta' x_5}g_1^{\alpha(r'_2x_4+\beta' r'_2x_6)})=\\
+        = ((g_1^{x_3+\alpha x_4},g_1^{x_5+\alpha x_6}),g_1^{r_1x_3+\alpha r_2x_4+\beta r_1x_5 +\alpha\beta r_2x_6},g_1^{r'_1x_3+ \alpha r'_2x_4 +r'_1\beta' x_5 + \alpha\beta' r'_2x_6})=
+    \end{gather*}
+    \[
+        \begin{pmatrix}
+            z_1\\
+            z_2\\
+            z_3\\
+            z_4
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            1 & \alpha & 0 & 0 \\
+            0 & 0 & 1 & \alpha \\
+            r_1 & \alpha r_2 & \beta r_1 & \alpha\beta r_2 \\
+            r'_1 & \alpha r'_2 & \beta' r'_1 & \alpha\beta' r'_2
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            x_3\\
+            x_4\\
+            x_5\\
+            x_6
+        \end{pmatrix}
+    \]
+
+    \[ \text{Since Det}
+    \begin{pmatrix}
+        .&.&.&. \\
+        .&.&.&.\\
+        .&.&.&.\\
+        .&.&.&. 
+    \end{pmatrix}=
+    \alpha^2(r_2-r_1)(r'_2-r'_1)(\beta-\beta')\neq 0
+    \]
+    \centering\textbf{IFF:}\\
+    $\overbrace{r_2\neq r_1 ,r'_2\neq r'_1}^{\text{for construction}},\beta \neq \beta' \rightarrow$ this last condition is true because we picked $H_s$ collision resistant.\\
+    Otherwise $H_s$ computed on different elements($(c_1,c_2,l)$ and $(c'_1,c'_2,l')$) will have to output the same $\beta( = \beta')$.
 \end{proof}
