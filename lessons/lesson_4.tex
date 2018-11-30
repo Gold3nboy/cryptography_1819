@@ -181,18 +181,19 @@ What's the deep meaning of this formula? This is something to do.
 
         % Adversary asks for the challenge. Challenger chooses evenly between X and Y, and samples a value; then it sends that value's image by f to the adversary
         \receive{\shortstack[l]{
-            $Z \pickUAR \{X_\lambda, Y_\lambda\}$ \\
-            $z \pickUAR Z$
+            $z_0 \pickUAR X$ \\
+            $z_1 \pickUAR Y$ \\
+            $b \pickUAR \{0, 1\}$
         }}
-        {$(X_\lambda, Y_\lambda, f(z))$}
+        {$f(z_b)$}
         {}
 
         \postlevel
 
         % Adversary attempts to guess from which distribution the value's image came from
         \send{}
-        {$Z'$}
-        {\textsc{Output 1 iff} $Z' = Z$}
+        {$b'$}
+        {\textsc{Output 1 iff} $b' = b$}
 
     \end{cryptogame}
 
@@ -208,20 +209,21 @@ What's the deep meaning of this formula? This is something to do.
             \newinst[2]{C}{C$^\textsc{dist}$}
       
             % The distinguisher asks for the challenge
-            \mess{C}{$(X_\lambda, Y_\lambda, z)$}{D}
+            \mess{C}{$z_b$}{D}
             \node[anchor=west] at (mess from) {\shortstack[l]{
-                $Z \pickUAR \{X_\lambda, Y_\lambda\}$ \\
-                $z \pickUAR Z$
+                $z_0 \pickUAR X$ \\
+                $z_1 \pickUAR Y$ \\
+                $b \pickUAR \{0, 1\}$
             }};
       
             % The distinguisher applies f to z and relays the image to A
-            \mess{D}{$(X_\lambda, Y_\lambda, f(z))$}{A}
+            \mess{D}{$f(z_b)$}{A}
             
             % Adversary distinguishes betweeen the two distributions
-            \mess{A}{$Z'$}{D}
+            \mess{A}{$b'$}{D}
 
-            \mess{D}{$Z'$}{C}
-            \node[anchor=west] at (mess to) {\textsc{Output 1 iff} $Z' = Z$};
+            \mess{D}{$b'$}{C}
+            \node[anchor=west] at (mess to) {\textsc{Output 1 iff} $b' = b$};
       
             \sdend{}
         \end{tikzpicture}
@@ -264,4 +266,4 @@ A deterministic function $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + l(
     
 \end{cryptogame}
 
-So, if we take $s \leftarrow\$ U_{\lambda}$, the output of $G$ will be indistinguishable from a random draw from $U_{\lambda}$.
+So, if we take $s \pickUAR U_{\lambda}$, the output of $G$ will be indistinguishable from a random draw from $U_{\lambda}$.
