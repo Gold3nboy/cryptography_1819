@@ -1,0 +1,99 @@
+\chapter*{Lesson 18}
+
+\subsection{Public Key Infrastructure}
+
+The problem now is that Alice has a public key, but she wants "the blue check"
+over it, so Bob is sure that public key comes only from the true Alice.\\
+
+To obtain the blue check, Alice needs an universally-trusted third party, called
+\textit{ Certification Authority}, which will provide a special
+\textit{signature} to Alice for proving her identity to Bob.\\
+The schema works as follows:
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      \sdbegin{}
+      \newinst{A}{ Certification Authority$pk_{CA}, sk_{CA}$}
+      \newinst[4]{B}{Alice}
+
+            \postlevel
+            \mess{B}{"Alice", $pk_{A}$}{A}
+            \node[anchor=west] at (mess from) {\shortstack[l]{
+            		$  pk_{A}, sk_{A}  $ 
+                  \\
+                  $  pk_{CA}  $ }};
+            \postlevel
+            \mess{A}{$cert_{A}$}{B}
+            \node[anchor=west] at (mess to) {\shortstack[l]{where $cert_{A}$  is\\
+                        $\sigma \leftarrow\$ Sign (sk_{CA}, "Alice"\|pk_{A})$  } };
+      
+            
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+\end{figure}
+
+The CA message $pk'$ is also called as $cert_{A}$, the signature of the CA for
+Alice.\\
+
+Now, when Bob wants to check the validity of the Alice's public key:
+
+\begin{figure}[h!]
+   \centering
+   \sdinit{}
+   \begin{tikzpicture}
+      \sdbegin{}
+      \newinst{A}{$ CA $}
+      \newinst[2]{B}{ Alice }
+      \newinst[4]{C}{Bob}
+
+            \postlevel
+            \mess{B}{"Alice", $pk_{A}$}{A}
+            \node[anchor=west] at (mess from) {\shortstack[l]{
+            		$  pk_{A}, sk_{A}  $ 
+                  \\
+                  $  pk_{CA}  $ }};
+            \postlevel
+            \mess{A}{$cert_{A}$}{B}
+            \node[anchor=west] at (mess to) {\shortstack[l]{where $cert_{A}$  is\\
+                        $\sigma \leftarrow\$ Sign (sk_{CA}, "Alice"\|pk_{A})$  } };
+    
+                  \postlevel
+                  \mess{B}{}{C}
+                  \node[anchor=west] at (mess to) {\shortstack[l]{
+                  		$  pk_{BOB}, pk_{CA} $ 
+                        \\
+                $  Vrfy(pk_{CA}, "Alice"\|pk_{A}, certa_{A})  $ }};
+            
+
+      \sdend{}
+      \sdend{}
+   \end{tikzpicture}
+\end{figure}
+
+How can Bob recognize a valid certificate from an expired/invalid one?\\
+
+The infrastructure provides some servers which contain the lists of the
+currently valid certificates.\\
+
+\begin{theorem}
+    Signatures are in \textit{ \textbf{Minicrypt} } .
+\end{theorem}
+This is a counterintuitive result, not proven during the lesson, but very
+interesting because it implies that we can create valid signatures only with hash
+functions, without considering at all public key encryption.\\
+
+
+In the next episodes:
+\begin{itemize}
+    \item Digital Signatures from TDP*
+    \item Digital Signatures from ID Scheme*
+    \item Digital Signatures from CDH
+\end{itemize}
+
+Where * appears, something called \textit{Random Oracle Model} is used in the
+proof. Briefly, this model assumes the existance of an ideal hash function which
+behaves like a truly random function (outputs a random y as long as x was never
+queried, otherwise gives back the already taken y).
