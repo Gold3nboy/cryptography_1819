@@ -15,10 +15,18 @@
 \RequirePackage{tikz}
 \RequirePackage{xparse}
 
+% Acronyms:
+% Universally unforgeable from chosen message attack
+\newcommand{\ufcma}{\textsc{uf-cma}}
+% Decisional Diffie-Hellman
+\newcommand{\ddh}{\textsc{ddh}}
+% Computational Diffie-Hellman
+\newcommand{\cdh}{\textsc{cdh}}
+
 % Arguments: Identifier (used as label) | description | challengername
-\NewDocumentEnvironment{cryptogame}{mmm}
+\NewDocumentEnvironment{cryptogame}{m m m}
 { % Crypto-game BEGIN
-\begin{figure}[!ht]
+\begin{figure}[htbp]
     \centering
 
     %%%%%%%%%%COPIED - sdinit
@@ -28,35 +36,43 @@
     \pgfsetlayers{umlsd@background,umlsd@threadlayer,main}%
     %%%%%%%%%%%%
 
-
-    % From http://tex.stackexchange.com/questions/164707/how-to-use-greek-letters-in-pgf-umlsd-or-generally-terms-starting-with
-    \renewcommand{\mess}[4][0]{
+    \newcommand{\challenger}[1]{
         \stepcounter{seqlevel}
-        \path (##2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
-        \addtocounter{seqlevel}{##1}
-        \path (##4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
-        \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]{##3};
-        \node (\detokenize{##3} from) at (mess from) {};
-        \node (\detokenize{##3} to) at (mess to) {};
+        \path (C)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node [anchor = west] {##1};
+    }
+    
+    \newcommand{\adversary}[1]{
+        \stepcounter{seqlevel}
+        \path (A)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node [anchor = east] {##1};
     }
 
-
-    %Drawing commands
     \newcommand{\send}[3]{
-        \mess{A}{##2}{C}
-        \node[anchor=east] at (mess from) {##1};
-        \node[anchor=west] at (mess to) {##3};
+        \stepcounter{seqlevel}
+        \path (A)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (tail) {} node [anchor = east] {##1};
+        \path (C)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (head) {} node [anchor = west] {##3};
+        \draw [->,>=angle 60] (tail) -- (head)
+            node [midway, above] {##2};
     }
+
     \newcommand{\receive}[3]{
-        \mess{C}{##2}{A}
-        \node[anchor=west] at (mess from) {##1};
-        \node[anchor=east] at (mess to) {##3};
+        \stepcounter{seqlevel}
+        \path (C)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (tail) {} node [anchor = west] {##1};
+        \path (A)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (head) {} node [anchor = east] {##3};
+        \draw [->,>=angle 60] (tail) -- (head)
+            node [midway, above] {##2};
     }
 
     \begin{tikzpicture}
 
         %%%%%%%%%%%%%COPIED - sdbegin
         \setlength{\unitlength}{1cm}%
+
         \tikzstyle{sequence}=[coordinate]%
         \tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum height=0.8cm, minimum width=1.6cm, fill=white, drop shadow={opacity=1,fill=black}]%
         \ifpgfumlsdroundedcorners%
@@ -65,6 +81,7 @@
         \tikzstyle{blockstyle}=[anchor=north west]%
         \tikzstyle{blockcommentstyle}=[anchor=north west, font=\small]%
         \tikzstyle{dot}=[inner sep=0pt,fill=black,circle,minimum size=0.2pt]%
+        
         \global\def\unitfactor{0.6}%
         \global\def\threadbias{center}%
         % reset counters
@@ -80,29 +97,19 @@
         %%%%%%%%%%%%%%
 
         %Add the game's participants
-        \newinst{A}{A}     %Adversary
-        \newinst[2.5]{C}{$\textrm{C}^{\textsc{#3}}$}  %Challenger
-
+        \newinst{A}{A}
+        \newinst[2.5]{C}{$\textrm{C}^{\textsc{#3}}$}
 
 }
 { % Crypto-game END
 
-        %%%%%%%%%%%%%%% COPIED - sdend
         \begin{pgfonlayer}{umlsd@background}
             \ifnum\value{instnum}>0
                 \foreach \t [evaluate=\t] in {1,...,\theinstnum}{
                     \draw[dotted] (inst\t) -- ++(0,-\theseqlevel*\unitfactor-2.2*\unitfactor);
                 }
             \fi
-            \ifnum\value{threadnum}>0
-                \foreach \t [evaluate=\t] in {1,...,\thethreadnum}{
-                    \path (thread\t)+(0,-\theseqlevel*\unitfactor-0.1*\unitfactor) node (threadend) {};
-                    \tikzstyle{threadstyle}+=[threadcolor\t]
-                    \drawthread{thread\t}{threadend}
-                }
-            \fi
         \end{pgfonlayer}
-        %%%%%%%%%%%%%%%
 
     \end{tikzpicture}
     \caption{#2}
