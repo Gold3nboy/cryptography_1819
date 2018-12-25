@@ -44,16 +44,195 @@ Some additional notes (may be incorrect):
     \item The message space of the second prover is a polylogarithmic language in ($\lambda$)
 \end{itemize}
 
-\begin{theorem} 
-    Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$
-    is Membership-hard, then the above scheme is \textsc{cca}-secure.
+
+
+
+
+\begin{theorem}
+    Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$ is Membership-hard, then the above scheme is \textsc{cca}-secure.
 \end{theorem}
 
 \begin{proof}
- Five different games will be defined:
-\todo{"I diagrammi arriveranno con un ritardo che preciserò al più presto. Mi scuso per il disagio."
+    Five different games will be defined, from $\textsc{Game}_{\Pi, A}^0$ up to $\textsc{Game}_{\Pi, A}^4$; the first game will be an analogous formalization of how the above \textsc{pke} scheme works. It shall be proven that, for either fixed b in $\{0, 1\}$:
+    \begin{equation*}
+        \textsc{Game}_{\Pi, A}^0(\lambda, b) = \textsc{Game}_{\Pi, A}^1(\lambda, b) \approx_C \textsc{Game}_{\Pi, A}^2(\lambda, b) \approx_S \textsc{Game}_{\Pi, A}^3(\lambda, b) = \textsc{Game}_{\Pi, A}^4(\lambda, b)
+    \end{equation*}
+    and finally that $\textsc{Game}_{\Pi, A}^4(\lambda, 0) = \textsc{Game}_{\Pi, A}^4(\lambda, 1)$, therefore concluding that $\textsc{Game}_{\Pi, A}^0(\lambda, 0) \approx_C \textsc{Game}_{\Pi, A}^0(\lambda, 1)$, and proving this scheme is \textsc{cca}-secure.
 
-- Trenitalia style}
+    \todo{Non sono per niente sicuro riguardo all'origine di $x$ ed $y$, né tantomeno dove sia definito il sampler per essi}
+
+    The games are defined as follows:
+
+    % Game 0
+    \begin{cryptogame}{pkecca0}{Original \textsc{cca} game}{pke-cca}
+    
+        % Challenger generates key pair and publishes the public key
+        \receive{$((\omega_1, \omega_2), (\tau_1, \tau_2)) \pickUAR \mathcal{KG}en(1^\lambda)$}
+        {$(\omega_1, \omega_2)$}
+        {}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR Sample_1$ \\
+            $\pi_1 \pickUAR Prove_1(\omega_1, y, x)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Prove_2(\omega_2, (y, (\pi_1 \cdot m_b)), x)$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    % Game 1: Use verifiers instead of provers
+    \begin{cryptogame}{pkecca1}{Use verifiers}{1}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR Sample_1$ \\
+            $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    % Game 2: Sample (y, x(?)) outside the language instead of inside
+    \begin{cryptogame}{pkecca2}{Sample statements outside the language}{2}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR \overline{Sample}_1$ \\
+            $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    \todo{ Non è stato chiaro sull'origine di x ed y, inoltre mi manca da scrivere le query di decifratura}
+    
+    % Game 3: Decryption queries return false whenever y is not in the language
+    \begin{cryptogame}{pkecca3}{Modify decryption queries}{3}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{\shortstack[l]{
+            $(x, y) \pickUAR \overline{Sample}_1$ \\
+            $\pi_1 \pickUAR Verify_1(\tau_1, y)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Verify_2(\tau_2, (y, (\pi_1 \cdot m_b)))$ }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}
+        {}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
+    
+    % Game 4: pi1 is chosen UAR
+    \begin{cryptogame}{pkecca4}{$\pi_1$ is chosen \textsc{uar}}{4}
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary asks for a challenge
+        \send{}{$m_0, m_1$}{}
+        %Challenger replies with an encrypted message
+        \receive{ \shortstack[l]{
+            $\pi_1 \pickUAR Im(Prove_1)$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $\pi_2 \pickUAR Prove_2(\omega_2, (y, (\pi_1 \cdot m_b)), x)$
+        }}
+        {$c = ((y, (\pi_1 \cdot m_b)), \pi_2)$}{}
+    
+        \postlevel
+    
+        % Adversary can query the challenger for polynomially-many decryptions
+        \send{}{}{}
+        \receive{}{}{}
+    
+        \postlevel
+    
+        % Adversary guesses which message has been encrypted
+        \send{}{$b'$}{\textsc{Output} 1 \textsc{iff} $b=b'$}
+    
+    \end{cryptogame}
 
 \end{proof}
 

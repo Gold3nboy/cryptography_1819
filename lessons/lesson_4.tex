@@ -1,4 +1,4 @@
-\chapter*{ Lesson 4}
+\chapter*{Lesson 4}
 
 \section{Negligible function}
 
@@ -58,276 +58,212 @@ Let $\nu : \mathbb{N} \to [0,1]$ be a function. Then it is deemed \textbf{neglig
 \end{solution}
 
 
-\section{ONE WAY FUNCTION}
-A OWF is a function "hard to invert".
-\begin{definition}
-    
-The function 
+\section{One-Way Functions}
 
-\begin{equation}
-    f:\{0,1\}^{n(\lambda)} \to {0,1}^{n(\lambda)} 
-\end{equation}
+A One-Way Function (\textsc{owf}) is a function that is ``easy to compute'', but ``hard to invert''.
 
-is a OWF, if 
-\begin{equation}
-    \forall  PPT  \A   \exists   \nu(\lambda) \in \negl{x}
-\end{equation}
-such that
+\begin{definition}    
+    Let $f : \{0,1\}^{n(\lambda)} \to {0,1}^{n(\lambda)}$ be a function. Then it is a \textsc{owf} iff:
 
-\begin{equation}
-    \P [ GAME_{f,A}^{owf} (\lambda)=1 ] \le \nu(\lambda)   
-\end{equation}
+    \begin{equation}
+        \forall\; \textsc{ppt}\; \A\;
+        \exists\nu(\lambda) \in \negl{x} :
+        \Pr \left[ \textsc{Game}_{f,A}^\textsc{owf} (\lambda) = 1 \right]
+        \leq \nu(\lambda)
+    \end{equation}
 
 \end{definition}
 
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C^{owf} $} % Increase "5" to widen
-      
-      \postlevel
-      \mess{B}{y}{A}
-      \node[anchor=west] at (mess from) {\shortstack[r]{$ x \leftarrow
-       \$ \{0,1\}^{n} $ \\
-        $ y=f(x)$}};
-      
-      \postlevel
-      \mess{A}{x}{B}
-      \node[anchor=west] at (mess to) { \small{Output=1 iff $f(x')=y$ } };
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{Game for OWF}
-   \label{fig:game_owf}
-\end{figure}
+\begin{cryptogame}{owfdef}{One-Way Function hardness}{owf}
+    \receive{\shortstack[l]{
+        $x \pickUAR \{0,1\}^{n}$ \\
+        $y = f(x)$}}
+    {$y$}
+    {}
+
+    \postlevel
+
+    \send{}
+    {$x'$}
+    {\textsc{Output 1 iff} $f(x')=y$}
+
+\end{cryptogame}
+
+Do note that the game does not look for the equality $x' = x$, but rather for the equality of their images computed by $f$.
+
+\pagebreak
 
 \begin{exercise}
-Show that $\exists  \Adv$
-inefficient and wins with probability 1 ,  and exists $\Adv$ efficient winning
-with probability $2^{-n}$ .
+    \
+    \begin{enumerate}
+        \item Show that there exists an inefficient adversary that wins $\textsc{Game}^\textsc{owf}$ with probability 1
+        \item Show that there exists an efficient adversary that wins $\textsc{Game}^\textsc{owf}$ with probability $2^{-n}$
+    \end{enumerate}
 \end{exercise}
 
-\newpage
 
-\section{One way puzzle}
-A one-way function can be thought as a function which is very efficient in
-generating puzzles, and these puzzles are very hard to solve.\\
-Furthermore, the person generating the puzzle knows a solution to it and can
-efficiently verify the validity of (possible other) solutions to the puzzle.\\
+\subsubsection{One-Way puzzles}
+A one-way function can be thought as a function which is very efficient in generating puzzles that are very hard to solve. Furthermore, the person generating the puzzle can efficiently verify the validity of a solution when one is given.
 
-For a give couple  $(P_{GEN},P_{VER})$ of a puzzle generator and a puzzle
-verifier, we have :
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C $} % Increase "5" to widen
-      
-      % Message from Alice to Bob, with precomputations
-      \postlevel
-      \mess{B}{y}{A}
-      \node[anchor=west] at (mess from) {$(x,y)\leftarrow \P_{GEN}$};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{x}{B}
-      \node[anchor=west] at (mess to) {$ \P_{VER}(x,y) = 1 $};
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{One way puzzle scheme}
-   \label{fig:owp}
-\end{figure}
+For a given couple $(\mathcal{P}_\textsc{gen},\mathcal{P}_\textsc{ver})$ of a puzzle generator and a puzzle verifier, we have:
 
-So, we can say that One-way Puzzle is a problem in
-NP(because solutions are easy to verify ), while not in P(because a solution is
-hard to provide).\\
+\begin{cryptogame}{owpuzzle}{The puzzle game}{puzzle}
+    \receive{$(x, y) \pickUAR \mathcal{P}_\textsc{gen}$}
+    {$y$}
+    {}
 
-\section {  Impagliazzo Worlds}
-Suppose to have Gauss, a genius child, and his professor. The professor gives to
-Gauss some mathematical problems, and Gauss wants to solve them all.\\
-Immagine now that, if using one-way functions, the problem is $f(x)$ , and the
-solution to the problem is $x$.\\
-According to Impagliazzo, we live in one of these possible worlds:
+    \postlevel
+
+    \send{}
+    {$x'$}
+    {\textsc{Output} $\mathcal{P}_\textsc{ver}(x', y)$}
+
+\end{cryptogame}
+
+So, we can say that one-way puzzle is a problem in \textsc{np}, because the verifier enables efficient solution verification, but not in \textsc{p} because finding a solution from scratch is impractical by definition.
+
+\subsection{Impagliazzo's Worlds}
+
+Suppose to have Gauss, a genius child, and his professor. The professor gives to Gauss some mathematical problems, and Gauss wants to solve them all.
+
+Imagine now that, if using one-way functions, the problem is $f(x)$, and its solution is $x$. According to Impagliazzo, we live in one of these possible worlds:
 \begin{itemize}
-    \item Algorithmica , where P=NP , and all the problems easy to verify
-        are also easy to solve, (so the Professor can try as hard as possible to
-        break the scheme, but without success, since Gauss will solve them all
-        using the verification procedure to compute the solution);
-    \item Heuristica, NP problems are hard to solve in the worst case but
-        easy on average , (so the professor , with some effort, can create a
-        game difficult enough, but Gauss will solve it anyway; here there are
-        some problems that the professor cannot find a solution to);
-    \item Pessiland, NP problems are hard on average but no one-way
-        functions exist
-    \item Minicrypt , OWF exist but we don not have public-key cryptography,
-    \item Cryptomania, public-key cryptography is possible,  i.e. two
-        parties can exchange secret messages over open channels.
+    \item \textit{Algorithmica}: $\textsc{P} = \textsc{NP}$, meaning all efficiently verifiable problems are also efficiently solvable. 
+    
+    The professor can try as hard as possible to create a hard scheme, but he won't succeed because Gauss will always be able to efficiently break it using the verification procedure to compute the solution
+
+    \item \textit{Heuristica}: \textsc{NP} problems are hard to solve in the worst case but easy on average. 
+    
+    The professor, with some effort, can create a game difficult enough, but Gauss will solve it anyway; here there are some problems that the professor cannot find a solution to
+
+    \item \textit{Pessiland}: \textsc{NP} problems are hard on average but no one-way functions exist
+    
+    \item \textit{Minicrypt}: One-way functions exist but public-key cryptography is impractical
+    
+    \item \textit{Cryptomania}: Public-key cryptography is possible: two parties can exchange secret messages over open channels
 \end{itemize}
     
 \section{Computational Indistinguishability}
-Distribution ensemble $X={X_{\lambda \in \mathbb{N}}}$ and $Y={Y_{\lambda \in
-\mathbb{N} }}$  are a sequence of distributions.
+
+Distribution ensembles $X = \{X_{\lambda \in \mathbb{N}}\}$ and $Y = \{Y_{\lambda \in \mathbb{N}}\}$ are distribution sequences.
 
 \begin{definition}
-    $X$ and $Y$ are computationally \textbf{indistinguishable} $(X
-    \approx_{c} Y)$ if $ \forall. PPT. D, \exists \nu(\lambda) \in
-    \negl{\lambda} $ such that
-    \begin{equation}
-    |   \P [ D(X_{\lambda})=1 ] - \P [ D(Y_{\lambda})=1 ]   | \le \nu(\lambda) 
-    \end{equation}
+    $X$ and $Y$ are \textbf{computationally indistinguishable} $(X \approx_{c} Y)$ if $\forall\; \textsc{ppt}\; D, \exists \nu(\lambda) \in \negl{\lambda}$ such that:
+    \begin{equation*}
+        \left| \Pr[D(X_\lambda) = 1] - \Pr[D(Y_\lambda) = 1] \right| \leq \nu(\lambda) 
+    \end{equation*}
 \end{definition}
 
+\todo{AP181129-2344: There may be room for improvement, but I like how it's worded: it puts some unusual perspective into the cryptographic game, and it could be a good thing since it closely precedes our first reduction, and the whole hybrid argument mish-mash.}
 
-Suppose we have this mental game: a Distinguisher $D$ receives the value $z$.
-This value has been chosen by me , the Challenger, among $X_{\lambda}$ and
-$Y_{\lambda}$ , and the Distinguisher has to \textit{distinguish} which was the
-source of $z$.
-What does this formula mean?\\
-This formula means that, fixed $1$ as one of the sources, the
-\textit{probability}  that D says "1!" when I pick $z$ from $X_{\lambda}$ is \textbf{not
-so far}  from the \textit{probability}  that D says "1!" when I pick $z$ from
-$Y_{\lambda}$ .\\
-\\
-So, this means that, when this property is verified by two random variables, 
-there isn't too much \textit{difference} between the two
-variables in terms of exposed information (reachable by D), otherwise the distance 
-between the two probabilities should be much more than a \textit{negligible}
-quantity .\\
+Suppose we have this mental game: a Distinguisher $D$ receives the value $z$. This value has been chosen by me, the Challenger, among $X_{\lambda}$ and $Y_{\lambda}$, and the Distinguisher has to \textit{distinguish} which was the source of $z$. What does this formula mean?
+
+This formula means that, fixed 1 as one of the sources, the \textit{probability} that D says ``1!'' when I pick $z$ from $X_{\lambda}$ is \textbf{not so far} from the \textit{probability} that D says ``1!'' when I pick $z$ from $Y_{\lambda}$.
+
+So, this means that, when this property is verified by two random variables, there isn't too much \textit{difference} between the two variables in terms of exposed information (reachable by D), otherwise the distance between the two probabilities should be much more than a \textit{negligible} quantity.
+
 What's the deep meaning of this formula? This is something to do.
 
 \begin{lemma}\label{lem:tria}
-    If $X \approx_{c} Y  $ then $ \forall PPT. f$  we have $f(x) \approx_{c}
-    f(y)$.
+    $\forall\; \textsc{ppt}\; f,\; X \approx_{c} Y \implies f(x) \approx_{c} f(y)$
 \end{lemma}
 
 \begin{proof}
-    [by contraddiction]
-We want to show that  $ f(x) \approx_{c} f(y) $ . So, let's suppose this property is not true.\\
- Assume $ \exists PPT.f, D' $ and some $ p'(\lambda) \in \poly{\lambda} $ such that
+    We want to show that $f(x) \approx_{c} f(y)$. So, let's suppose this property is not true.
+
+    Assume $\exists\; \textsc{ppt}\; f, A$ and some $p'(\lambda) \in \poly(\lambda) $ such that
     \begin{equation}
-        |\P [ D '(f(x))=1 ] - \P [ \D '(f(y))=1 ]| > \frac{1}{p'(\lambda)}
+        \left| \Pr[D'(f(x)) = 1] - \Pr[D'(f(y)) = 1] \right| \geq \frac{1}{p'(\lambda)}
     \end{equation}.
 
-So D' which can distinguish $f(x)$ and $f(y)$ :
+    \begin{cryptogame}{fdistin}{A distinguisher for $f$}{$f$-\textsc{dist}}
+
+        % Adversary asks for the challenge. Challenger chooses evenly between X and Y, and samples a value; then it sends that value's image by f to the adversary
+        \receive{\shortstack[l]{
+            $z_0 \pickUAR X$ \\
+            $z_1 \pickUAR Y$ \\
+            $b \pickUAR \{0, 1\}$
+        }}
+        {$f(z_b)$}
+        {}
+
+        \postlevel
+
+        % Adversary attempts to guess from which distribution the value's image came from
+        \send{}
+        {$b'$}
+        {\textsc{Output 1 iff} $b' = b$}
+
+    \end{cryptogame}
+
+    \begin{figure}
+        \centering
+        \sdinit{}
+        \begin{tikzpicture}
+            \sdbegin{}
+
+            % Define symbols and names for the parties
+            \newinst{A}{A}
+            \newinst[2]{D}{D}
+            \newinst[2]{C}{C$^\textsc{dist}$}
+      
+            % The distinguisher asks for the challenge
+            \mess{C}{$z_b$}{D}
+            \node[anchor=west] at (mess from) {\shortstack[l]{
+                $z_0 \pickUAR X$ \\
+                $z_1 \pickUAR Y$ \\
+                $b \pickUAR \{0, 1\}$
+            }};
+      
+            % The distinguisher applies f to z and relays the image to A
+            \mess{D}{$f(z_b)$}{A}
+            
+            % Adversary distinguishes betweeen the two distributions
+            \mess{A}{$b'$}{D}
+
+            \mess{D}{$b'$}{C}
+            \node[anchor=west] at (mess to) {\textsc{Output 1 iff} $b' = b$};
+      
+            \sdend{}
+        \end{tikzpicture}
+        \caption{Distinguisher reduction}
+        \label{fig:distredux}
+    \end{figure}
 
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \D $}
-      \newinst[5]{B}{$ \C $} % Increase "5" to widen
-      
-      % Message from Alice to Bob, with precomputations
-      \postlevel
-      \mess{B}{z}{A}
-      \node[anchor=west] at (mess from) {\shortstack[r]{
-      		$  z \leftarrow\$ X_{\lambda}  $ 
-            \\
-            $  z \leftarrow\$ Y_{\lambda}  $ }};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{ \small{sourcename }}{B}
-      \node[anchor=west] at (mess to) {};
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{Distinguisher of $f(x) \approx_{c} f(y)$}
-   \label{fig:dis1}
-\end{figure}.
-But , if this kind of distinguisher would exist, we could use this distinguisher
-to distinguish$X$ and $Y$ .
-\newpage
-We can build something like this:
+    In the game depicted by figure \ref{cryptogame:fdistin}, the adversary can make use of $f$, because it is \textsc{ppt}. Thus, if such a distinguisher exists, then it can be used to distinguish $X$ from $Y$, as shown in figure \ref{fig:distredux}. So, if $A$ could efficiently distinguish between $f(x)$ and $f(y)$, then $D$ can efficiently distinguish between $x$ and $y$. This contradicts the hypothesis $X \approx_{c} Y$, which in turn means $f(X) \approx_{c} f(Y)$.
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{D}{$\D '$}
-      \newinst[3]{A}{$ \D $}
-      \newinst[3]{B}{$  $} % Increase "5" to widen
-      
-      % Message from Alice to Bob, with precomputations
-      \postlevel
-      \mess{B}{z}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-      		$  z \leftarrow\$ X_{\lambda}  $ 
-            \\
-            $  z \leftarrow\$ Y_{\lambda}  $ }};
-      
-        \mess{A}{f(z)}{D}
-      \node[anchor=west] at (mess to) {  };
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{D}{$f(x) \text{ or } f(y)$}{A}
-      \node[anchor=west] at (mess to) {  };
-
-      \mess{A}{sourcename}{B}
-      \node[anchor=west] at (mess to) {  };
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{The reduction done}
-   \label{fig:red1}
-\end{figure}
-So, if D' could distinguish between f(x) and f(y), this means that its output
-can be used to distuinguish also the main problem  in polinomial time (since D'
-is a PPT), the distinction about
-$X_{\lambda}$ and $Y_{\lambda}$.\\
 \end{proof}
-\section{Pseudorandom Generator (PRG)}
+
+\pagebreak
+
+\section{Pseudorandom Generators}
 
 A deterministic function $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + l(
-\lambda)} $ is a PRG if :
+\lambda)} $ is called a PseudoRandom Generator, or \textsc{prg} iff:
 \begin{itemize}
-    \item G is polinomial time, so it runs in polinomial time
-    \item $| G(s) | = \lambda + l(\lambda)$
+    \item G runs in polinomial time
+    \item $|G(s)| = \lambda + l(\lambda)$ % Well duh, we can see it by def...
     \item $G(U_{\lambda}) \approx_{c} U_{\lambda + l(\lambda)}$
 \end{itemize}
 
+\begin{cryptogame}{prg}{The pseudorandom game}{prg}
+    
+    \receive{\shortstack[l]{
+        $x_0 \pickUAR G(\mathcal{U}_\lambda)$ \\
+        $x_1 \pickUAR \mathcal{U}_{\lambda+l(\lambda)}$ \\
+        $b \pickUAR \{0, 1\}$
+    }}
+    {$x_b$}
+    {}
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \D $}
-      \newinst[5]{B}{$ C^{PRG} $} % Increase "5" to widen
-      
-      % Message from Alice to Bob, with precomputations
-      \postlevel
-      \mess{B}{z}{A}
-      \node[anchor=west] at (mess from) {\shortstack[r]{
-                  $  z=G(s); s \leftarrow\$ U_{\lambda}  $  
-            \\
-    $ z \leftarrow\$ U_{\lambda} $ }};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{sourcename}{B}
-      \node[anchor=west] at (mess to) {  };
-      
-      \sdend{}
-   \end{tikzpicture}
-   \caption{Pseudorandom generator game }
-   \label{fig:prggame}
-\end{figure}
+    \postlevel
 
-So, if we take $s \leftarrow\$ U_{\lambda}$, the output of $G$ will be
-indistinguishable from a random draw from $U_{\lambda}$.\\
+    \send{}
+    {$b'$}
+    {\textsc{Output 1 iff} $b = b'$}
+    
+\end{cryptogame}
+
+So, if we take $s \pickUAR U_{\lambda}$, the output of $G$ will be indistinguishable from a random draw from $U_{\lambda}$.

@@ -1,0 +1,118 @@
+%Copyright 2018, Andrea Proietto
+%Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+%
+%The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+%
+%THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+%=============================================
+% This is a reduced version of a larger package, and contains an environment definition that enables quick drawing of cryptographic games, with the purpose of being as least intrusive, and most readable as possibile to the document writer/programmer.
+%It is partially founded on the work of "asmeikal", found in GitHub: (https://github.com/asmeikal/crypto16)
+
+\ProvidesPackage{notation}[2018/09/21 v0.2-crypto The Notation]
+
+\RequirePackage[underline=false]{pgf-umlsd}
+\RequirePackage{tikz}
+\RequirePackage{xparse}
+
+% Acronyms:
+% Universally unforgeable from chosen message attack
+\newcommand{\ufcma}{\textsc{uf-cma}}
+% Decisional Diffie-Hellman
+\newcommand{\ddh}{\textsc{ddh}}
+% Computational Diffie-Hellman
+\newcommand{\cdh}{\textsc{cdh}}
+
+% Arguments: Identifier (used as label) | description | challengername
+\NewDocumentEnvironment{cryptogame}{m m m}
+{ % Crypto-game BEGIN
+\begin{figure}[htbp]
+    \centering
+
+    %%%%%%%%%%COPIED - sdinit
+    % From http://tex.stackexchange.com/questions/98525/pgf-umlsd-and-externalize
+    \pgfdeclarelayer{umlsd@background}%
+    \pgfdeclarelayer{umlsd@threadlayer}%
+    \pgfsetlayers{umlsd@background,umlsd@threadlayer,main}%
+    %%%%%%%%%%%%
+
+    \newcommand{\challenger}[1]{
+        \stepcounter{seqlevel}
+        \path (C)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node [anchor = west] {##1};
+    }
+    
+    \newcommand{\adversary}[1]{
+        \stepcounter{seqlevel}
+        \path (A)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node [anchor = east] {##1};
+    }
+
+    \newcommand{\send}[3]{
+        \stepcounter{seqlevel}
+        \path (A)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (tail) {} node [anchor = east] {##1};
+        \path (C)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (head) {} node [anchor = west] {##3};
+        \draw [->,>=angle 60] (tail) -- (head)
+            node [midway, above] {##2};
+    }
+
+    \newcommand{\receive}[3]{
+        \stepcounter{seqlevel}
+        \path (C)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (tail) {} node [anchor = west] {##1};
+        \path (A)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
+            node (head) {} node [anchor = east] {##3};
+        \draw [->,>=angle 60] (tail) -- (head)
+            node [midway, above] {##2};
+    }
+
+    \begin{tikzpicture}
+
+        %%%%%%%%%%%%%COPIED - sdbegin
+        \setlength{\unitlength}{1cm}%
+
+        \tikzstyle{sequence}=[coordinate]%
+        \tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum height=0.8cm, minimum width=1.6cm, fill=white, drop shadow={opacity=1,fill=black}]%
+        \ifpgfumlsdroundedcorners%
+            \tikzstyle{inststyle}+=[rounded corners=3mm]%
+        \fi%
+        \tikzstyle{blockstyle}=[anchor=north west]%
+        \tikzstyle{blockcommentstyle}=[anchor=north west, font=\small]%
+        \tikzstyle{dot}=[inner sep=0pt,fill=black,circle,minimum size=0.2pt]%
+        
+        \global\def\unitfactor{0.6}%
+        \global\def\threadbias{center}%
+        % reset counters
+        \setcounter{preinst}{0}%
+        \setcounter{instnum}{0}%
+        \setcounter{threadnum}{0}%
+        \setcounter{seqlevel}{0}%
+        \setcounter{callevel}{0}%
+        \setcounter{callselflevel}{0}%
+        \setcounter{blocklevel}{0}%
+        % origin
+        \node[coordinate] (inst0) {};%
+        %%%%%%%%%%%%%%
+
+        %Add the game's participants
+        \newinst{A}{A}
+        \newinst[2.5]{C}{$\textrm{C}^{\textsc{#3}}$}
+
+}
+{ % Crypto-game END
+
+        \begin{pgfonlayer}{umlsd@background}
+            \ifnum\value{instnum}>0
+                \foreach \t [evaluate=\t] in {1,...,\theinstnum}{
+                    \draw[dotted] (inst\t) -- ++(0,-\theseqlevel*\unitfactor-2.2*\unitfactor);
+                }
+            \fi
+        \end{pgfonlayer}
+
+    \end{tikzpicture}
+    \caption{#2}
+    \label{cryptogame:#1}
+\end{figure}
+}

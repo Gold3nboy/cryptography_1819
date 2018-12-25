@@ -1,46 +1,119 @@
 \chapter*{Lesson 18}
 
-\subsection{Public Key Infrastructure}
+\subsubsection{Cramer-Shoup scheme construction}
 
-The problem now is that Alice has a public key, but she wants "the blue check"
-over it, so Bob is sure that public key comes only from the true Alice.\\
+From the above two proof systems we can construct a \textsc{pke} scheme, which is attributed to Cramer and Shoup:
 
-To obtain the blue check, Alice needs an universally-trusted third party, called
-\textit{ Certification Authority}, which will provide a special
-\textit{signature} to Alice for proving her identity to Bob.\\
-The schema works as follows:
+\todo{split definition from correctness}
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      \sdbegin{}
-      \newinst{A}{ Certification Authority$pk_{CA}, sk_{CA}$}
-      \newinst[4]{B}{Alice}
+\begin{itemize}
+    \item $(pk, sk) \pickUAR \mathcal{KG}en$, where:
+    \begin{itemize}
+        \item $pk := (h_1, h_2, h_3) = (g_1^{x_1} g_2^{x_2}, g_1^{x_3} g_2^{x_4}, g_1^{x_5} g_2^{x_6})$
+        \item $sk := (x_1, x_2, x_3, x_4, x5, x_6)$
+    \end{itemize}
+    \item Encryption procedure:
+    \begin{itemize}
+        \item $r \pickUAR \mathbb{Z}_q$
+        \item $\beta = H_s(c_1, c_2, c_3) = (g_1^r, g_2^r, h_1^r m)$
+        \item $Enc(pk, m) = (c_1, c_2, c_3, (h_2 h_3^\beta)^r)$
+    \end{itemize}
+    \item Decryption procedure:
+    \begin{itemize}
+        \item Check that $c_1^{x_3 + \beta x_5} c_2^{x_4 + \beta x_6} = c_4$. If not, output FALSE.
+        \item Else, output $\hat{m} = c_3 c_1^{-x_1} c_2^{-x_2}$
+    \end{itemize}
+\end{itemize}
 
-            \postlevel
-            \mess{B}{"Alice", $pk_{A}$}{A}
-            \node[anchor=west] at (mess from) {\shortstack[l]{
-            		$  pk_{A}, sk_{A}  $ 
-                  \\
-                  $  pk_{CA}  $ }};
-            \postlevel
-            \mess{A}{$cert_{A}$}{B}
-            \node[anchor=west] at (mess to) {\shortstack[l]{where $cert_{A}$  is\\
-                        $\sigma \leftarrow\$ Sign (sk_{CA}, "Alice"\|pk_{A})$  } };
-      
-            
-      \sdend{}
-      \sdend{}
-   \end{tikzpicture}
+\section{Digital signatures}
+
+In this section we explore the solutions to the problem of authentication with the use of an asymmetric key scheme. Some observations are in order:
+
+\begin{figure}
+    \centering
+
+    \tikzstyle{int} = [draw, minimum size = 2em]
+
+    \begin{tikzpicture}[node distance = 2cm, auto, >=latex']
+
+        \node (s) {};
+        \node (a) [int] [right of = s] {Alice};
+        \node (k) [above of = a, node distance = 1cm] {$sk$};
+        \node (b) [int] [right of = a, node distance = 5cm] {Bob};
+        \node (p) [above of = b, node distance = 1cm] {$pk$};
+        \node (e) [right of = b] {};
+
+        \path[->] (s) edge node {$m$} (a);
+        \path[->] (k) edge (a);
+        \path[->] (a) edge node {$(m, \sigma)$} (b);
+        \path[->] (p) edge (b);
+        \path[->] (b) edge node {$b$} (e);
+
+    \end{tikzpicture}
+    \caption{Asymmetric authentication}
+    \label{fig:digisign}
 \end{figure}
 
-The CA message $pk'$ is also called as $cert_{A}$, the signature of the CA for
-Alice.\\
+\begin{itemize}
+    \item In a symmetric setting, a verifier routine could be banally implemented as recomputing the signature using the shared secret key and the message. Here, Bob cannot recompute $\sigma$ as he's missing Alice's secret key (and for good reasons too...). Thus, the verifying routine must be defined otherwise
+    \item In a vaguely similar manner to how an attacker could encrypt messages by itself in the asimmetric scenario, because the public key is known to everyone, any attacker can verify any signed messages, for free
+\end{itemize}
+
+Nevertheless, proving that a \textsc{ds} scheme is secure is largely defined in the same way as in the symmetric scenario, with the \textsc{uf-cma} property:
+
+\begin{cryptogame}{dsufcma}{Unforgeable digital signatures}{uf-cma}
+    
+    \receive{$(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$}{$pk$}{}
+
+    \postlevel
+
+    \send{$m \in M$}{$m$}{}
+    \receive{$\sigma \pickUAR Sign(sk, m)$}{$\sigma$}{}
+
+    \postlevel
+
+    \send{$m^* \notin M$}{$(m^*, \sigma^*)$}{\textsc{Output} $\textit{Verify}(pk, m^*, \sigma^*)$}
+
+\end{cryptogame}
+
+\subsection{Public Key Infrastructure}
+
+The problem now is that Alice has a public key, but she wants "the blue check" over it, so Bob is sure that public key comes only from the true Alice.
+
+To obtain the blue check, Alice needs an universally-trusted third party, called \textit{Certification Authority}, which will provide a special \textit{signature} to Alice for proving her identity to Bob.
+
+The scheme works as follows:
+
+\begin{figure}
+    \centering
+    \sdinit{}
+    \begin{tikzpicture}
+        \sdbegin{}
+        \newinst{A}{Cert. Auth. $pk_{CA}, sk_{CA}$}
+        \newinst[2]{B}{Alice}
+
+        \postlevel
+        \mess{B}{"Alice", $pk_{A}$}{A}
+        \node[anchor=west] at (mess from) {\shortstack[l]{
+            $pk_{A}, sk_{A}$ \\
+            $pk_{CA}$}};
+
+        \postlevel
+
+        \mess{A}{$cert_{A}$}{B}
+        \node[anchor=west] at (mess to) {\shortstack[l]{
+            where $cert_{A}$ is \\
+            $\sigma \pickUAR Sign(sk_{CA}, "Alice"\|pk_{A})$}};
+        
+        \sdend{}
+    \end{tikzpicture}
+\end{figure}
+
+The CA message $pk'$ is also called as $cert_{A}$, the signature of the CA for Alice.
 
 Now, when Bob wants to check the validity of the Alice's public key:
 
-\begin{figure}[h!]
+\begin{figure}
    \centering
    \sdinit{}
    \begin{tikzpicture}
@@ -58,7 +131,7 @@ Now, when Bob wants to check the validity of the Alice's public key:
             \postlevel
             \mess{A}{$cert_{A}$}{B}
             \node[anchor=west] at (mess to) {\shortstack[l]{where $cert_{A}$  is\\
-                        $\sigma \leftarrow\$ Sign (sk_{CA}, "Alice"\|pk_{A})$  } };
+                        $\sigma \pickUAR Sign (sk_{CA}, "Alice"\|pk_{A})$  } };
     
                   \postlevel
                   \mess{B}{}{C}
@@ -73,17 +146,15 @@ Now, when Bob wants to check the validity of the Alice's public key:
    \end{tikzpicture}
 \end{figure}
 
-How can Bob recognize a valid certificate from an expired/invalid one?\\
+How can Bob recognize a valid certificate from an expired/invalid one?
 
-The infrastructure provides some servers which contain the lists of the
-currently valid certificates.\\
+The infrastructure provides some servers which contain the lists of the currently valid certificates.
 
 \begin{theorem}
-    Signatures are in \textit{ \textbf{Minicrypt} } .
+    Signatures are in \textit{\textbf{Minicrypt}}.
 \end{theorem}
-This is a counterintuitive result, not proven during the lesson, but very
-interesting because it implies that we can create valid signatures only with hash
-functions, without considering at all public key encryption.\\
+
+This is a counterintuitive result, not proven during the lesson, but very interesting because it implies that we can create valid signatures only with hash functions, without considering at all public key encryption.
 
 
 In the next episodes:
@@ -93,7 +164,4 @@ In the next episodes:
     \item Digital Signatures from CDH
 \end{itemize}
 
-Where * appears, something called \textit{Random Oracle Model} is used in the
-proof. Briefly, this model assumes the existance of an ideal hash function which
-behaves like a truly random function (outputs a random y as long as x was never
-queried, otherwise gives back the already taken y).
+Where * appears, something called \textit{Random Oracle Model} is used in the proof. Briefly, this model assumes the existance of an ideal hash function which behaves like a truly random function (outputs a random y as long as x was never queried, otherwise gives back the already taken y).

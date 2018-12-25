@@ -47,7 +47,93 @@ Vrf($P_k$, m, ($\sigma_1,\sigma_2$))
     \item Check $\hat{e}(g,\sigma_1)=\hat{e}(\sigma_2,\alpha(m))=\hat{e}(g_1,g_2)$
 \end{itemize}
 
-\textbf{Correctness:} \textit{"Just move the exponents"}\\ 
+\textbf{Correctness:} \textit{"Just move the exponents"} 
 
 $\hat{e}(g,\sigma_1)=\overbrace{\hat{e}(g,g_2^a\cdot \alpha(m)^a)}^{\text{I can separate the second part for bilinearity}}=\hat{e}(g,g_2^a)\cdot \hat{e}(g,\alpha(m)^r)=\hat{e}(\underbrace{g^a}_{g_1},g_2)\cdot \hat{e}(\underbrace{g^r}_{\sigma_2},\alpha(m))=\hat{e}(g_1,g_2)\cdot\hat{e}(\sigma_2,\alpha(m))$\\
 We can say that we are moving the exponents from the "private domain" to the "public domain".
+
+\begin{theorem}
+    The Waters' signature scheme is \ufcma
+\end{theorem}
+
+\begin{proof}
+    \begin{quote}
+        The trick is to ``program the 'u's '' (Venturi)
+    \end{quote}
+
+    \todo{Sequence is incomplete/incorrect, have to study it more...}
+
+    \begin{figure}[h]
+        \centering
+        \sdinit{}
+        \begin{tikzpicture}
+            
+            \sdbegin{}
+            \newinst{A}{A}
+            \newinst[2.5]{B}{C$^\textsc{wds}$}
+            \newinst[2.5]{C}{C$^\cdh$}
+           
+            \postlevel
+
+            % Instantiate game
+            \mess{C}{$(\text{``params''}, g^a, g^b)$}{B}
+            \node[anchor=west] at (mess from) {\shortstack[l]{
+                ``params''$ = $ \\
+                $ \quad =(\G, \G_t, g, q, \hat{e})$ \\
+                $ \quad \pickUAR BilGen(1^\lambda)$ \\
+                $a, b \pickUAR \mathbb{Z}_q$}};
+           
+           % Send pk to adversary
+           \postlevel
+           \mess{B}{$(\text{``params''}, g^a, g^b, u)$}{A}
+           \node[anchor=west] at (mess from) {Construct $u$ string};
+
+           % Adversary can query for signatures
+           \postlevel
+           \mess{A}{$m$}{B}
+           \node[anchor=east] at (mess from) {$m \in M$};
+           \mess{B}{$\sigma$}{A};
+           \node[anchor=west] at (mess from) {$\sigma = \textit{Sign}()$};
+
+           % Adversary forges
+           \postlevel
+           \mess{A}{$(m^*, \sigma^*)$}{B}
+           \node[anchor=east] at (mess from) {$m^* \notin M$};
+           
+           \sdend{}
+        \end{tikzpicture}
+        \caption{Reducing Waters' scheme to \cdh}
+        \label{fig:reduxwaters}
+    \end{figure}
+
+    \todo{The following explanation is roundabout, will rectify later}
+
+    The following describes how the Waters' challenger constructs the $u$ string. The main idea is, given $k$ as the message length, to choose each single bit of $u$ from 1 up to $k$ such that:
+
+    \begin{equation*}
+        \alpha(m) = g_2^{\beta(m)}g^{\gamma(m)},\quad \beta(m) = x_0 + \sum_{i=1}^{k}m_ix_i,\quad \gamma(m) = y_0 + \sum_{i=1}^{k}m_iy_i
+    \end{equation*}
+
+    where $x_0 \pickUAR \{-kl, \dots, 0\}, x_{1\text{---}k} \pickUAR \{0, \dots, l\}, y_{0\text{---}k} \pickUAR \mathbb{Z}_q$
+
+    In particular: $l = 2q_s$, where $q_s$ is the number of sign queries made by the adversary.
+
+    Therefore, let $u_i = g_2^{x_i}g^{y_i} \quad \forall i \in [0, k]$. Then:
+
+    \begin{equation*}
+        \alpha(m) = g_2^{x_0}g^{y_0} \prod_{i=1}^k (g_2^{x_i}g^{y_i})^{m_i} = g_2^{x_0+\sum_{i=1}^k m_ix_i}g^{y_0+\sum_{i=1}^k m_iy_i} = g_2^{\beta(m)}g^{\gamma(m)}
+    \end{equation*}
+
+    \todo{Partizioni, doppi if.... qui non ci ho capito 'na mazza}
+
+    \textbf{Step 1}: $\sigma = (\sigma_1, \sigma_2) = (g_2^a \alpha(m)^{\bar{r}}, g^{\bar{r}})$, for $\bar{r} \pickUAR \mathbb{Z}_q \quad \bar{r} = r - a\beta^{-1}$
+
+    \begin{align*}
+        \sigma_1 &= g_2^a\alpha(m)^{\bar{r}} \\
+        &= g_2^a\alpha(m)^{r - a\beta^{-1}} \\
+        &= g_2^a (g_2^{\beta(m)} g^{\gamma(m)})^{r - a\beta^{-1}} \\
+        &= g_2^a g_2^{\beta(m)r-a} g^{\gamma(m)r - \gamma(m)a\beta^{-1}} \\
+        &= g_2^{\beta(m)r} g^{\gamma(m)r} g^{-\gamma(m)\beta^{-1}}
+    \end{align*}
+
+\end{proof}
