@@ -36,12 +36,12 @@
  \end{shaded}
 }
 
-\titlecontents{chapter}[0em]{\lsstyle\smallskip\bfseries}%\vspace{1cm}%
-      {\contentslabel[\chaptername~\thecontentslabel]{0em}\hspace{5.6em}}%
-      {\renewcommand\thecontentslabel{\relax}\itshape}%numberless%
-      {\hfill\contentspage}[\medskip]%
-
-      
+\newcommand{\mychapter}[2]{
+    \setcounter{chapter}{#1}
+    \setcounter{section}{0}
+    \chapter*{#2}
+    \addcontentsline{toc}{chapter}{#2}
+}
 % Cryptography arrow symbol denoting a uniformly random sampling action
 \newcommand\pickUAR{\mathrel{{\leftarrow}\vcenter{\hbox{\tiny\rmfamily\upshape\!\!\$}}}}
 
