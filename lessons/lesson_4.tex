@@ -166,11 +166,11 @@ So, this means that, when this property is verified by two random variables, the
 What's the deep meaning of this formula? This is something to do.
 
 \begin{lemma}\label{lem:tria}
-    $\forall\; \textsc{ppt}\; f,\; X \approx_{c} Y \implies f(x) \approx_{c} f(y)$
+    $\forall\; \textsc{ppt}\; f,\; X \compindist Y \implies f(x) \compindist f(y)$
 \end{lemma}
 
 \begin{proof}
-    We want to show that $f(x) \approx_{c} f(y)$. So, let's suppose this property is not true.
+    We want to show that $f(x) \compindist f(y)$. So, let's suppose this property is not true.
 
     Assume $\exists\; \textsc{ppt}\; f, A$ and some $p'(\lambda) \in \poly(\lambda) $ such that
     \begin{equation}
@@ -232,7 +232,7 @@ What's the deep meaning of this formula? This is something to do.
     \end{figure}
 
 
-    In the game depicted by figure \ref{cryptogame:fdistin}, the adversary can make use of $f$, because it is \textsc{ppt}. Thus, if such a distinguisher exists, then it can be used to distinguish $X$ from $Y$, as shown in figure \ref{fig:distredux}. So, if $A$ could efficiently distinguish between $f(x)$ and $f(y)$, then $D$ can efficiently distinguish between $x$ and $y$. This contradicts the hypothesis $X \approx_{c} Y$, which in turn means $f(X) \approx_{c} f(Y)$.
+    In the game depicted by figure \ref{cryptogame:fdistin}, the adversary can make use of $f$, because it is \textsc{ppt}. Thus, if such a distinguisher exists, then it can be used to distinguish $X$ from $Y$, as shown in figure \ref{fig:distredux}. So, if $A$ could efficiently distinguish between $f(x)$ and $f(y)$, then $D$ can efficiently distinguish between $x$ and $y$. This contradicts the hypothesis $X \compindist Y$, which in turn means $f(X) \compindist f(Y)$.
 
 \end{proof}
 

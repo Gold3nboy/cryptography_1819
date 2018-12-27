@@ -11,17 +11,100 @@
 
 \ProvidesPackage{notation}[2018/09/21 v0.2-crypto The Notation]
 
-\RequirePackage[underline=false]{pgf-umlsd}
-\RequirePackage{tikz}
-\RequirePackage{xparse}
+% Required for crypto games
+\RequirePackage{tikz} % duh...
+\usetikzlibrary{arrows,shadows} % shadow fpr the participants, arrow for the messages
+\RequirePackage{xparse} % Improved environment definition
+\RequirePackage{ifthen} %Needed for cryptogame end
 
-% Acronyms:
+% Cryptography
+%
+% Evaluate UAR [math mode]
+\newcommand{\pickUAR}{\mathrel{{\leftarrow}\vcenter{\hbox{\scriptsize\rmfamily\upshape\!\!\textsf{\$}}}}}
+
+% Acronyms
+%
+% Independent and Identically Distributed
+\newcommand{\iid}{\textsc{iid}}
+% Uniformly At Random
+\newcommand{\uar}{\textsc{uar}}
 % Universally unforgeable from chosen message attack
 \newcommand{\ufcma}{\textsc{uf-cma}}
 % Decisional Diffie-Hellman
 \newcommand{\ddh}{\textsc{ddh}}
 % Computational Diffie-Hellman
 \newcommand{\cdh}{\textsc{cdh}}
+% Chosen Plaintext Attack
+\newcommand{\cpa}{\textsc{cpa}}
+% Chosen Ciphertext Attack
+\newcommand{\cca}{\textsc{cca}}
+% One-Way Function
+\newcommand{\owf}{\textsc{owf}}
+% PseudoRandom Generator
+\newcommand{\prg}{\textsc{prg}}
+% PseudoRandom Function
+\newcommand{\prf}{\textsc{prf}}
+% PseudoRandom Permutation
+\newcommand{\prp}{\textsc{prp}}
+
+% Function classes and relations
+%
+% Computational indistinguishability
+\newcommand{\compindist}{\approx_\textsc{c}}
+% Statistical indistinguishability
+\newcommand{\statindist}{\approx_\textsc{s}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Cryptogames
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Define counters
+\newcounter{preinstance}
+\newcounter{instancecount}
+\newcounter{sequencecursor}
+
+% Styles
+\tikzstyle{msgstyle}=[->, >=angle 60]
+\tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum height=0.8cm, minimum width=1.6cm, fill=white, drop shadow={opacity=1,fill=black}]
+
+% Common commands
+%
+% Diagram spacing
+\newcommand{\seqdelay}{\stepcounter{sequencecursor}}
+
+% Message: from, fromtext, msgtext, to, totext
+\newcommand{\seqmessager}[5]{
+    \stepcounter{sequencecursor}
+    \path (#1)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor) 
+        node (tail) {} node [anchor = east] {#2};
+    \path (#4)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor)
+        node (head) {} node [anchor = west] {#5};
+    \draw [msgstyle] (tail) -- (head)
+        node [midway, above] {#3};
+}
+
+% Message: from, fromtext, msgtext, to, totext
+\newcommand{\seqmessagel}[5]{
+    \stepcounter{sequencecursor}
+    \path (#1)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor) 
+        node (tail) {} node [anchor = west] {#2};
+    \path (#4)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor)
+        node (head) {} node [anchor = east] {#5};
+    \draw [msgstyle] (tail) -- (head)
+        node [midway, above] {#3};
+}
+
+% New participant
+% \entity[edge distance]{var}{name:class}
+\newcommand{\entity}[3][0]{
+    \stepcounter{instancecount}
+    \path (inst\thepreinstance.east)+(#1,0)
+        node[inststyle] (inst\theinstancecount) {#3};
+    \path (inst\theinstancecount)+(0,-0.5*\unitfactor)
+        node (#2) {};
+    \tikzstyle{instcolor#2}=[]
+    \stepcounter{preinstance}
+}
 
 % Arguments: Identifier (used as label) | description | challengername
 \NewDocumentEnvironment{cryptogame}{m m m}
@@ -29,90 +112,108 @@
 \begin{figure}[htbp]
     \centering
 
-    %%%%%%%%%%COPIED - sdinit
-    % From http://tex.stackexchange.com/questions/98525/pgf-umlsd-and-externalize
-    \pgfdeclarelayer{umlsd@background}%
-    \pgfdeclarelayer{umlsd@threadlayer}%
-    \pgfsetlayers{umlsd@background,umlsd@threadlayer,main}%
-    %%%%%%%%%%%%
-
-    \newcommand{\challenger}[1]{
-        \stepcounter{seqlevel}
-        \path (C)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor)
-            node [anchor = west] {##1};
-    }
-    
-    \newcommand{\adversary}[1]{
-        \stepcounter{seqlevel}
-        \path (A)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor)
-            node [anchor = east] {##1};
-    }
-
-    \newcommand{\send}[3]{
-        \stepcounter{seqlevel}
-        \path (A)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
-            node (tail) {} node [anchor = east] {##1};
-        \path (C)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
-            node (head) {} node [anchor = west] {##3};
-        \draw [->,>=angle 60] (tail) -- (head)
-            node [midway, above] {##2};
-    }
-
-    \newcommand{\receive}[3]{
-        \stepcounter{seqlevel}
-        \path (C)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
-            node (tail) {} node [anchor = west] {##1};
-        \path (A)+(0, -\theseqlevel*\unitfactor-0.7*\unitfactor)
-            node (head) {} node [anchor = east] {##3};
-        \draw [->,>=angle 60] (tail) -- (head)
-            node [midway, above] {##2};
-    }
-
     \begin{tikzpicture}
 
-        %%%%%%%%%%%%%COPIED - sdbegin
-        \setlength{\unitlength}{1cm}%
+        % Set unit measurements
+        \setlength{\unitlength}{1cm}
+        \def\unitfactor{0.6}
 
-        \tikzstyle{sequence}=[coordinate]%
-        \tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum height=0.8cm, minimum width=1.6cm, fill=white, drop shadow={opacity=1,fill=black}]%
-        \ifpgfumlsdroundedcorners%
-            \tikzstyle{inststyle}+=[rounded corners=3mm]%
-        \fi%
-        \tikzstyle{blockstyle}=[anchor=north west]%
-        \tikzstyle{blockcommentstyle}=[anchor=north west, font=\small]%
-        \tikzstyle{dot}=[inner sep=0pt,fill=black,circle,minimum size=0.2pt]%
+        % Set counters
+        \setcounter{preinstance}{0}
+        \setcounter{instancecount}{0}
+        \setcounter{sequencecursor}{0}
+        \node[coordinate] (inst0) {};
+
+        % Commands
+        %
+        % Challenger computation
+        \newcommand{\challenger}[1]{
+            \stepcounter{sequencecursor}
+            \path (C)+(0,-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+                node [anchor = west] {##1};
+        }
+
+        % Adversary computation
+        \newcommand{\adversary}[1]{
+            \stepcounter{sequencecursor}
+            \path (A)+(0,-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+                node [anchor = east] {##1};
+        }
+
+        % Message from adversary to challenger
+        \newcommand{\send}[3]{
+            \stepcounter{sequencecursor}
+            \path (A)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor)
+                node (tail) {} node [anchor = east] {##1};
+            \path (C)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor)
+                node (head) {} node [anchor = west] {##3};
+            \draw [msgstyle] (tail) -- (head)
+                node [midway, above] {##2};
+        }
+
+        % Message from challenger to adversary
+        \newcommand{\receive}[3]{
+            \stepcounter{sequencecursor}
+            \path (C)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor)
+                node (tail) {} node [anchor = west] {##1};
+            \path (A)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor)
+                node (head) {} node [anchor = east] {##3};
+            \draw [msgstyle] (tail) -- (head)
+                node [midway, above] {##2};
+        }
         
-        \global\def\unitfactor{0.6}%
-        \global\def\threadbias{center}%
-        % reset counters
-        \setcounter{preinst}{0}%
-        \setcounter{instnum}{0}%
-        \setcounter{threadnum}{0}%
-        \setcounter{seqlevel}{0}%
-        \setcounter{callevel}{0}%
-        \setcounter{callselflevel}{0}%
-        \setcounter{blocklevel}{0}%
-        % origin
-        \node[coordinate] (inst0) {};%
-        %%%%%%%%%%%%%%
-
-        %Add the game's participants
-        \newinst{A}{A}
-        \newinst[2.5]{C}{$\textrm{C}^{\textsc{#3}}$}
+        % Add the game's participants
+        \entity{A}{\textsf{A}}
+        \entity[2.5]{C}{$\textsf{C}^{\textsc{#3}}$}
 
 }
 { % Crypto-game END
 
-        \begin{pgfonlayer}{umlsd@background}
-            \ifnum\value{instnum}>0
-                \foreach \t [evaluate=\t] in {1,...,\theinstnum}{
-                    \draw[dotted] (inst\t) -- ++(0,-\theseqlevel*\unitfactor-2.2*\unitfactor);
-                }
-            \fi
-        \end{pgfonlayer}
+        \ifnum\value{instancecount}>0
+            \foreach \t [evaluate=\t] in {1,...,\theinstancecount}{
+                \draw[dotted] (inst\t) -- ++(0,-\thesequencecursor*\unitfactor-2.2*\unitfactor);
+            }
+        \fi
 
     \end{tikzpicture}
     \caption{#2}
     \label{cryptogame:#1}
+\end{figure}
+}
+
+% Arguments: Identifier (used as label) | description | challengername | Second adversary name
+\NewDocumentEnvironment{cryptoredux}{m m m m}
+{ % Crypto-game BEGIN
+\begin{figure}[htbp]
+    \centering
+
+    \begin{tikzpicture}
+
+        % Set unit measurements
+        \setlength{\unitlength}{1cm}
+        \def\unitfactor{0.6}
+
+        % Set counters
+        \setcounter{preinstance}{0}
+        \setcounter{instancecount}{0}
+        \setcounter{sequencecursor}{0}
+        \node[coordinate] (inst0) {};
+
+        \entity{D}{$\textsf{D}^{\textsc{#4}}$}
+        \entity[2.2]{A}{$\textsf{A}$}
+        \entity[2.2]{C}{$\textsf{C}^{\textsc{#3}}$}
+
+}
+{ % Crypto-game END
+
+        \ifnum\value{instancecount}>0
+            \foreach \t [evaluate=\t] in {1,...,\theinstancecount}{
+                \draw[dotted] (inst\t) -- ++(0,-\thesequencecursor*\unitfactor-2.2*\unitfactor);
+            }
+        \fi
+
+    \end{tikzpicture}
+    \caption{#2}
+    \label{cryptoredux:#1}
 \end{figure}
 }
