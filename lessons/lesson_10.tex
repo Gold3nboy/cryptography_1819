@@ -1,18 +1,14 @@
 \mychapter{10}{Lesson 10}
 \section{Domain extension for PRFs/MACs}
 
-\textit{Almost universal approach} : I have a family $\F(\H)$ with $\H$ AU and
-with PRF $f \in \F$.\\
+\textit{Almost universal approach} : I have a family $\F(\H)$ with $\H$ AU and with PRF $f \in \F$.
 
 \textit{Computational AU} : we want to build a family $\H$ using some other
 PRFs. We expect to have:
 \begin{itemize}
-    \item $ \P [ h_{s}(m)=h_{s}(m'), s\leftarrow\$\{0,1\}^{\lambda} , (m,
-        m')\leftarrow\$A(1^{\lambda}) ] \in \negl{\lambda} $;
-    \item We need two PRFs. One is $F_{k}$, and the other is $F_{s}j$\\
-=========================================================================\\
-something related to $f_{s}(1,.)$ and $f_{s}(0, . )$, but I didn't get it. \\
-=========================================================================\\
+    \item $ \P [ h_{s}(m)=h_{s}(m'), s\leftarrow\$\{0,1\}^{\lambda} , (m, m')\leftarrow\$A(1^{\lambda}) ] \in \negl{\lambda} $;
+    \item We need two PRFs. One is $F_{k}$, and the other is $F_{s}j$
+    \item \todo{something related to $f_{s}(1,.)$ and $f_{s}(0, . )$, but I didn't get it.}
 \end{itemize}.
 
 \subsection{XOR mode}
@@ -27,7 +23,7 @@ so that the input to the PRF $F_{s}(.)$ is $n + log_{2} t$ bytes long.
 \begin{exercise}
     Prove this !
 \end{exercise}
-Possible proof:\\
+Possible proof:
 
 we have to show that
 \[
@@ -286,13 +282,16 @@ In particular, a successful forgery can be obtained winning the following game:
    \end{tikzpicture}
    \caption{$Game _{\Pi, \A}^{auth}(\lambda)$}
 \end{figure}
+
 meaning that the $c^{*}$ challenge ciphertext should be a \textbf{fresh} and a
 valid one ciphertext, considering
 that the $Dec(.)$ function is defined as
-\[
-    Dec:\K*\C \to M \cup \{\perp\} 
-\]
-where $\perp$ represents invalid/meaningless messages.\\
+
+\begin{equation*}
+    Dec:\K*\C \to M \cup \{\perp\}
+\end{equation*}
+
+where $\perp$ represents invalid/meaningless messages.
 
 In the end, we want that our \textit{authenticated encryption schema} is
 cpa-secure and has this last property, called \textbf{strong unforgeability} or
@@ -311,7 +310,7 @@ cpa-secure and has this last property, called \textbf{strong unforgeability} or
             output $m$)
         \item else output $\perp$
     \end{itemize}
-    .
+    
     ====================================================\\
     TO DO AND TO PROVE\\
     Approach: reduce cca to cpa; given $D^{cca}$, we can build $D^{cpa}$.
@@ -334,11 +333,13 @@ We have 3 ways to combine these 2 schema to obtain a new one:
         \end{gather*}
         
     \item  \textbf{ \textit{MAC-then-encrypt} } :
+    \item 
         \begin{gather*}
             \phi = Tag(k_{2}, m)\\
             c \leftarrow\$ Enc(k_{1}, \phi \| m)\\
             c^{*}=c
         \end{gather*}
+
 ===============================================================================\\
 DA RIVEDERE: come i $\phi$ sono randomici o no? A guardare la prima parte della
 prossima lezione , sembrerebbe di si.\\
@@ -351,10 +352,8 @@ prossima lezione , sembrerebbe di si.\\
         
 ===============================================================================\\
 \end{enumerate}
-In a paper is clearly stated that the first solution doesn't work taking random
-combination of CPA-secure and MAC schemes, because there are couple which,
-mixed, are not CCA-secure. Furthermore the second solution doesn't work for the
-same above reason, even if it's now part of the standard.\\
+
+In a paper is clearly stated that the first solution doesn't work taking random combination of CPA-secure and MAC schemes, because there are couple which, mixed, are not CCA-secure. Furthermore the second solution doesn't work for the same above reason, even if it's now part of the standard.
 
 Instead, the third solution works always for a CPA-secure scheme $\Pi_{1}$ and
 strong unforgeability scheme $\Pi_{2}$ which, combined, they generate the final scheme
@@ -440,26 +439,18 @@ $\Pi$.
   % \label{fig:}
 \end{figure}
 
-Here we are supposing that $\A$ can break the cpa-security of a generic $\Pi_{1}$ 
-scheme used by $\C$, while $\A'$ can break the cpa-security of a generic scheme
-$\Pi$. $\C$ can generate the $Tag(k_{2},.)$ function, randomly chosing
-$k_{2}$((((
-and simulating $\Pi$.
-\\=================================================================================\\
-REVIEW\\
-Professor says that we have to show that $Game^{cpa}(\lambda, 0) \approx_{c}
-Game^{cpa}(\lambda, 1)$ , but why??? Isn't this proof enough?
-\\=================================================================================\\
+Here we are supposing that $\A$ can break the cpa-security of a generic $\Pi_{1}$ scheme used by $\C$, while $\A'$ can break the cpa-security of a generic scheme $\Pi$. $\C$ can generate the $Tag(k_{2},.)$ function, randomly chosing $k_{2}$(((( and simulating $\Pi$.
+
+\todo{Professor says that we have to show that $Game^{cpa}(\lambda, 0) \approx_{c} Game^{cpa}(\lambda, 1)$ , but why??? Isn't this proof enough?}
+
 Proved for the cpa-security property, now we have to prove, in a similar way,
 that the auth property must be holded by $\Pi$ if $\Pi_{2}$ is an auth-secure
 scheme.
 \begin{exercise}
-    Prove it!\\
+    Prove it!
+
     Similar to the cpa-security proof.
 \end{exercise}
-
-
-
 
 
 \end{proof}

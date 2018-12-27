@@ -77,8 +77,7 @@ sent by the attacker during the game}
 
 
 
-This last definition is compliant with the three properties before exposed, in
-particular:\\
+This last definition is compliant with the three properties before exposed, in particular:
 
 if a scheme is \textbf{one time secure} $\Rightarrow$ the scheme has
 each one of these 3 properties
@@ -167,7 +166,7 @@ force the schema and do the following
 \end{figure}
 
 So first consider the following \textbf{hybrid game} :
-\begin{figure}[h!]
+\begin{figure}[ht!]
    \centering
    \sdinit{}
    \begin{tikzpicture}
@@ -295,12 +294,9 @@ occupied bits in memory are $2^{n}l$.
   \thickspace
 \]
 
-In particular, the family $\R=\{ R:\{0,1\}^{n} \to \{0,1\}^{l} \}$, also
-indicated as $\R(\lambda, n, l)$,  containing
-all the possible random functions has cardinality $2^{2^{n}l}$.\\
+In particular, the family $\R=\{ R:\{0,1\}^{n} \to \{0,1\}^{l} \}$, also indicated as $\R(\lambda, n, l)$, containing all the possible random functions has cardinality $2^{2^{n}l}$.
 
-\textbf{Intuition:} a pseudo-random function is indistinguishable
-(computationally speaking) from a truly random one.\\
+\textbf{Intuition:} a pseudo-random function is indistinguishable (computationally speaking) from a truly random one.
 
 Call $\F=\{ F_{k}:\{0,1\}^{n(\lambda)} \to \{0,1\}^{l(\lambda)} \}_{k \in
 \{0,1\}^{\lambda}}$ the family of pseudorandom functions with key $k$. To give a
@@ -309,7 +305,7 @@ definition of pseudo-random function, consider the following games:
 
 
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
    \sdinit{}
    \begin{tikzpicture}[scale=0.5]
       % Define symbols and names for the parties

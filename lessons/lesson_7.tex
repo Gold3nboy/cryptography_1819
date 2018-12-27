@@ -5,26 +5,30 @@
 \end{theorem}
 (this definition should mean implicitly that the $k$ key has been chosen by the
 challenger before the proof starts)
-\begin{proof} TO BE REVIEWED.
+
+\begin{proof} 
+    \todo{TO BE REVIEWED.}
     Now use the induction on the height $n$ of the GGM tree for $\nu(\lambda)
-    \in \poly{\lambda} $ .\\
+    \in \poly{\lambda} $.
     
-    \textbf{Base Case $\Rightarrow n=1$} follows by security of PRG $G$ function,
-    because
-    \[
+    \textbf{Base Case $\Rightarrow n=1$} follows by security of PRG $G$ function, because
+    \begin{equation*}
         (F_{k}(0), F_{k}(1))=(G_{0}(k), G_{1}(k)) \approx_{c} U_{2\lambda}
-    \]
+    \end{equation*}
+
     This means that, chosen $k$, the two values returned by $F$ are
     indistinguishable from 2 values taken at random and inserted in the
     truth table of a possible random function. Since these values are
     indistinguishables, the source functions are indistinguishables and $F_{k}$
-    is pseudorandom.\\
+    is pseudorandom.
     
-    Now, for the \textbf{Inductive step} :\\
+    Now, for the \textbf{Inductive step}:
+
     \begin{lemma}
        Let $F':\{0,1\}^{n-1} \to \{0,1\}^{\lambda} $ be a PRF.
        Now define $F_{k}(x,y)=G_{x}(F_{k}'(y))$ where $F_{k}:\{0,1\}^{n} \to
-       \{0,1\}^{\lambda} $.\\
+       \{0,1\}^{\lambda} $.
+
        If $\{F_{k}'\}$ is a PRF so is $ \{F_{k}\}$.
     \end{lemma}
     
@@ -170,21 +174,20 @@ For this proof we use the following simple lemma.
     for $k_{1}, ..., k_{t} \leftarrow\$ U_{\lambda}$
 \end{lem}
 
-Assume that it exists a distinguisher $D_{1, 2}$ which is capable of distinguish
-$H(x, y)$ and $R(x, y)$.\\
+Assume that it exists a distinguisher $D_{1, 2}$ which is capable of distinguish $H(x, y)$ and $R(x, y)$.
 
 ...TO REVIEW, NOT UNDERSTOOD AT ALL ...
 \end{proof}
 
 \section{CPA SECURITY}
 
-Suppose $G$ is a PRG.\\
+Suppose $G$ is a PRG.
+
 Given $Enc(k,m)=G(k) \xor m$, and a known $(\bar{m}, \bar{c})$ where
 $c=G(k)\xor m$, then this function is not 2 time secure, since $c \xor
-\bar{c}=m \xor \bar{m}$, easy to invert.\\
-(??? some glue arguments missing ???)\\
-\[
-\]
+\bar{c}=m \xor \bar{m}$, easy to invert.
+
+(??? some glue arguments missing ???)
 
 
 \begin{figure}[h!]
@@ -245,16 +248,12 @@ arbitrarily long (also 0, there is no constraint).
 \begin{observation}
     No deterministic scheme can achieve CPA security.
 \end{observation}
-This is because the Adversary is not limited in what he can ask to the
-Challenger: if he asks $m_{0}$ and $m_{1}$ before sending the starred messages,
-he will know in advance the encrypted form of the messages, and he will be able
-to distinguish with $ \P [Game^{cpa}]=1 $ the two games.\\
+This is because the Adversary is not limited in what he can ask to the Challenger: if he asks $m_{0}$ and $m_{1}$ before sending the starred messages, he will know in advance the encrypted form of the messages, and he will be able to distinguish with $ \P [Game^{cpa}]=1 $ the two games.
 
-So, a way to obtain a CPA-secure encryption scheme consists of returning
-different cyphertexts for the same message, and we can build a scheme which
-tries to generate this kind of output using PRFs.\\
+So, a way to obtain a CPA-secure encryption scheme consists of returning different cyphertexts for the same message, and we can build a scheme which tries to generate this kind of output using PRFs.
 
-Consider the following SKE scheme $\Pi$.\\
+Consider the following SKE scheme $\Pi$.
+
 Let $\F=\{ F_{k}:\{0,1\}^{n} \to \{0,1\}^{l} \}$ be a
 PRF:
 \begin{itemize}
@@ -296,8 +295,7 @@ To prove this, we have to prove that $Game_{\Pi, \A}^{cpa}(\lambda, 0)
     $
 \end{lemma}
 \begin{proof}
-    Suppose these two hybrids are distinguishable; but then we can use the related
-    distinguisher to break the starting assumption saying $\F$ is a PRF.\\
+    Suppose these two hybrids are distinguishable; but then we can use the related distinguisher to break the starting assumption saying $\F$ is a PRF.
 
     Since they are two similar games (but just for the encryption function), we can use
     the CPA game for this reduction.
@@ -374,25 +372,15 @@ lemma is proven.
     
 \end{lemma}
 \begin{proof}
-Even if the output of the first  hybrid is $(r_{i}, R(r_{i}) \xor m_{b})$,
-the distribution of the second member of this couple doesn't depend on $m_{b}$,
-hence we can assume that $R(r_{i}) \xor m_{b} \equiv R(r_{i})$.\\
+Even if the output of the first  hybrid is $(r_{i}, R(r_{i}) \xor m_{b})$, the distribution of the second member of this couple doesn't depend on $m_{b}$, hence we can assume that $R(r_{i}) \xor m_{b} \equiv R(r_{i})$.
 
-The difference between $\H\Y\B_{1}$ and $\H\Y\B_{2}$ comes if we play the game
-once more and we pick up the same $c_{1}$ of the first game: while in
-$\H\Y\B_{2}$ $r_{2}$ is independent from $r_{1}$ and will be different from the
-previous $r'_{2}$  with probability near to 1, in $\H\Y\B_{1}$ ( if $r_{i}$ is
-the same of the previous game) 
-$R(r_{i})$ will be the same of the previous game (because $R()$ is a
-random function).\\
+The difference between $\H\Y\B_{1}$ and $\H\Y\B_{2}$ comes if we play the game once more and we pick up the same $c_{1}$ of the first game: while in $\H\Y\B_{2}$ $r_{2}$ is independent from $r_{1}$ and will be different from the previous $r'_{2}$  with probability near to 1, in $\H\Y\B_{1}$ ( if $r_{i}$ is the same of the previous game) $R(r_{i})$ will be the same of the previous game (because $R()$ is a random function).
 
-Anyway, we can show that this "collision" happens with very low probability.\\
+Anyway, we can show that this "collision" happens with very low probability.
 
-Call \textbf{REPEAT}  this event of collision of $r_{i}$ between 2 consecutive
-games.\\
-To show the statement of the lemma, it suffices to show that 
-$P[REPEAT] \in \negl{\lambda} $, therefore the two distributions are
-indistinguishable (or distinguishable with a negligible probability) .\\
+Call \textbf{REPEAT}  this event of collision of $r_{i}$ between 2 consecutive games.
+
+To show the statement of the lemma, it suffices to show that $P[REPEAT] \in \negl{\lambda} $, therefore the two distributions are indistinguishable (or distinguishable with a negligible probability).
 
 In fact, if I make $q$ queries to $\H\Y\B_{1}$, 
 \begin{gather*}
@@ -406,9 +394,6 @@ P[REPEAT]=P[ \exists i, j \in q \text{ such that } r_{i}=r_{j}] \leq \\
 \end{gather*} 
 \end{proof}
 
-Since $\H\Y\B_{0} \equiv Game(\lambda, 0)$ but the same proofs can be made for
-$Game(\lambda, 1)$,  
-$ Game(\lambda, 0) \equiv \H\Y\B_{0}(Game(\lambda, 0)) \approx_{c} \H\Y\B_{2} \approx_{c} 
-\H\Y\B'_{0}(Game(\lambda,1)) \equiv Game(\lambda, 1)$
+Since $\H\Y\B_{0} \equiv Game(\lambda, 0)$ but the same proofs can be made for $Game(\lambda, 1)$, $ Game(\lambda, 0) \equiv \H\Y\B_{0}(Game(\lambda, 0)) \approx_{c} \H\Y\B_{2} \approx_{c} \H\Y\B'_{0}(Game(\lambda,1)) \equiv Game(\lambda, 1)$
 \end{proof}
 

@@ -242,8 +242,8 @@ But only 1 among the above $\pm y^{t+1}$ is a square, this is because $\frac{p-1
 
 =======
 \subsection{Rabin's Trapdoor permutation}
-Now we study a one way function built on previous deductions about number
-theory and modular arithmetic.\\
+
+Now we study a one way function built on previous deductions about number theory and modular arithmetic.
 
 The \textit{Rabin trapdoor permutation} is defined as 
 \[
@@ -253,8 +253,7 @@ The \textit{Rabin trapdoor permutation} is defined as
 where $n=p*q$ for primes $p,q=3 mod 4$.\\
 \todo{label related to a previous construction}
 
-We can observe that the image of this function is a subset of $
-\mathbb{Z}^{*}_{n} $.\\
+We can observe that the image of this function is a subset of $\mathbb{Z}^{*}_{n} $.
 
 For the \textbf{Chinese remainder theorem}, we can consider values modulo
 $N=pq$ as values modulo $p$ and values modulo $q$.\\
@@ -269,7 +268,7 @@ The image of the function $f$ exactly matches the definition of
     f \text{'s image set}= \mathbb{QR}_{p}=\{y:y \equiv x^{2} 
     \text{ mod } p, x \in \mathbb{Z}^{*}_{p}   \} 
 \]
-We can observe the same for $\mathbb{Z}^{*}_{q}$ .\\
+We can observe the same for $\mathbb{Z}^{*}_{q}$ .
 
 So for \textbf{Chinese remainder theorem} it is possible to state that $f$ maps
 as follows
@@ -297,8 +296,7 @@ only 1 out of these above 4 values is a quadratic residue because only one of
 $-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.
 \todo{label to previous fact}
 
-Therefore, we have that the Rabin's TDP is a permutation, and that the
-cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.\\
+Therefore, we have that the Rabin's TDP is a permutation, and that the cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.
 
 Furthermore, with the following claim we can state that the Rabin cryptosystem
 is as secure as the hardness of factoring.
@@ -318,9 +316,9 @@ is as secure as the hardness of factoring.
         x + z \in \{(0,2x_{q}), (2x_{p}, 0)\}
     \]
 
-    Now assume $x + z = (2x_{p}, 0)$ without loss of generality, since the proof
-    for the other case is the same.\\
-    We have that $x+z \equiv 0$ mod $q$ and $x+z \not\equiv 0 $ mod $p$.\\
+    Now assume $x + z = (2x_{p}, 0)$ without loss of generality, since the proof for the other case is the same.
+
+    We have that $x+z \equiv 0$ mod $q$ and $x+z \not\equiv 0 $ mod $p$.
 
     But then $gcd( x+z , n)=q$, and we obtain $q$.
 \end{proof}
