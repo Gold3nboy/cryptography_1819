@@ -1,0 +1,77 @@
+\mychapter{1}{Lesson 1}
+
+\section{Problems in Cryptography}
+
+- Confidential communication 
+
+\todo{Image of Alice,Bob, Eve in ske}
+
+\textbf{Kerckhoffs's principle:} \underline{No security by obscurity.}
+
+Security should only rely on the secrecy of the key. However sharing the key between two parties is a costly operation.
+
+\textbf{Syntax:}
+\begin{itemize}
+    \item $\K = $ Key Space
+    \item $\M = $ Message Space
+    \item $\C = $ Ciphertext Space
+    \item $Enc: \K \times \M \to \C$
+    \item $Dec: \K \times \C \to \M$
+\end{itemize}
+
+\textbf{Correctness:}
+
+$\forall m \in \M, \forall k \in \K : Dec(k, Enc(k,m))=m$
+
+\begin{definition}
+    Perfect Secrecy (SHANNON)
+
+    Let M be any distribution over $\M$.
+
+    Let K be uniform over $\K$.
+
+    We say that $(Enc, Dec)$ is perfectly secret if $\forall M, \forall m \in \M, \forall c \in \C$.
+
+    $$Pr[M=m]=Pr[M=m|C=c]$$
+    Meaning that the ciphertext does not reveal anything about the message.
+\end{definition}
+
+\begin{theorem}
+    Let M, K, C as above. The following are equivalent:
+\end{theorem}
+
+\begin{enumerate}[I]
+    \item $Pr[M=m]=Pr[M=m|C=c]$
+    \item M and C are INDEPENDENT
+    \item $\forall m, m' \in \M, \forall c \in C$ $Pr[Enc(k,m)=c]=Pr[Enc(k,m')=c]$
+\end{enumerate}
+
+\begin{proof}
+
+    $(I)\implies(II)$
+    \begin{gather*}
+        Pr[M=m \wedge C=c]=Pr[C=c]Pr[M=m|C=c]=Pr[C=c]Pr[M=m]   
+    \end{gather*}
+    They are independent.
+    
+    $(II)\implies(III)$
+    Fix M, any $m\in M, c\in C$
+    \begin{gather*}
+        Pr[Enc(K,m)=c]=Pr[Enc(K,M)=c|M=m]=Pr[C=c|M=m]=Pr[C=c]   
+    \end{gather*}
+
+    $(III)\implies(I)$
+    \begin{gather*}
+        Pr[C=c]=\sum_{m'}Pr[C=c\wedge M=m']=\\
+        =\sum_{m'}Pr[Enc(K,M)=c\wedge M=m']=\\
+        =\sum_{m'}Pr[Enc(K,M)=c| M=m']Pr[M=m']=\\
+        =\sum_{m'}Pr[Enc(K,m')=c]Pr[M=m']= \text{(Using III)}\\
+        =Pr[Enc(K,m)=c]\underbrace{\sum_{m'}Pr[M=m']}_{=1}=\\
+        =Pr[Enc(K,m)=c]=Pr[Enc(K,M)=c|M=m]=\\
+        =\underbrace{Pr[C=c|M=m]}_{\text{\shortstack{The proof ends here\\but we want (I)}}}\implies Pr[M=m]Pr[C=c|M=m]\implies\\
+        \implies P[M=m]=\frac{Pr[C=c]Pr[M=m|C=c]}{Pr[C=c|M=m]}\\
+        \implies Pr[M=m]=Pr[M=m|C=c]
+    \end{gather*}
+\end{proof}
+
+\todo{\section{One Time Pad}}
