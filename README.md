@@ -42,7 +42,7 @@ I tried also to be as accurate as possible in drawing pictures.
 If you don't like something/everything/life, please contact me so we can try to improve (at least notes).
 
 ### Major issues
-* properly numbering chapters , section and subsections
+* ~~properly numbering chapters , section and subsections~~
 * pairing theorems/claims/facts/exercises with Proofs unequivocally
 ### Minor issues
 * refs should have a certain name while pointing to sections with other names
