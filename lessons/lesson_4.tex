@@ -240,10 +240,9 @@ What's the deep meaning of this formula? This is something to do.
 
 \section{Pseudorandom Generators}
 
-A deterministic function $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + l(
-\lambda)} $ is called a PseudoRandom Generator, or \textsc{prg} iff:
+A deterministic function $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + l(\lambda)} $ is called a PseudoRandom Generator, or \prg{} iff:
 \begin{itemize}
-    \item G runs in polinomial time
+    \item $G$ runs in polinomial time
     \item $|G(s)| = \lambda + l(\lambda)$ % Well duh, we can see it by def...
     \item $G(U_{\lambda}) \approx_{c} U_{\lambda + l(\lambda)}$
 \end{itemize}
@@ -258,7 +257,7 @@ A deterministic function $G:\{0,1\}^{\lambda} \to \{0,1\}^{\lambda + l(
     {$x_b$}
     {}
 
-    \postlevel
+    \seqdelay
 
     \send{}
     {$b'$}
