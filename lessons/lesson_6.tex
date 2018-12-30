@@ -143,7 +143,6 @@ and thus, by XORing the result with $\bar{m}$, obtain the entire unknown message
             {prg}
             {ind}
 
-
             \receive{\shortstack[l]{
                 $x_0 \pickUAR G(U_\lambda)$ \\
                 $x_1 \pickUAR U_l$ \\
@@ -152,17 +151,14 @@ and thus, by XORing the result with $\bar{m}$, obtain the entire unknown message
             {$x_b$}{}
 
             \return{}{$m_0, m_1$}{}
-            
-            
+
             \invoke{\shortstack[l]{
                 $c = x_b \xor m_0$
             }}{$c$}{}
 
-            
             \return{}{$b'$}{}
 
             \seqdelay
-
             \send{$b'' = \begin{cases}
                 0 &\textsc{iff } b'=0 \\
                 1 &\textsc{else}
@@ -193,18 +189,20 @@ and thus, by XORing the result with $\bar{m}$, obtain the entire unknown message
 
 \section{Pseudorandom functions}
 
-A random function
-\[  R:\{0,1\}^{n} \to \{0,1\}^{l} \].
-is a function that takes in input $x$ and :
-\begin{itemize}
-    \item returns a new $R(x)=y \leftarrow\$ \{0,1\}^{l}$ if $x$ has never been
-        saw before and records that value (so \textbf{ \textit{two distinct inputs can collide} })
+\textsc{Prg}s are practically used as a stepping stone for building \emph{PseudoRandom Functions} (\prf), which in turn form the basis for most, if not all cryptographic schemes. Before introducing what a \prf{} formally is, a more intuitive definition of a \emph{truly random function} is given.
 
-    \item returns the recorded $R(x)$ otherwise
-\end{itemize}.
-We could generate these functions, but they occupy too much space: supposing all
-the possible outputs of $R$ have been generated and stored in an array in memory, the
-occupied bits in memory are $2^{n}l$.
+\begin{definition}
+    A random function $R : \{0,1\}^{n} \to \{0,1\}^{l}$ is a function that, depending on what is known about its previous applications:
+
+    \begin{itemize}
+        \item if $x$ is ``fresh'' (in formal terms, $R$ has never been applied to $x$ beforehand), then a value $y$ is chosen \uar{} from $R$'s codomain, and it is permanently associated as the image of $x$ in $R$\footnote{this property is also called \emph{lazy sampling}};
+
+        \item if $x$ is not fresh, then $R(x)$ is directly returned instead.
+    \end{itemize}
+\end{definition}
+
+It sholud be noted that such functions occupy too much space, if we were to memorize it anywhere: supposing all the possible outputs of $R$ have been generated and stored as an array in memory, its size in bits will be $2^{n}l$.
+
 \[  
     \color{black!50}%
     \overbracket[0.5pt][5pt]{{\thickspace}%
@@ -212,107 +210,111 @@ occupied bits in memory are $2^{n}l$.
     \overbracket[0.5pt][5pt]{{\thickspace}%
     \color{black}\printarray[4em]{1110...}\thickspace}^{l\textrm{ bits}}_{2}\thickspace%
     \overbracket[0.5pt][5pt]{{\thickspace}%
-      \color{black}\printarray[4em]{0011...}\thickspace}^{l\textrm{ bits}}_{3}\thickspace%
+    \color{black}\printarray[4em]{0011...}\thickspace}^{l\textrm{ bits}}_{3}\thickspace%
     \color{black!25}\underbracket[0pt][5.5pt]{{\thickspace}%
-      \printarray[2em]{...,...,...,...}\thickspace}_{}%
+    \printarray[2em]{...,...,...,...}\thickspace}_{}%
     \overbracket[0.5pt][5pt]{{\thickspace}%
-      \color{black}\printarray[4em]{1111...}\thickspace}^{l\textrm{ bits}}_{2^{n}}\thickspace%
-  \thickspace
+    \color{black}\printarray[4em]{1111...}\thickspace}^{l\textrm{ bits}}_{2^{n}}\thickspace%
+    \thickspace
 \]
 
-In particular, the family $\R=\{ R:\{0,1\}^{n} \to \{0,1\}^{l} \}$, also indicated as $\R(\lambda, n, l)$, containing all the possible random functions has cardinality $2^{2^{n}l}$.
+So we look for a kind of function which is ``random'', but does not require to be memorized as a whole map, while still being efficiently computable. This is where  pseudorandomness comes in: a function is deemed pseudorandom (a \prf) when it is (computationally) indistinguishable from a truly random one.
 
-\textbf{Intuition:} a pseudo-random function is indistinguishable (computationally speaking) from a truly random one.
+Usually, \prf{}s come as function families $F_k$, where $k$ is a key that identifies a single function inside the family itself\footnote{Those unfamiliar with the ``currying'' technique may see the key as an additional argument to pass to the ``main'' function $F$}.
 
-Call $\F=\{ F_{k}:\{0,1\}^{n(\lambda)} \to \{0,1\}^{l(\lambda)} \}_{k \in
-\{0,1\}^{\lambda}}$ the family of pseudorandom functions with key $k$. To give a
-definition of pseudo-random function, consider the following games:
+With this in mind, let $\F=\{ F_{k}:\{0,1\}^{n(\lambda)} \to \{0,1\}^{l(\lambda)} \}_{k \in \{0,1\}^{\lambda}}$ be the \emph{keyed} function family that defines a \prf. Consider the two games in figure \ref{fig:prftwins}, each one involving respectively $\mathcal{F}$ and a random function $R$, where $\mathcal{R}=\{R : \{0, 1\}^{n} \to \{0, 1\}^{l}\}$, also written as $\mathcal{R}(\lambda, n, l)$ is the set of all random functions from $n$-bit strings to $l$-bit strings.
 
+\begin{figure}[ht]
+    \centering
+    \sdinit{}
+    \begin{tikzpicture}[scale=0.5]
+        % Define symbols and names for the parties
+        \sdbegin{}
+        \newinst{A}{$ \A $}
+        \newinst[2.3]{B}{$ C $} % Increase "5" to widen
+        \mess{A}{$x$}{B}
+        \node[anchor=west] at (mess to) {  };
+        \postlevel
+        \mess{B}{z}{A}
+        \node[anchor=west] at (mess from) {\shortstack[l]{
+            $k \pickUAR \{0,1\}^{\lambda}$ \\
+            $z = F_{k}(x)$}};
+        % Message from Bob to Alice, with computations by both sides
+        \postlevel
+        \mess{A}{$b'$}{B}
+        \node[anchor=west] at (mess to) {  };
+        \sdend{}
+    \end{tikzpicture}
+    \sdinit{}
+    \begin{tikzpicture}[scale=.5]
+        % Define symbols and names for the parties
+        \sdbegin{}
+        \newinst{A}{$ \A $}
+        \newinst[2.3]{B}{$ C $} % Increase "5" to widen
+        \mess{A}{$x$}{B}
+        \node[anchor=west] at (mess to) {  };
+        \postlevel
+        \mess{B}{z}{A}
+        \node[anchor=west] at (mess from) {\shortstack[l]{
+            $R \pickUAR \R(\lambda, n, l)$ \\
+            $z = R(x)$}};
+        % Message from Bob to Alice, with computations by both sides
+        \postlevel
+        \mess{A}{$b'$}{B}
+        \node[anchor=west] at (mess to) {  };
+        \sdend{}
+    \end{tikzpicture}
 
-
-
-\begin{figure}[!ht]
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.5]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C $} % Increase "5" to widen
-      \mess{A}{$x$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{z}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-                  $ k \leftarrow\$ \{0,1\}^{\lambda}   $ 
-            \\
-    $ z=F_{k}(x)   $ }};
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{$b'$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-   %\label{fig:}
-   \sdinit{}
-   \begin{tikzpicture}[scale=.5]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C $} % Increase "5" to widen
-      \mess{A}{$x$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{z}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-                  $ R \leftarrow\$ \R(\lambda, n, l) $ 
-            \\
-    $  z=R(x)  $ }};
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{$b'$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-   \caption{$Real_{\F, \A}(\lambda)$ vs $Rand_{\R, \A}(\lambda) $}
-   %\label{fig:}
+    \caption{$Real_{\F, \A}(\lambda)$ vs $Rand_{\R, \A}(\lambda)$}
+    \label{fig:prftwins}
 \end{figure}
 
-where $b' \in \{0,1\}$ is a convention and 1 is assigned to $Real$ or $Rand$; so
-in this game the adversary \textbf{recognizes}  which machine he is talking with.
+$b' \in \{0,1\}$ is a convention and 1 is assigned to $Real$ or $Rand$; so in this game the adversary \textbf{recognizes} which machine he is talking with.
 
 \begin{definition}
-    $\F$ is a PRF family if 
+    $F_k$ is a \prf{} iff: 
     \[
-        Real_{\F, \A}(\lambda) \approx_{c} Rand_{\R, \A}(\lambda)
+        Real_{\F, \A}(\lambda) \compindist Rand_{\R, \A}(\lambda)
     \]
 \end{definition}
 
 \begin{exercise}
-    Show that no PRG is secure against \textbf{unbounded attackers} .
+    Show that no \prg{} is secure against \textbf{unbounded attackers}.
 \end{exercise}
 
 \begin{exercise}
-    Show the same (as above) for PRF.
+    Show the same as above, but for any \prf{} instead.
 \end{exercise}
 
-\subsection{GGM Tree}
+\subsection{\textsc{Ggm}-tree}
+
+In this section, it is described how to construct a \prf{} starting from a given \prg, using a technique devised form Goldreich, Goldwasser and Micali, called the \emph{\textsc{ggm}-tree}.
 
 \begin{construction}
-    Let $G:\{0,1\}^{\lambda} \to \{0,1\}^{2\lambda} $ be a PRG and let us write 
+    Let $G : \{0,1\}^{\lambda} \to \{0,1\}^{2\lambda} $ be a PRG and let us write 
     \[
         G(k)=(G_{0}(k), G_{1}(k))
     \]
 
-    Now consider this tree, called \textbf{GGM tree}, which describes the use of
-    $G(k)$:
+    Consider this \textsc{ggm}-tree, which describes how $G$ will be used in the \prf{} construction:
 
-    GGM TREE IMAGE
+    \begin{figure}[htbp]
+        \centering
+        \begin{tikzpicture}
+
+            GGM TREE IMAGE - MISSING
+
+        \end{tikzpicture}
+        \caption{The \textsc{ggm}-tree for $G$}
+        \label{fig:ggmtree}
+    \end{figure}
 
 
-    Build $\F=\{ F_{k}:\{0,1\}^{n} \to \{0,1\}^{\lambda} \}$ such that 
+    Build $\F=\{F_{k} : \{0,1\}^{n} \to \{0,1\}^{\lambda} \}$ such that:
     \[
-        F_{k}(x)=G_{x_{n}}(G_{x_{n-1}}... G_{x_{2}}(G_{x_{1}}(k)))
+        F_k(x)=G_{x_{n}}(G_{x_{n-1}}( \dots G_{x_2}(G_{x_1}(k)) \dots ))
     \]
+
 \end{construction}
 
 For example, in the tree with height $n=3$,  for $x=001$ we have $F_{k}(001)$, which is
