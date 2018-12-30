@@ -27,7 +27,7 @@ Consider the experiment depicted in figure \ref{cryptogame:otindist} for the enc
     {$\textsc{Game}_{\Pi, \textsf{A}}^{\textsc{ind}}(\lambda, b)$}
     {ind}
 
-    \send{}{$m_{0}, m \in \M$}{}
+    \send{}{$m_0, m \in \M$}{}
 
     \receive{\shortstack[l]{
         $k \pickUAR \mathcal{K}$ \\
@@ -55,23 +55,12 @@ Consider the experiment depicted in figure \ref{cryptogame:otindist} for the enc
 
 This last definition is compliant with the three properties exposed beforehand. In particular, if a scheme is \textbf{one time secure}, then it has each one of these 3 properties:
 
+\todo{TO BE REVIEWED}
+
 \begin{itemize}
-    \item \textbf{compliance with point 1} : suppose point 1 is not valid, and
-        $k$ is not hard to discover for $ \Adv $. But then $ \Adv $ is able to perfectly
-        distinguish $m$ and $m_{0}$ with $ \P [ 1 ]  $ every time, and so the
-        scheme couldn't be one time secure;
-    \item \textbf{compliance with point 2} : suppose point 2 is not valid, and
-        then the encrypted message can be easily discovered by $ \Adv $. But
-        then , as before, $ \Adv $ can win every game with $ \P [ 1 ]  $ , so
-        the scheme couldn't be one time secure;
-    \item \textbf{compliance with point 3} : suppose point 3 is not valid, and
-        some information about $m$ is leaked in $c$, for example the first bit
-        of $c$ is the same bit of $m$ . $\Adv $ could forge
-        $m_{0}==m$ such that they have the same bits but just the first is
-        different. When $\Adv $ obtains $c$, he can look at the first bit and
-        distinguish which was the message encrypted. Thus, the scheme wouldn't
-        be one time secure.
-        TO BE REVIEWED.
+    \item \textbf{compliance with point 1}: suppose point 1 is not valid, and $k$ is not hard to discover for \textsf{A}. Then \textsf{A} is able to perfectly distinguish $m$ and $m_{0}$ every time, therefore the scheme cannot be one time secure;
+    \item \textbf{compliance with point 2}: suppose point 2 is not valid, and then the encrypted message can be easily discovered by \textsf{A}. Then, as before, \textsf{A} can win every game with $\Pr[1]$, so the scheme couldn't be one time secure;
+    \item \textbf{compliance with point 3}: suppose point 3 is not valid, and some information about $m$ is leaked in $c$, for example the first bit of $c$ is the same bit of $m$. \textsf{A} could forge $m_0 = m$ such that they have the same bits but just the first is different. When \textsf{A} obtains $c$, he can look at the first bit and distinguish which was the message encrypted. Thus, the scheme wouldn't be one time secure.
 \end{itemize}
 
 What is not \textbf{two time secure}? Here is an apparently safe scheme, $\Pi_{\xor}$, where $G : \{0, 1\}^\lambda \to \{0, 1\}^l$ is a \prg:
