@@ -62,22 +62,18 @@
 \newcounter{preinstance}
 \newcounter{instancecount}
 \newcounter{sequencecursor}
-%\newcounter{intransientfigure}
-%\setcounter{intransientfigure}{0}
+\newcounter{intransientfigure}
+\setcounter{intransientfigure}{0}
 \newcounter{looplabel}
 
-%\newcommand{\craftfloat}{
-%    \def\@testenvir{cryptogame}
-%    \ifx\@currenvir\@testenvir
-%    %\ifthenelse{\equal{\@currenvir}{document}}{}{}
-%    %\ifnum\@floatpenalty<0\relax
-%        CRAFTING FLOAT
-%        \setcounter{intransientfigure}{1}
-%        \begin{figure}[htbp]
-%        \centering
-%    \else IF FAILED
-%    \fi
-%}
+\newcommand{\craftfloat}{
+    \ifnum\@floatpenalty<0\relax
+    \else
+        \setcounter{intransientfigure}{1}
+        \begin{figure}[htbp]
+        \centering
+    \fi
+}
 
 % Styles
 \tikzstyle{msgstyle}=[->, >=angle 60]
@@ -169,9 +165,7 @@
 \NewDocumentEnvironment{cryptogame}{m m m}
 { % Crypto-game BEGIN
 
-    %\craftfloat
-    \begin{figure}[htbp]
-    \centering
+    \craftfloat
 
     \begin{tikzpicture}
 
@@ -187,14 +181,14 @@
         
         % Loop macros
         \newcommand{\cgbeginloop}{
-            \ifnum\thelooplabel=0
+            \ifnum\thelooplabel=0 %
             \setcounter{looplabel}{\thesequencecursor}
             \else \PackageError{notation}{Attempting to nest loops in a cryptosequence. Close the former loop first}
             \fi
         }
 
         \newcommand{\cgendloop}{
-            \ifnum\thelooplabel=0
+            \ifnum\thelooplabel=0 %
                 \PackageError{notation}{No loop to close here}
             \fi
             \draw[->](A)+(-0.2, -\thesequencecursor*\unitfactor-0.7*\unitfactor)
@@ -218,23 +212,19 @@
         \fi
     \end{tikzpicture}
 
-    %\ifnum\value{intransientfigure}=1
-    %    \caption{#2}
-    %    \label{cryptogame:#1}
-    %    \end{figure}
-    %    \setcounter{intransientfigure}{0}
-    %\fi
-    \caption{#2}
-    \label{cryptogame:#1}
-    \end{figure}
-
+    \ifnum\value{intransientfigure}=1
+        \caption{#2}
+        \label{cryptogame:#1}
+        \end{figure}
+        \setcounter{intransientfigure}{0}
+    \fi
 }
 
 % Arguments: Identifier (used as label) | description | challengername | Second adversary name
 \NewDocumentEnvironment{cryptoredux}{m m m m}
 { % Crypto-game BEGIN
-\begin{figure}[htbp]
-    \centering
+
+    \craftfloat
 
     \begin{tikzpicture}
 
@@ -280,9 +270,12 @@
                 \draw[dotted] (inst\t) -- ++(0,-\thesequencecursor*\unitfactor-2.2*\unitfactor);
             }
         \fi
-
     \end{tikzpicture}
-    \caption{#2}
-    \label{cryptoredux:#1}
-\end{figure}
+    
+    \ifnum\value{intransientfigure}=1
+        \caption{#2}
+        \label{cryptoredux:#1}
+        \end{figure}
+        \setcounter{intransientfigure}{0}
+    \fi
 }
