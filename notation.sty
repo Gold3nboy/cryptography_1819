@@ -21,6 +21,10 @@
 %
 % Evaluate UAR [math mode]
 \newcommand{\pickUAR}{\mathrel{{\leftarrow}\vcenter{\hbox{\scriptsize\rmfamily\upshape\!\!\textsf{\$}}}}}
+% Default adversary
+\newcommand{\adversary}{\textsf{A}}
+% Cryptogame [math mode]
+\NewDocumentCommand{\cryptog}{m O{\Pi} O{\adversary}}{\textsc{Game}^{\textsc{#1}}_{#2, #3}}
 
 % Acronyms
 %
@@ -66,7 +70,7 @@
 \setcounter{intransientfigure}{0}
 \newcounter{looplabel}
 
-\newcommand{\craftfloat}{
+\newcommand{\cseqcraftfloat}{
     \ifnum\@floatpenalty<0\relax
     \else
         \setcounter{intransientfigure}{1}
@@ -82,10 +86,10 @@
 % Internal commands
 %
 % Diagram spacing
-\newcommand{\seqdelay}{\stepcounter{sequencecursor}}
+\newcommand{\cseqdelay}{\stepcounter{sequencecursor}}
 
 % Message: from, fromtext, msgtext, to, totext
-\newcommand{\seqmessager}[5]{
+\newcommand{\cseqmessager}[5]{
     \stepcounter{sequencecursor}
     \path (#1)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor) 
         node (tail) {} node [anchor = east] {#2};
@@ -96,7 +100,7 @@
 }
 
 % Message: from, fromtext, msgtext, to, totext
-\newcommand{\seqmessagel}[5]{
+\newcommand{\cseqmessagel}[5]{
     \stepcounter{sequencecursor}
     \path (#1)+(0, -\thesequencecursor*\unitfactor-0.7*\unitfactor) 
         node (tail) {} node [anchor = west] {#2};
@@ -107,8 +111,8 @@
 }
 
 % New participant
-% \entity[edge distance]{var}{name:class}
-\newcommand{\entity}[3][0]{
+% \cseqentity[edge distance]{var}{name:class}
+\newcommand{\cseqentity}[3][0]{
     \stepcounter{instancecount}
     \path (inst\thepreinstance.east)+(#1,0)
         node[inststyle] (inst\theinstancecount) {#3};
@@ -118,54 +122,76 @@
     \stepcounter{preinstance}
 }
 
+% Entity computation
+\newcommand{\cseqcompute}[3]{
+    \stepcounter{sequencecursor}
+    \path (#1)+(0,-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+        node [anchor = #3] {#2};
+}
+
+
 % API Commands
 %
 % Challenger computation
-\newcommand{\challenger}[1]{
-    \stepcounter{sequencecursor}
-    \path (C)+(0,-\thesequencecursor*\unitfactor-0.7*\unitfactor)
-        node [anchor = west] {#1};
+\newcommand{\cseqchallenger}[1]{
+    \cseqcompute{C}{#1}{west};
 }
-
 % Adversary computation - optional orientation as first argument: [east|west]
-\newcommand{\adversary}[2][east]{
-    \stepcounter{sequencecursor}
-    \path (A)+(0,-\thesequencecursor*\unitfactor-0.7*\unitfactor)
-        node [anchor = #1] {#2};
+\newcommand{\cseqadversary}[2][east]{
+    \cseqcompute{A}{#2}{#1};
+}
+% Distinguisher computation
+\newcommand{\cseqdistinguisher}[1]{
+    \cseqcompute{D}{#1}{east};
 }
 
-% Distinguisher computation
-\newcommand{\distinguisher}[1]{
-    \stepcounter{sequencecursor}
-    \path (D)+(0,-\thesequencecursor*\unitfactor-0.7*\unitfactor)
-        node [anchor = east] {#1};
-}
 
 % Message from adversary to challenger
 \newcommand{\send}[3]{
-    \seqmessager{A}{#1}{#2}{C}{#3}
+    \cseqmessager{A}{#1}{#2}{C}{#3}
 }
-
 % Message from challenger to adversary
 \newcommand{\receive}[3]{
-    \seqmessagel{C}{#1}{#2}{A}{#3}
+    \cseqmessagel{C}{#1}{#2}{A}{#3}
 }
-
 % Message from adversary to distinguisher - cryptoredux only
 \newcommand{\invoke}[3]{
-    \seqmessagel{A}{#1}{#2}{D}{#3}
+    \cseqmessagel{A}{#1}{#2}{D}{#3}
 }
-
 % Message from distinguisher to adversary - cryptoredux only
 \newcommand{\return}[3]{
-    \seqmessager{D}{#1}{#2}{A}{#3}
+    \cseqmessager{D}{#1}{#2}{A}{#3}
 }
+
+% Loop macros
+\newcommand{\cseqbeginloop}{
+    \ifnum\thelooplabel=0
+    \setcounter{looplabel}{\thesequencecursor}
+    \stepcounter{looplabel}
+    \else \PackageError{notation}{Attempting to nest loops in a cryptosequence. Close the former loop first}
+    \fi
+}
+
+\newcommand{\cseqendloop}{
+    \ifnum\thelooplabel=0
+        \PackageError{notation}{No loop to close here}
+    \fi
+    \ifnum\thelooplabel>\thesequencecursor\relax
+        \PackageError{notation}{Closing an empty loop}
+    \fi
+    \draw[->](A)+(-0.2, -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+    .. controls +(-0.6, -1.3)
+    and         +(-0.6, +1.3)
+    ..          +(-0.2, 0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
+    \setcounter{looplabel}{0}
+}
+
 
 % Arguments: Identifier (used as label) | description | challengername
 \NewDocumentEnvironment{cryptogame}{m m m}
 { % Crypto-game BEGIN
 
-    \craftfloat
+    \cseqcraftfloat
 
     \begin{tikzpicture}
 
@@ -178,33 +204,10 @@
         \setcounter{instancecount}{0}
         \setcounter{sequencecursor}{0}
         \node[coordinate] (inst0) {};
-        
-        % Loop macros
-        \newcommand{\cgbeginloop}{
-            \ifnum\thelooplabel=0
-            \setcounter{looplabel}{\thesequencecursor}
-            \stepcounter{looplabel}
-            \else \PackageError{notation}{Attempting to nest loops in a cryptosequence. Close the former loop first}
-            \fi
-        }
-
-        \newcommand{\cgendloop}{
-            \ifnum\thelooplabel=0
-                \PackageError{notation}{No loop to close here}
-            \fi
-            \ifnum\thelooplabel>\thesequencecursor\relax
-                \PackageError{notation}{Closing an empty loop}
-            \fi
-            \draw[->](A)+(-0.2, -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
-            .. controls +(-0.6, -1.3)
-            and         +(-0.6, +1.3)
-            ..          +(-0.2, 0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
-            \setcounter{looplabel}{0}
-        }
 
         % Add the game's participants
-        \entity{A}{\textsf{A}}
-        \entity[2.5]{C}{$\textsf{C}^{\textsc{#3}}$}
+        \cseqentity{A}{\textsf{A}}
+        \cseqentity[2.5]{C}{$\textsf{C}^{\textsc{#3}}$}
 
 }
 { % Crypto-game END
@@ -224,11 +227,13 @@
     \fi
 }
 
+
+
 % Arguments: Identifier (used as label) | description | challengername | Second adversary name
 \NewDocumentEnvironment{cryptoredux}{m m m m}
 { % Crypto-game BEGIN
 
-    \craftfloat
+    \cseqcraftfloat
 
     \begin{tikzpicture}
 
@@ -242,33 +247,10 @@
         \setcounter{sequencecursor}{0}
         \node[coordinate] (inst0) {};
 
-        % Loop macros
-        \newcommand{\cgbeginloop}{
-            \ifnum\thelooplabel=0
-            \setcounter{looplabel}{\thesequencecursor}
-            \stepcounter{looplabel}
-            \else \PackageError{notation}{Attempting to nest loops in a cryptosequence. Close the former loop first}
-            \fi
-        }
-
-        \newcommand{\cgendloop}{
-            \ifnum\thelooplabel=0
-                \PackageError{notation}{No loop to close here}
-            \fi
-            \ifnum\thelooplabel>\thesequencecursor\relax
-                \PackageError{notation}{Closing an empty loop}
-            \fi
-            \draw[->](A)+(-0.2, -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
-            .. controls +(-0.6, -1.3)
-            and         +(-0.6, +1.3)
-            ..          +(-0.2, 0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
-            \setcounter{looplabel}{0}
-        }
-
         % Add the reduction's participants
-        \entity{D}{$\textsf{D}^{\textsc{#4}}$}
-        \entity[2.2]{A}{$\textsf{A}$}
-        \entity[2.2]{C}{$\textsf{C}^{\textsc{#3}}$}
+        \cseqentity{D}{$\textsf{D}^{\textsc{#4}}$}
+        \cseqentity[2.2]{A}{$\textsf{A}$}
+        \cseqentity[2.2]{C}{$\textsf{C}^{\textsc{#3}}$}
 
 }
 { % Crypto-game END

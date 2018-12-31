@@ -192,14 +192,14 @@ Suppose $G$ is a \prg. Given $Enc(k,m)=G(k) \xor m$, and a known $(\bar{m}, \bar
     {The \cpa-security game}
     {cpa}
 
-    \challenger{$k \pickUAR \{0, 1\}^\lambda$}
+    \cseqchallenger{$k \pickUAR \{0, 1\}^\lambda$}
 
-    \cgbeginloop
+    \cseqbeginloop
     \send{}{$m$}{}
     \receive{$c \pickUAR Enc_k(m)$}{$c$}{}
-    \cgendloop
+    \cseqendloop
 
-    \seqdelay
+    \cseqdelay
 
     \send{}{$m_0^*, m_1^*$}{}
     \receive{\shortstack[l]{
@@ -207,14 +207,14 @@ Suppose $G$ is a \prg. Given $Enc(k,m)=G(k) \xor m$, and a known $(\bar{m}, \bar
         $c^* \pickUAR Enc_k(m_b^*)$
     }}{$c^*$}{}
 
-    \seqdelay
+    \cseqdelay
 
-    \cgbeginloop
+    \cseqbeginloop
     \send{}{$m$}{}
     \receive{$c \pickUAR Enc_k(m)$}{$c$}{}
-    \cgendloop
+    \cseqendloop
 
-    \seqdelay
+    \cseqdelay
 
     \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
 
@@ -225,8 +225,7 @@ The adversary wins if it finds which $m_{b}^{*}$ message was previously encrypte
 The two cyclic requests, before and after the starred messages, can be arbitrarily long (also 0, there is no constraint).
 
 \begin{definition}
-  A scheme is CPA-secure if $Game_{\Pi, \A}^{cpa}(\lambda,0)
-    \approx_{c}Game_{\Pi, \A}^{cpa}(\lambda,1)  $
+    A scheme is \cpa-secure if $\cryptog{cpa}(\lambda, 0) \compindist \cryptog{cpa}(\lambda, 1)$
 \end{definition}
 
 Having given this definition of security, recall the $\Pi_{\xor}$ scheme defined in the previous lesson. It is easy to see that $\Pi_{\xor}$ is not \cpa-secure for the same reasons that it is not computationally 2-time secure; however this example sheds some new light about a deeper problem:

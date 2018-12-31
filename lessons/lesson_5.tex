@@ -171,7 +171,7 @@ In essence, the hybrid argument proves that computational indistinguishability i
             $z \pickUAR Z$}}
         {$z = (b_{1}, \dots ,b_{l(\lambda)}, s_{l(\lambda)})$}{}
 
-        \seqdelay
+        \cseqdelay
         
         \send{}{$a$}{\textsc{Output 1 iff} $a \simeq Z$}
 
@@ -181,25 +181,25 @@ In essence, the hybrid argument proves that computational indistinguishability i
 
     \begin{cryptoredux}{prghyb}{Reducing to a distinguisher for $G$, where $\beta = (b_1, \dots, b_{i-1})$ and $\sigma = (b_{i+1}, \dots, b_{l(\lambda)}, s_{l(\lambda))}$}{prg}{i-dist}
 
-        \seqmessagel{C}{\shortstack[l]{
+        \receive{\shortstack[l]{
             $s \pickUAR U_\lambda$ \\
             $z_0 = G(s)$ \\
             $z_1 \pickUAR U_{\lambda+1}$ \\
             $a \pickUAR \{0, 1\}$}}
-        {$z_a = (b, s)$}{A}{}
+        {$z_a = (b, s)$}{}
 
-        \seqdelay
+        \cseqdelay
 
-        \seqmessagel{A}{\shortstack[l]{
+        \invoke{\shortstack[l]{
             $\beta \pickUAR U_{i}$ \\
             $\sigma = G^{l(\lambda)-i+1}(s)$
         }}
-        {$(\beta, b, \sigma)$}{D}{}
+        {$(\beta, b, \sigma)$}{}
         
-        \seqdelay
+        \cseqdelay
 
-        \seqmessager{D}{}{$a'$}{A}{}
-        \seqmessager{A}{}{$a'$}{C}{\textsc{Output 1 iff} $a' = a$}
+        \return{}{$a'$}{}
+        \send{}{$a'$}{\textsc{Output 1 iff} $a' = a$}
     
     \end{cryptoredux}
 
@@ -248,7 +248,7 @@ There is also an alternative definition:
 
 
 \begin{cryptogame}{hcpreddef2}{Another hardcore game, $f$ and $\mathfrak{hc}$ are known}{hc(2)}
-    \seqdelay
+    \cseqdelay
     \receive{\shortstack[l]{
         $x \pickUAR \{0, 1\}^n$ \\
         $z_0 = \mathfrak{hc}(x)$ \\
@@ -256,8 +256,8 @@ There is also an alternative definition:
         $b \pickUAR \{0, 1\}$
     }}{$(f(x), z_b)$}{}
 
-    \seqdelay
-    \seqdelay
+    \cseqdelay
+    \cseqdelay
 
     \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
 \end{cryptogame}

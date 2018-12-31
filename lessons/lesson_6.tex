@@ -35,7 +35,7 @@ Consider the experiment depicted in figure \ref{cryptogame:otindist} for the enc
         $c \pickUAR Enc(k, m_b)$ }}
     {$c$}{}
 
-    \seqdelay
+    \cseqdelay
 
     \send{}{$b'$}{\textsc{Output 1 iff} $b = b'$}
     
@@ -103,7 +103,7 @@ and thus, by XORing the result with $\bar{m}$, obtain the entire unknown message
         }}
         {$c$}{}
 
-        \seqdelay
+        \cseqdelay
 
         \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
         
@@ -147,7 +147,7 @@ and thus, by XORing the result with $\bar{m}$, obtain the entire unknown message
 
             \return{}{$b'$}{}
 
-            \seqdelay
+            \cseqdelay
             \send{$b'' = \begin{cases}
                 0 &\textsc{iff } b'=0 \\
                 1 &\textsc{else}
