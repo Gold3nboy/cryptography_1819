@@ -1,0 +1,130 @@
+\mychapter{1}{Lesson 1}
+
+\section{Problems in Cryptography}
+
+- Confidential communication 
+
+\todo{Image of Alice,Bob, Eve in ske}
+
+\textbf{Kerckhoffs's principle:} \underline{No security by obscurity.}
+
+Security should only rely on the secrecy of the key. However sharing the key between two parties is a costly operation.
+
+\textbf{Syntax:}
+\begin{itemize}
+    \item $\K = $ Key Space
+    \item $\M = $ Message Space
+    \item $\C = $ Ciphertext Space
+    \item $Enc: \K \times \M \to \C$
+    \item $Dec: \K \times \C \to \M$
+\end{itemize}
+
+\textbf{Correctness:}
+
+$\forall m \in \M, \forall k \in \K : Dec(k, Enc(k,m))=m$
+
+\begin{definition}
+    Perfect Secrecy (SHANNON)
+
+    Let M be any distribution over $\M$.
+
+    Let K be uniform over $\K$.
+
+    We say that $(Enc, Dec)$ is perfectly secret if $\forall M, \forall m \in \M, \forall c \in \C$.
+
+    $$Pr[M=m]=Pr[M=m|C=c]$$
+    Meaning that the ciphertext does not reveal anything about the message.
+\end{definition}
+
+\begin{theorem}
+    Let M, K, C as above. The following are equivalent:
+\end{theorem}
+
+\begin{enumerate}[I]
+    \item $Pr[M=m]=Pr[M=m|C=c]$
+    \item M and C are INDEPENDENT
+    \item $\forall m, m' \in \M, \forall c \in C$ $Pr[Enc(k,m)=c]=Pr[Enc(k,m')=c]$
+\end{enumerate}
+
+\begin{proof}
+
+    $(I)\implies(II)$
+    \begin{gather*}
+        Pr[M=m \wedge C=c]=Pr[C=c]Pr[M=m|C=c]=Pr[C=c]Pr[M=m]   
+    \end{gather*}
+    They are independent.
+    
+    $(II)\implies(III)$
+    Fix M, any $m\in M, c\in C$
+    \begin{gather*}
+        Pr[Enc(K,m)=c]=Pr[Enc(K,M)=c|M=m]=Pr[C=c|M=m]=Pr[C=c]   
+    \end{gather*}
+
+    $(III)\implies(I)$
+    \begin{gather*}
+        Pr[C=c]=\sum_{m'}Pr[C=c\wedge M=m']=\\
+        =\sum_{m'}Pr[Enc(K,M)=c\wedge M=m']=\\
+        =\sum_{m'}Pr[Enc(K,M)=c| M=m']Pr[M=m']=\\
+        =\sum_{m'}Pr[Enc(K,m')=c]Pr[M=m']= \text{(Using III)}\\
+        =Pr[Enc(K,m)=c]\underbrace{\sum_{m'}Pr[M=m']}_{=1}=\\
+        =Pr[Enc(K,m)=c]=Pr[Enc(K,M)=c|M=m]=\\
+        =\underbrace{Pr[C=c|M=m]}_{\text{\shortstack{The proof ends here\\but we want (I)}}}\implies Pr[M=m]Pr[C=c|M=m]\implies\\
+        \implies P[M=m]=\frac{Pr[C=c]Pr[M=m|C=c]}{Pr[C=c|M=m]}\\
+        \implies Pr[M=m]=Pr[M=m|C=c]
+    \end{gather*}
+\end{proof}
+
+\section{One Time Pad (OTP)}
+
+$K=M=C=\{0,1\}^l$\\
+$K\leftarrow\$ \{0,1\}^l$
+\begin{itemize}
+    \item $Enc(k,m)=k\xor m=c$
+    \item $Dec(k,c)=k\xor c=m$
+\end{itemize}
+\begin{theorem}
+    \textbf{OTP} is perfectly secret
+\end{theorem}
+\begin{proof}
+    Fix any $m,c \in \{0,1\}^l$:
+    \begin{gather*}
+        Pr[Enc(k,m)=c]=Pr[k\xor m=c]=\\
+        =Pr[k=c\xor m]=2^{-l} \text{(because k is uniform)}\\
+        =Pr[Enc(k,m')=c] \forall m'    
+    \end{gather*}
+    This satisfies (III)
+\end{proof}
+
+\textbf{Problems:}
+\begin{enumerate}
+    \item $|k|=|m|$ (the key must have the same length of the message)
+    \item There must be one different key for each message (\textit{One Time}).\\Otherwise:\\
+    $c_1=k\xor m_1; c_2=k \xor m_2 \implies c_1\xor c_2=m1\xor m_2$\\
+    Not independent! (OTP is malleable\footnote{An encryption algorithm is "malleable" if it is possible to transform a ciphertext into another ciphertext which decrypts to a related plaintext. That is, given an encryption $c$ of a plaintext $m$, it is possible to generate another valid ciphertext $c'$, for a known $Enc$, $Dec$, without necessarily knowing or learning $m$. })
+\end{enumerate}
+
+\begin{theorem}
+    In any perfectly secret SKE we must have $|\K|\geq |\M|$
+\end{theorem}
+\begin{proof}
+    Take $M$ to be uniform over $\M$ and take $c$ s.t. $Pr[C=c]>0$.\\
+    Consider $M'=\{Dec(K,c):k\in K\}$ (decryption of $c$ with every key) and assume $|\K|<|\M|$
+    \begin{gather*}
+        \implies |M'|\leq |K|\leq |M|\\
+        \implies \exists m \in M \setminus M'\\
+        \text{Now} Pr[M=m]=\frac{1}{|\M|}\\
+        Pr[\underbrace{M=m}_{m\text{ is not inside }M'}|\overbrace{C=c}^{\text{By assumption all the c "creates" M'}}]=\emptyset
+    \end{gather*}
+    The above notion can be represented with the following picture:\\
+    \def\firstcircle{(0,0) circle (1.5cm)}
+    \def\secondcircle{(60:0) circle (0.9cm)}
+    \begin{tikzpicture}
+        \begin{scope}[shift={(3cm,-5cm)}, fill opacity=0.5]
+            \fill[red] \firstcircle;
+            \fill[green] \secondcircle;
+            \draw \firstcircle node[label={[xshift=1.0cm, yshift=0.3cm]$M$}] { };
+            \draw \secondcircle node[label={[xshift=1.2cm, yshift=-0.5cm]$m$}] {$M'$};
+        \end{scope}
+    \end{tikzpicture}
+    Meaning that $c$ is not an encryption of $m$!
+\end{proof}
