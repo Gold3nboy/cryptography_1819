@@ -12,15 +12,16 @@
 \ProvidesPackage{notation}[2018/09/21 v0.2-crypto The Notation]
 
 % Required for crypto games
-\RequirePackage{tikz} % duh...
-\usetikzlibrary{arrows,shadows} % shadow fpr the participants, arrow for the messages
-\RequirePackage{xparse} % Improved environment definition
-\RequirePackage{ifthen} %Needed for cryptogame end
+\RequirePackage{tikz}
+\usetikzlibrary{arrows,shadows} % shadows for the entities, arrows for the messages
+\RequirePackage{xparse} % Improved macro/environment definition commands
 
 % Cryptography
 %
 % Evaluate UAR [math mode]
 \newcommand{\pickUAR}{\mathrel{{\leftarrow}\vcenter{\hbox{\scriptsize\rmfamily\upshape\!\!\textsf{\$}}}}}
+% Default challenger
+\newcommand{\challenger}{\textsf{C}}
 % Default adversary
 \newcommand{\adversary}{\textsf{A}}
 % Default distinguisher
@@ -36,6 +37,8 @@
 \newcommand{\iid}{\textsc{iid}}
 % Uniformly At Random
 \newcommand{\uar}{\textsc{uar}}
+% Probabilistic Polynomial time
+\newcommand{\ppt}{\textsc{ppt}}
 % Universally unforgeable from chosen message attack
 \newcommand{\ufcma}{\textsc{uf-cma}}
 % Decisional Diffie-Hellman
@@ -214,8 +217,8 @@
         }
 
         % Add the game's participants
-        \cseqentity{A}{\textsf{A}}
-        \cseqentity[2.5]{C}{$\textsf{C}^{\textsc{#3}}$}
+        \cseqentity{A}{$\adversary$}
+        \cseqentity[2.5]{C}{$\challenger^{\textsc{#3}}$}
 
 }
 { % Crypto-game END
@@ -279,9 +282,9 @@
         }
 
         % Add the reduction's participants
-        \cseqentity{D}{$\textsf{D}^{\textsc{#4}}$}
-        \cseqentity[2.2]{A}{$\textsf{A}$}
-        \cseqentity[2.2]{C}{$\textsf{C}^{\textsc{#3}}$}
+        \cseqentity{D}{$\distinguisher^{\textsc{#4}}$}
+        \cseqentity[2.2]{A}{$\adversary$}
+        \cseqentity[2.2]{C}{$\challenger^{\textsc{#3}}$}
 
 }
 { % Crypto-game END
