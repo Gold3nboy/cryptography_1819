@@ -127,15 +127,26 @@ Note that the theorem is more general, and holds for any $p, q$ that are coprime
 
 How to use this theorem for constructing a PKE scheme:
 
-Reminder (Euler's theorem): $\forall x \in \mathbb{Z}_n \implies x^{\varphi(n)} = x \mod n$
+Reminder (Euler's theorem):\review{ $\forall x \in \mathbb{Z}_n \implies
+x^{\varphi(n)} = x \mod n$ \\
+maybe the correct one is \\
+$\forall x \in \mathbb{Z}_n \implies
+x^{\varphi(n)} = 1 \mod n$
+}
 
 Reminder: $\forall p, q \in \mathbb{P} \implies \varphi(pq) = (p-1)(q-1)$
 
-So let $a$ be the public key such that $\gcd(a, \varphi(n))=1$, then $\exists! b \in \mathbb{Z}_n : ab = 1 \mod \varphi(n)$, $d$ will be our private key.
+So let $a$ be the public key such that $\gcd(a, \varphi(n))=1$, then $\exists! b
+\in \mathbb{Z}_n : ab = 1 \mod \varphi(n)$, $b$ will be our private key.
 
-Define encryption as $f(a, m) = m^a \mod n$, and then decryption as $g(b, c) = c^b \mod n$
+Define encryption as $f(a, m) = m^a \mod n$, and then decryption as $g(b, c) =
+c^b \mod n$.
 
-Observe that $g(b, f(a, m)) = (m^a)^b = m^{ab} = m \mod n$, because $ab = 1 \mod \varphi(n)$
+Observe that 
+\[
+g(b, f(a, m)) = (m^a)^b =m^{ab}=m^{k\varphi(n)+1}=(m^{\varphi(n)})^{k}m = m \mod n
+\]
+, because $ab = 1 \mod \varphi(n)$.
 
 So we conjecture that the above is a valid TDP-based PKE scheme. This is actually called the ``RSA assumption'':
 
@@ -202,9 +213,10 @@ now Enc is not deterministic.\\
 \textbf{Facts:}
 \begin{enumerate}
     \item $l \in super(log(\lambda))$ otherwise it is possible to bruteforce in PPT.
-    \item If $m\in\{0,1\}$ then I can prove it CPA secure under RSA (just use standard TDP)
+        \review{\item If $m\in\{0,1\}$ then I can prove it CPA secure under RSA
+        (just use standard TDP)}
     \item If $m$ is "in the middle" ($\{0,1\} \leq m \leq \{0,1\}^l$) RSA is believed to be secure and is \underline{standardized} (PKCS\#1,5)
-    \item Still not CCA secure!
+        \review{ \item Still not CCA secure! counterexample?}
 \end{enumerate}
 
 
@@ -222,58 +234,81 @@ Since $Z_p^*$ is cyclic I can always write:
 
 \begin{gather*}
     Z_p^*=\{g^0,g^1,g^2,\ldots,g^{\frac{p-1}{2}-1},g^{\frac{(p-1)}{2}},\ldots,g^{p-2} \}\\
-    \QR[p]=\{g^0,g^2,g^4,\ldots,\overbrace{g^{p-3}}^{g^{\frac{pi1}{2}-1} in Z_p^*},\underbrace{g^0}_{g^{\frac{p-1}{2}}in Z_p^*},\ldots\}\\
+    \QR[p]=\{g^0,g^2,g^4,\ldots,\overbrace{g^{p-3}}^{g^{\frac{p-1}{2}-1} in Z_p^*},\underbrace{g^0}_{g^{\frac{p-1}{2}}in Z_p^*},\ldots\}\\
     |\QR[p]|=\frac{p-1}{2}
 \end{gather*}
-Moreover since $(g^{\frac{p-1}{2}})^2 \equiv 1 \Mod{p} $ then $g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.\\
-Now assume $p\equiv 3 \Mod{4}$ ([*]$p=4t+3$ CRT), then squaring $Mod{p}$ is a permutation because, given \underline{$y=x^2 \Mod{p}$} if I compute:
-\begin{gather*}
-    (y^{t+1})^2=\underbrace{y^{2t+2}}_{\text{[*] }2t+2=\frac{p-3}{2}+2=\frac{p+1}{2}=\frac{p-1}{2}+1}=(x^2)^{\frac{p-1}{2}+1}=1x^2=x^2\\
-    \implies x=\pm y^{t+1}
-\end{gather*}
+Moreover, since $(g^{\frac{p-1}{2}})^2 \equiv 1 \Mod{p} $ and $g^{\frac{p-1}{2}}$
+cannot be 1 (since $g^{0}\not=g^{\frac{p-1}{2}}\not=g^{p-1}$ ) but must be one
+of the $p-1$ elements of $Z_{p}^{*}$, then
+$g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.\\
 
-But only 1 among the above $\pm y^{t+1}$ is a square, this is because $\frac{p-1}{2}$ is odd.
+Now it's possible to show that $f: \QR[p]\to \QR[p] $ is a permutation, and we
+are going to show a method to invert it, aka $f^{-1}$.\\
 
+Assume $p\equiv 3 \Mod{4}$
+([*]$p=4t+3\Rightarrow t=\frac{p-3}{4}$), then squaring $Mod{p}$ is a permutation because, given
+\underline{$y=x^2 \Mod{p}$} if I compute: \begin{gather*}
+    (y^{t+1})^2=\underbrace{y^{2t+2}}_{\text{[*]
+    }2t+2=\frac{p-3}{2}+2=\frac{p+1}{2}=\frac{p-1}{2}+1}=(x^2)^{\frac{p-1}{2}+1}=1x^2=x^2\\
+    \implies x=\pm y^{t+1} \end{gather*}
+
+But only 1 among the above $\pm y^{t+1}$ is a square, in particular only the
+positive one.\\
+Since we have that 
+\[ 
+    p=k4+3 \Rightarrow \frac{p-1}{2}=\frac{4k+2}{2}=2k+1
+\]
+so $\frac{p-1}{2}$ is odd.\\
+
+Now, since we are considering just $\QR[p]=\{y \in \mathbb{Z}_{p}^{*} : \exists
+x \in \mathbb{Z}_{p}^{*} x^{2}=y\}$ and we can write each $x \in
+\mathbb{Z}_{p}^{*} $ as
+$g^{z}$ for a $z \in \mathbb{Z}_{p}$, 
+\[
+    y=x^{2} \Leftrightarrow y=(g^{z})^{2}=g^{2z}
+\]
+
+So, $y=g^{z'} \in \QR[p] \Leftrightarrow z'$ is even. If $z'$ is odd, then $y \notin \QR[p] $.
+
+Since $\frac{p-1}{2}$ is odd, then $g^{\frac{p-1}{2}} \not\in \QR[p]$, and since
+it is possible to generate all of the other numbers with odd exponents 
+\[
+g^{odd}=g^{\frac{p-1}{2} \pm even}=g^{\frac{p-1}{2}}g^{ \pm even} \Rightarrow
+-1(g^{\pm even})
+\]
+and $g$ powered to odd exponents will have this form.\\
+
+From that, it's possible to state the following
 \begin{lemma}
-    $\forall z, z\in \QR[p]$ IFF $-z\notin \QR[p]$
+    $\forall z, z\in \QR[p] \implies  -z \notin \QR[p]$
 \end{lemma}
 
 
 
-=======
 \subsection{Rabin's Trapdoor permutation}
 
 Now we study a one way function built on previous deductions about number theory and modular arithmetic.
 
 The \textit{Rabin trapdoor permutation} is defined as 
 \[
-    f: \mathbb{Z}^{*}_{n}  \to \mathbb{Z}^{*}_{n}  \newline
     f(x)=x^{2} \text{ mod } n
 \]
-where $n=p*q$ for primes $p,q=3 mod 4$.\\
-\todo{label related to a previous construction}
+where $n=p*q$ for primes $p,q=3 \text{mod} 4$.\\
 
-We can observe that the image of this function is a subset of $\mathbb{Z}^{*}_{n} $.
+We can observe that the image of this function is $\QR[n]$, a subset of $\mathbb{Z}^{*}_{n} $.
 
-For the \textbf{Chinese remainder theorem}, we can consider values modulo
-$N=pq$ as values modulo $p$ and values modulo $q$.\\
-So now consider
-\[
-    f: \mathbb{Z}^{*}_{p}  \to \mathbb{Z}^{*}_{p}  \newline
-    f(x)=x^{2} \text{ mod } p
-\]
-The image of the function $f$ exactly matches the definition of
-\textbf{quadratic residues}, since 
-\[
-    f \text{'s image set}= \mathbb{QR}_{p}=\{y:y \equiv x^{2} 
-    \text{ mod } p, x \in \mathbb{Z}^{*}_{p}   \} 
-\]
-We can observe the same for $\mathbb{Z}^{*}_{q}$ .
-
-So for \textbf{Chinese remainder theorem} it is possible to state that $f$ maps
+For \textbf{Chinese remainder theorem} it is possible to state that $f$ maps
 as follows
 \[
     x= (x_{p}, x_{q}) \mapsto (x^{2}_{p}, x^{2}_{q})
+\]
+since each element of $ \mathbb{Z}_n$ has always two different forms , in $
+\mathbb{Z}_{p} $ and in $ \mathbb{Z}_{q} $.\\
+
+So
+\[
+y \in  \mathbb{QR}_{n} \Leftrightarrow y_{p} \in \mathbb{QR}_{p} \wedge y_{q} \in
+\mathbb{QR}_{q} 
 \]
 
 As before, the image of $f$ is exactly
@@ -281,25 +316,20 @@ As before, the image of $f$ is exactly
     \mathbb{QR}_{n} = \{ y: \exists x : y=x^{2} \text{ mod } n\}
 \]
 
-For the previous observations, it's possible to state the following \textbf{Fact:}
-\[
-y \leftarrow \mathbb{QR}_{n} \Leftrightarrow y \in \mathbb{QR}_{p} \wedge y \in
-\mathbb{QR}_{q} 
-\]
-
-This is important because if we try to invert the function $f$, among the
-hypotetical 4 possible values
+If we try to invert the function $f$, even without applying the previous
+inversion algorithm, we easily note that among the 4 possible values
 \[
     f^{-1}(y)=\{ (x_{p}, x_{q}),(-x_{p}, x_{q}),(x_{p},- x_{q})(-x_{p},- x_{q})\}
 \]\label{les15:outoffour}
-only 1 out of these above 4 values is a quadratic residue because only one of
-$-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.
-\todo{label to previous fact}
+only 1 is a quadratic residue since we said, in the
+last lemma, that only one out of
+$-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.\\
 
-Therefore, we have that the Rabin's TDP is a permutation, and that the cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.
+Therefore, we have that the Rabin's TDP is a permutation in $\QR[n]$, and that the
+cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.\\
 
 Furthermore, with the following claim we can state that the Rabin cryptosystem
-is as secure as the hardness of factoring.
+is OWF thanks to the hardness of factoring.
 
 \begin{claim}
     Given $x, z$ such that $x^{2}\text{ mod} n \equiv z^{2} \text{ mod } n
@@ -309,9 +339,9 @@ is as secure as the hardness of factoring.
 \]
 \end{claim}
 \begin{proof}
-    For the previous statement \ref{les15:outoffour}, since $f^{-1}(y)$
-    has only one value out of four, summing two distinct elements $x, z$
-    in the domain of function $f$ generates only 2 possible values:
+    Since $f^{-1}(y)$ has only one value out of four, $x\neq \pm z$ and
+    $z\in \{(x_{p},x_{q}),(-x_{p},-x_{q})\}$ , then
+    $x \in \{(x_{p},-x_{q}),(-x_{p},x_{q})\}$ and 
     \[
         x + z \in \{(0,2x_{q}), (2x_{p}, 0)\}
     \]
@@ -326,29 +356,30 @@ is as secure as the hardness of factoring.
 \begin{theorem}
     Squaring mod $n$ (where $n$ is a \textit{bloom integer}\footnote{ a bloom
     integer $n$ is $n=p,q$ for $p,q=3 mod 4$, as the definition of Rabin's TDP})
-    is a \textbf{trapdoor permutation} under factioring.
+    is a \textbf{trapdoor permutation} under factoring.
 \end{theorem}
+Since we have already shown tha Rabin's function is a permutation since it is
+invertible, we have to show that Rabin's function is also OWF.
 
 In other words
 \[
-    \text{Factoring is hard } \Rightarrow \text{ inverting $f(x)$ is hard}
+    \text{Factoring is hard } \Rightarrow \text{ $f(x)$ is OWF , aka inverting
+    it is hard}
 \]
 The following proof is by contraddiction.
 \begin{proof}
-    Assume that exists an adversary PPT such that
-    \[
-        \P [ x^{2}=y:(p,q,n) \leftarrow\$ Genbloom(1^{\lambda}), y \leftarrow\$
-        \mathbb{QR}_{n}, x \leftarrow \A(y)  ] \geq \frac{1}{poly(\lambda)}  
-    \]
-    But then we can build the following reduction:
+    Assume that exists an adversary PPT who, given $y=x^{2} \text{ mod }
+    n$, can find a $z \in \mathbb{Z}_{n} $ such that $z^{2} \text{ mod } n=y$
+    but $z\neq \pm x$ .\\
 
-    \todo{check the correctness of the image}
-\begin{figure}[h!]
+    We can build the following reduction to show that $\A$ choses $x$:
+
+\begin{figure}[ht]
    \centering
    \sdinit{}
    \begin{tikzpicture}
       \sdbegin{}
-      \newinst{A}{$ \A $}
+      \newinst{A}{$ \A^{Rabin} $}
       \newinst[2.5]{B}{$ \A_{fact} $}
       \newinst[2]{C}{$\C_{(p,q,n) \leftarrow\$ Genbloom \wedge p,q \equiv 3
       \text{ mod } 4}$}
@@ -377,6 +408,11 @@ The following proof is by contraddiction.
    \end{tikzpicture}
 \end{figure}
 
+Once obtained $z\neq \pm x$ which $z^{2}=y$ we can use \textbf{Claim 1}(just
+summing $x$ and $z$ and analyzing the result) to factorize $n$ in
+polytime.\\
+
+But factorizing $n$ in polytime is not possible.
 \end{proof}
 
 
