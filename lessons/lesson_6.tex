@@ -152,14 +152,14 @@ and thus, by XORing the result with $\bar{m}$, obtain the entire unknown message
                 0 &\textsc{iff } b'=0 \\
                 1 &\textsc{else}
             \end{cases}$
-            }{$b''$}{}
+            }{$b''$}{\textsc{Output 1 iff} $b'' = b$}
 
         \end{cryptoredux}
 
         Do observe that the adversary always encrypts $m_0$, but this game can be modified for $m_1$ by switching $b''$'s assignments without loss of generality; the crucial point is to see if the distinguisher guesses which message the adversary has encrypted:
         \begin{itemize}
-            \item if $\textsf{D}^\textsc{ind}$ is wrong, then \textsf{A} can deduce almost surely that the value given by $\textsf{C}^\textsc{prg}$ is in fact truly random;
-            \item if $\textsf{D}^\textsc{ind}$ is right, then \textsf{A} has a reasonably high probability of having received a pseudorandom value from $\textsf{C}^\textsc{prg}$.
+            \item if $\textsf{D}^\textsc{ind}$ is wrong, then \textsf{A} can deduce with high probability that the value given by $\textsf{C}^\textsc{prg}$ is in fact truly random;
+            \item if $\textsf{D}^\textsc{ind}$ is right, then \textsf{A} has a sensibly greater probability of having received a pseudorandom value from $\textsf{C}^\textsc{prg}$.
         \end{itemize} 
 
         Either way, by the existence of $\textsf{D}^\textsc{ind}$, \textsf{A} gains an edge in efficiently breaking a \prg{}, which is absurd.

@@ -23,8 +23,12 @@
 \newcommand{\pickUAR}{\mathrel{{\leftarrow}\vcenter{\hbox{\scriptsize\rmfamily\upshape\!\!\textsf{\$}}}}}
 % Default adversary
 \newcommand{\adversary}{\textsf{A}}
+% Default distinguisher
+\newcommand{\distinguisher}{\textsf{D}}
 % Cryptogame [math mode]
 \NewDocumentCommand{\cryptog}{m O{\Pi} O{\adversary}}{\textsc{Game}^{\textsc{#1}}_{#2, #3}}
+% Hybrid game [math mode]
+\NewDocumentCommand{\hybridg}{m O{\Pi} O{\adversary}}{\textsc{Hyb}^{\textsc{#1}}_{#2, #3}}
 
 % Acronyms
 %
@@ -38,6 +42,10 @@
 \newcommand{\ddh}{\textsc{ddh}}
 % Computational Diffie-Hellman
 \newcommand{\cdh}{\textsc{cdh}}
+% Secret Key Encryption
+\newcommand{\ske}{\textsc{ske}}
+% Public Key Encryption
+\newcommand{\pke}{\textsc{pke}}
 % Chosen Plaintext Attack
 \newcommand{\cpa}{\textsc{cpa}}
 % Chosen Ciphertext Attack
@@ -163,29 +171,6 @@
     \cseqmessager{D}{#1}{#2}{A}{#3}
 }
 
-% Loop macros
-\newcommand{\cseqbeginloop}{
-    \ifnum\thelooplabel=0
-    \setcounter{looplabel}{\thesequencecursor}
-    \stepcounter{looplabel}
-    \else \PackageError{notation}{Attempting to nest loops in a cryptosequence. Close the former loop first}
-    \fi
-}
-
-\newcommand{\cseqendloop}{
-    \ifnum\thelooplabel=0
-        \PackageError{notation}{No loop to close here}
-    \fi
-    \ifnum\thelooplabel>\thesequencecursor\relax
-        \PackageError{notation}{Closing an empty loop}
-    \fi
-    \draw[->](A)+(-0.2, -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
-    .. controls +(-0.6, -1.3)
-    and         +(-0.6, +1.3)
-    ..          +(-0.2, 0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
-    \setcounter{looplabel}{0}
-}
-
 
 % Arguments: Identifier (used as label) | description | challengername
 \NewDocumentEnvironment{cryptogame}{m m m}
@@ -204,6 +189,29 @@
         \setcounter{instancecount}{0}
         \setcounter{sequencecursor}{0}
         \node[coordinate] (inst0) {};
+        
+        % Loop macros
+        \newcommand{\cseqbeginloop}{
+            \ifnum\thelooplabel=0
+            \setcounter{looplabel}{\thesequencecursor}
+            \stepcounter{looplabel}
+            \else \PackageError{notation}{Attempting to nest loops in a         cryptosequence. Close the former loop first}
+            \fi
+        }
+
+        \newcommand{\cseqendloop}{
+            \ifnum\thelooplabel=0
+                \PackageError{notation}{No loop to close here}
+            \fi
+            \ifnum\thelooplabel>\thesequencecursor\relax
+                \PackageError{notation}{Closing an empty loop}
+            \fi
+            \draw[->](A)+(-0.2,         -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+            .. controls +(-0.6, -1.3)
+            and         +(-0.6, +1.3)
+            ..          +(-0.2,         0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
+            \setcounter{looplabel}{0}
+        }
 
         % Add the game's participants
         \cseqentity{A}{\textsf{A}}
@@ -246,6 +254,29 @@
         \setcounter{instancecount}{0}
         \setcounter{sequencecursor}{0}
         \node[coordinate] (inst0) {};
+        
+        % Loop macros
+        \newcommand{\cseqbeginloop}{
+            \ifnum\thelooplabel=0
+            \setcounter{looplabel}{\thesequencecursor}
+            \stepcounter{looplabel}
+            \else \PackageError{notation}{Attempting to nest loops in a       cryptosequence. Close the former loop first}
+            \fi
+        }
+
+        \newcommand{\cseqendloop}{
+            \ifnum\thelooplabel=0
+                \PackageError{notation}{No loop to close here}
+            \fi
+            \ifnum\thelooplabel>\thesequencecursor\relax
+                \PackageError{notation}{Closing an empty loop}
+            \fi
+            \draw[->](D)+(-0.2,         -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+            .. controls +(-0.6, -1.3)
+            and         +(-0.6, +1.3)
+            ..          +(-0.2,         0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
+            \setcounter{looplabel}{0}
+        }
 
         % Add the reduction's participants
         \cseqentity{D}{$\textsf{D}^{\textsc{#4}}$}
