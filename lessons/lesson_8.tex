@@ -1,10 +1,9 @@
 \mychapter{8}{Lesson 8}
 \section{Domain extension}
 
-How can we encrypt long messages , say $m=(m_{1}, m_{2}, ..., m_{t})$ where
-for $i \in [t], m_{i} \in \{0,1\}^{n} $?\\
+How can we encrypt long messages , say $m=(m_{1}, m_{2}, ..., m_{t})$ where for $i \in [t], m_{i} \in \{0,1\}^{n} $?
 
-Mode of operation: let's build $P_{k}$, a blockcypher.\\
+Mode of operation: let's build $P_{k}$, a blockcypher.
 
 \subsection{Electronic CodeBook (ECB)}
 
@@ -63,32 +62,30 @@ CPA-secure as the encryption function is \textbf{deterministic.}
 \end{preview}
 
 In the image, each message is long exactly \textbf{n bits}, and 
-\[
-r \leftarrow\$ \{0,1\}^{n} 
-\]
+\begin{equation*}
+    r \leftarrow\$ \{0,1\}^{n}
+\end{equation*}
 so the sums made over $r$ are done in \textbf{mod $2^{n}$}, since $r$ can be a
-number in the range $[0, 2^{n} -1]$.\\
+number in the range $[0, 2^{n} -1]$.
 
-This is also called streamcipher, cause as input flows ECB produces the
-ciphertext.How to decrypt this schema?\\
-Since I know $r_{i}$, if I compute $F_{k}(r_{i})$ I can use the $\xor$-operation
-to calculate the message.\\
+This is also called streamcipher, cause as input flows ECB produces the ciphertext.How to decrypt this schema?
+
+Since I know $r_{i}$, if I compute $F_{k}(r_{i})$ I can use the $\xor$-operation to calculate the message.
 
 \subsection{Cipher block chaining (CBC)}
-================================================================================
-================================================================================
-                    CBC IMAGE
-================================================================================
-================================================================================
+
+\todo{CBC IMAGE}
+
 The schema to cipher here is 
 \[ 
     \forall i \in [1,t] c_{i}=P_{k}(C_{i-1}\xor m_{1})
 \]
 How to decipher?
-\[
+\begin{equation*}
     P_{k}^{-1}(i)= c_{i-1} \xor m_{i}
-\]
-so $m_{i}= P_{k}^{-1}(c_{i}) \xor c_{i-1}$.\\
+\end{equation*}
+
+so $m_{i}= P_{k}^{-1}(c_{i}) \xor c_{i-1}$.
 
 \begin{theorem}
     Assume $\F$ ($F_{k}$ in the image above is part of this family) is a PRF,
@@ -103,7 +100,7 @@ has t subsets, and $t$ can change from message $m$ to another message
 $m'=(m'_{1}, ..., m'_{t'})$.
 Consider the following hybrids:
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
    \centering
    \sdinit{}
    \begin{tikzpicture}[scale=0.65]
@@ -153,7 +150,7 @@ Consider the following hybrids:
 \end{figure}
 
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
    \centering
    \sdinit{}
    \begin{tikzpicture}[scale=0.5]
@@ -202,7 +199,7 @@ Consider the following hybrids:
    \caption{$\H\Y\B_{1}(\lambda, b)$}
 \end{figure}
 \newpage
-\begin{figure}[h!]
+\begin{figure}[ht!]
    \centering
    \sdinit{}
    \begin{tikzpicture}[scale=0.5]
@@ -265,59 +262,39 @@ Now we want to show that $Game_{\Pi, \lambda}^{cpa}(\lambda,0)
         \{0,1\}$
     \end{lemma}
 
-    The two hybrids are identical but for the encryption function, which is
-    completely random in the second one while the first one uses a random
-    function.\\
+    The two hybrids are identical but for the encryption function, which is completely random in the second one while the first one uses a random function.
     
-    Since  $R(r + i ) \xor m_{i} \approx R(r + i ) $ (because
-    $m_{i}$ doesn't affect the distribution of the result at all), if  $R(r^{*})$ 
-     behaves like a true random extractor , the two hybrids are
-    indistinguishable.\\
+    Since  $R(r + i ) \xor m_{i} \approx R(r + i ) $ (because $m_{i}$ doesn't affect the distribution of the result at all), if  $R(r^{*})$ behaves like a true random extractor , the two hybrids are indistinguishable.
 
-    Now, if I examine a simple query and the consecutive challenge query $(q,
-    q^{*})$ in a game in $\H\Y\B_{2}$, the responses will be chosen at random
-    with very low probability of being the same; but in a game in
-    $\H\Y\B_{1}$, the problem comes if the challenger 
-    creates an $r^{*}+ j'$ for $q^{*}$ which overlaps some chosen
-    $r_{i} + j$ previously chosen for $q$.\\
-    This is bad, because $R(r_{i} + j)=R(r^{*} + j')$ since $R$ is a random
-    function, and the probability of outputting the same response ciphertext
-    will be much higher in $\H\Y\B_{1}$.\\
+    Now, if I examine a simple query and the consecutive challenge query $(q, q^{*})$ in a game in $\H\Y\B_{2}$, the responses will be chosen at random with very low probability of being the same; but in a game in $\H\Y\B_{1}$, the problem comes if the challenger creates an $r^{*}+ j'$ for $q^{*}$ which overlaps some chosen $r_{i} + j$ previously chosen for $q$.
 
-    It's possible to show that these collisions happen very few times
-    (with \textbf{negligible} probability) in $\H\Y\B_{1}$ and  that the two 
-    hybrids are distinct and
-    distinguishable for a negligible factor.\\
+    This is bad, because $R(r_{i} + j)=R(r^{*} + j')$ since $R$ is a random function, and the probability of outputting the same response ciphertext will be much higher in $\H\Y\B_{1}$.
+
+    It's possible to show that these collisions happen very few times (with \textbf{negligible} probability) in $\H\Y\B_{1}$ and  that the two hybrids are distinct and distinguishable for a negligible factor.
 
     \begin{proof}
-        Let :
+        Let:
         \begin{itemize}
             \item $q$= \# of encryption queries
             \item $t_{i}$ = \# of blocks for the i-th query
             \item $t^{*}$ = \# of blocks for challenge
         \end{itemize}
- and let the function $R$ run: we will have 
- $R(r*), ...R(r^{*}+t^{*}-1)$ and $R(r_{i}), ..., R(r_{i}+t_{i}-1)$ sequences of random
- function outputs.
+
+        and let the function $R$ run: we will have $R(r*), ...R(r^{*}+t^{*}-1)$ and $R(r_{i}), ..., R(r_{i}+t_{i}-1)$ sequences of random function outputs.
 
  \begin{definition}
      \textbf{OVERLAP event}: $\exists$ i, j, j', $r_{i} + j=r^{*} + j'$ (here $j \leq t_{i}$ and $j' \leq t^{*}$), for some query $q_{i}$.
  \end{definition}
  
- If \textbf{OVERLAP}  does not happen , the sequence $(R(r^{*}), ...,
- R(r^{*}+t^{*}-1))$ is made of \textbf{ \textit{uniform} } and \textbf{
- \textit{independent}} values.
- Thus $\H\Y\B_{1}(b)$ is identical to $\H\Y\B_{2}(b)$ for all $b \in \{0,1\}$
- .\\
+ If \textbf{OVERLAP}  does not happen , the sequence $(R(r^{*}), ..., R(r^{*}+t^{*}-1))$ is made of \textbf{ \textit{uniform} } and \textbf{ \textit{independent}} values.
+ Thus $\H\Y\B_{1}(b)$ is identical to $\H\Y\B_{2}(b)$ for all $b \in \{0,1\}$.
 
- Now it suffices to show that $ \P [ OVERLAP ] \in \negl{\lambda}  $.\\
+ Now it suffices to show that $ \P [ OVERLAP ] \in \negl{\lambda}  $.
 
- For simplicity, assume $q=$(length of each query) and also $t_{i}=t^{*}=q$.\\
-Let $OVERLAP_{i}$ be the event that the $i-th$ query $r_{i}, ..., r_{i} + q - 1 $ 
-partially or totally overlaps the challenge sequence $r^{*}, ..., r^{*} + q - 1 $.\\
+ For simplicity, assume $q=$(length of each query) and also $t_{i}=t^{*}=q$.
+Let $OVERLAP_{i}$ be the event that the $i-th$ query $r_{i}, ..., r_{i} + q - 1 $ partially or totally overlaps the challenge sequence $r^{*}, ..., r^{*} + q - 1 $.
 
-Fix some $r*$.\\
-One can see that $OVERLAP_{i}$ happens if 
+Fix some $r*$. One can see that $OVERLAP_{i}$ happens if 
 \[
 r^{*}-q+1 \leq r_{i} \leq r^{*} + q - 1
 \]
@@ -329,7 +306,8 @@ r^{*}-q+1 \leq r_{i} \leq r^{*} + q - 1
     \item the sequence $r_{i},..., r_{i} + q - 1 $ comes before the sequence the
         sequence $r^{*}, ..., r^{*} + q - 1 $, and they overlap just for the
         last element $r_{i} + q - 1 = r^{*}$
-\end{itemize}.\\
+\end{itemize}.
+
 So now
 \[
     \P [ OVERLAP_{i} ] = \frac{(r^{*} +q - 1) - (r^{*}-q+1) + 1}{2^{n}} =

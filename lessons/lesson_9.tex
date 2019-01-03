@@ -1,12 +1,12 @@
 \mychapter{9}{Lesson 9}
+
 \section{Message Authentication and UFCMA-security}
+
 First, remember the $Tag()$ function and how a MAC works.
-Now $Tag()$ is defined using a key $k$, and we call it $Tag_{k}()$.\\
-In particular we are looking for a cool property of a message authentication
-protocol, called \textbf{ \textit{universal unforgeability against
-chosen-message attacks}}, which prevents the attacker from generating a valid
-couple $(m^{*}, \phi^{*})$ after some queries containing messages and receiving
-the related tags.\\
+
+Now $Tag()$ is defined using a key $k$, and we call it $Tag_{k}()$.
+
+In particular we are looking for a cool property of a message authentication protocol, called \textbf{ \textit{universal unforgeability against chosen-message attacks}}, which prevents the attacker from generating a valid couple $(m^{*}, \phi^{*})$ after some queries containing messages and receiving the related tags.
 
 This property is defined through a game called 
 \[
@@ -40,8 +40,7 @@ and played in the following manner:
    \caption{$Game_{\Pi, \A}^{ufcma}(\lambda)$}
 \end{figure}
 
-with $m^{*}$ which must be a fresh new message never used before and with the
-Adversary $\A$ which doesn't know the key $k$ used in the tag.\\
+with $m^{*}$ which must be a fresh new message never used before and with the Adversary $\A$ which doesn't know the key $k$ used in the tag.
 
 \begin{definition}
     $\Pi$ is \textbf{ \textit{ufcma-secure} } if $ \forall.PPT.\A$ 
@@ -206,8 +205,7 @@ In the next subsection, we will see how to create a UFCMA-secure MAC for
 variable length messages.
 
 \section{Domain extension}
-Assume $m=(m_{1}, ..., m_{t}) \in (\{0,1\}^{n})^{t}$for some $t \geq 1$.
-How can we tag m given just $Tag_{k}:\{0,1\}^{n} \to \{0,1\}^{l} $?\\
+Assume $m=(m_{1}, ..., m_{t}) \in (\{0,1\}^{n})^{t}$for some $t \geq 1$. How can we tag m given just $Tag_{k}:\{0,1\}^{n} \to \{0,1\}^{l} $?
 
 We can try various attempts:
 \begin{itemize}
@@ -258,7 +256,8 @@ the design of a shrinking functions family
    \H= \{ h_{s}:\{0,1\}^{nt} \to \{0,1\}^{n} \}_{s \in \{0,1\}^{\lambda}}
 \]
 which can be used to shrink variable length messages and then apply a PRF on
-them.\\
+them.
+
 This idea is cool, and I consider the induced family
 \[
     \F(\H)=\{F_{k}(h_{s}(.))\}
@@ -276,7 +275,7 @@ But we know that collisions exist, because we are trying to create a function
 which maps elements in $\{0,1\}^{nt} $ to the elements in $\{0,1\}^{t}$, and
 since the second set is smaller, for the pidgeonhole principle, there will be
  elements of $\{0,1\}^{t}$ which will be reached by more than one element of
-$\{0,1\}^{nt}$.\\
+$\{0,1\}^{nt}$.
 
 To overocome this problem, we can consider 2 ways:
 \begin{itemize}
@@ -294,9 +293,10 @@ To overocome this problem, we can consider 2 ways:
         \P_{s \leftarrow\$ \{0,1\}^{\lambda}} [ h_{s}(x)=h_{s}(x') ] \leq \epsilon  
     \]
 \end{definition}
-For $\epsilon=2^{-n}$ we call it \textbf{perfectly universal}.\\
-For $\epsilon \in \negl{\lambda} $ we call it \textbf{almost universal} (or
-\textbf{AU} ).\\
+
+For $\epsilon=2^{-n}$ we call it \textbf{perfectly universal}.
+
+For $\epsilon \in \negl{\lambda} $ we call it \textbf{almost universal} (or \textbf{AU} ).
 
 \begin{exercise}
     Show that any pairwise independent hash function is perfectly
@@ -420,20 +420,22 @@ $\H\Y\B$ could return the same $y$:
         probability (because $R$ is a random function), or
     \item with different $x_{i}\not= x_{j}$ but with the same
         $h_{s}(x_{i})=h_{s}(x_{j})$,
-\end{itemize}.\\
+\end{itemize}
+
 We want to show that the last item doesn't happen too often, and that these 2
-experiments are distinct for a negligible factor.\\
+experiments are distinct for a negligible factor.
 
 \begin{proof}
     Let \textbf{BAD}  be the event that
-    \[
-        \exists i, j \in [q] \text{ with } i\not= j \text{ s.t. }
-        h_{s}(x_{i})=h_{s}(x_{j})
-    \]
+    \begin{equation*}
+        \exists i, j \in [q] \text{ with } i\not= j \text{ s.t. } h_{s}(x_{i})=h_{s}(x_{j})
+    \end{equation*}
+
     As logn as \textbf{BAD} doesn't happen, the function $R$ is run as a
-    sequence of distinct points $R(h_{s}(x_{1})), ..., R(h_{s}(x_{q}))$.\\
+    sequence of distinct points $R(h_{s}(x_{1})), ..., R(h_{s}(x_{q}))$.
+
     So in this case the distribution if the 2 games is identical, and it
-    suffices to show that $ \P [ BAD ] \in \negl{\lambda}  $.\\
+    suffices to show that $ \P [ BAD ] \in \negl{\lambda}  $.
 
     The event \textbf{BAD}, which happens during a game made of $q$ queries and
     $q$ replies ,  is the same as collecting all the $q$ queries, chosing the
@@ -489,25 +491,25 @@ So now we have $Real \approx_{c} \H\Y\B \approx_{c} Rand$
      \sum_{i=1}^{t} m_{i}s_{i}-\sum_{i=1}^{t} m'_{i}s_{i}=0 \Leftrightarrow \\
      \sum_{i=1}^{t} \delta_{i}s_{i}=0 
  \end{gather*}
+
  Taking $m, m'$ such that $m \not= m'$ means that $m$ is distinct from $m'$
  at least for one subsequence $m_{i}\not=m'_{i}$.\\
  So we can assume, without loss of generality, that $i=1$ is an index (or the
  only index) which $m$ and $m'$ differ on.\\
 
- So we can split the last summation in 2 parts, choosing $\delta_{1}s_{1}$ as
- the first element and $ \sum_{i=2}^{t} \delta_{i}s_{i}$ as second element:\\
+ So we can split the last summation in 2 parts, choosing $\delta_{1}s_{1}$ as the first element and $ \sum_{i=2}^{t} \delta_{i}s_{i}$ as second element:
+
  \begin{gather*}
          \delta_{1}s_{1}+\sum_{i=2}^{t} \delta_{i}s_{i}=0 \Leftrightarrow \\
          \delta_{1}s_{1}=-\sum_{i=2}^{t} \delta_{i}s_{i} \Leftrightarrow \\
          s_{1}=\frac{-\sum_{i=2}^{t} \delta_{i}s_{i}}{\delta_{1}}
      \end{gather*}
-     and this means that when a collision happens $s_{1}$ must be exactly equal 
-     two the second member of the equation, which is an element of $\mathbb{F}$.
-     But since every seed is chosen at random among $ \mathbb{F} $, what's the
-     probability of picking the element $s_{1}$ which zeroes the above equation
-     ?\\
+
+     and this means that when a collision happens $s_{1}$ must be exactly equal two the second member of the equation, which is an element of $\mathbb{F}$. But since every seed is chosen at random among $ \mathbb{F} $, what's the probability of picking the element $s_{1}$ which zeroes the above equation?
+
      This probability is just $\frac{1}{ \mathbb{F} } = \frac{1}{2^{n}} \in
      \negl{\lambda} $.
+
      \subsubsection{$\H$ with Galois fields elements and polynomials}
 
  \begin{construction}

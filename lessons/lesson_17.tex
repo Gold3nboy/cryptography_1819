@@ -291,15 +291,9 @@ Some additional notes (may be incorrect):
     It's possible to distinguish \textbf{two cases} , looking at $c=(y, l,
     \Pi_{2})$ :
 \begin{enumerate}
-    \item if $(y^{(i)}, l^{(i)})=(y,l)$ and
-        $\tilde{\Pi}^{(i)}_{2}=\Pi^{(i)}_{2}$, it outputs $\perp$ if  in the
-        decryption scheme ($\Pi^{(i)}_{2} \not= \tilde{\Pi}^{(i)}_{2}$) it
-        outputs $\perp$.\\
+    \item if $(y^{(i)}, l^{(i)})=(y,l)$ and $\tilde{\Pi}^{(i)}_{2}=\Pi^{(i)}_{2}$, it outputs $\perp$ if in the decryption scheme ($\Pi^{(i)}_{2} \not= \tilde{\Pi}^{(i)}_{2}$) it outputs $\perp$.
 
-    \item \footnote{when decryption oracle doesn't output the challenge}
-        otherwise $(y^{(i)}, l^{(i)})\not= (y,l)$ if $y^{(i)}\not\in L$ we want
-        that $\Pi^{(i)}_{2}$ doesn't output exactly $Ver_{2}(\tau, (y^{(i)},
-        l^{(i)}))$, but it should output $\perp$.
+    \item \footnote{when decryption oracle doesn't output the challenge} otherwise $(y^{(i)}, l^{(i)})\not= (y,l)$ if $y^{(i)}\not\in L$ we want that $\Pi^{(i)}_{2}$ doesn't output exactly $Ver_{2}(\tau, (y^{(i)}, l^{(i)}))$, but it should output $\perp$.
 \end{enumerate}
 
 \textbf{EVENT BAD:} If we look at the view of $\A$, the only information he
@@ -384,8 +378,11 @@ Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
     \textit{We want to prove that if we take any $(c_1,c_2)\notin L_DDH$ the distribution $(\omega=h_1, \widetilde{\Pi}=Verify(\tau,(c_1,c_2)))$ uniformly distributed.}
 
     Define a \textbf{MAP} $\mu(\overbrace{x_1,x_2}^{random})=(\omega,\Pi)=(g_1^{x_1},g_2^{x_2},c_1^{x_1},c_2^{x_2})$ it suffices to prove that $\mu$ is injective. This can easily be done with some constrains:
-    $\mu'(x_1,x_2)=log_{g_1}(\mu(x_1,x_2))=(log_{g_1}(\omega),log_{g_1}(\Pi)$\\
-    For $r_1\neq r_2$ then $c_1=g_1^{r_1},c_2=g_2^{r_2}=g^{\alpha r_2}$. For $\alpha=log_{g_2}g_1$ then $\Pi=c_1^{x_1}c_2^{x_2}=g_1^{r_1x_1}g_2^{r_1x_1+\alpha r_2x_2}$.\\
+
+    $\mu'(x_1,x_2)=log_{g_1}(\mu(x_1,x_2))=(log_{g_1}(\omega),log_{g_1}(\Pi)$
+
+    For $r_1\neq r_2$ then $c_1=g_1^{r_1},c_2=g_2^{r_2}=g^{\alpha r_2}$. For $\alpha=log_{g_2}g_1$ then $\Pi=c_1^{x_1}c_2^{x_2}=g_1^{r_1x_1}g_2^{r_1x_1+\alpha r_2x_2}$.
+    
     \[\mu'(x_1,x_2)=
         \begin{pmatrix}
             z_1\\

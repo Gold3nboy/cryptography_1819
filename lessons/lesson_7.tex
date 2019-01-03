@@ -5,26 +5,30 @@
 \end{theorem}
 (this definition should mean implicitly that the $k$ key has been chosen by the
 challenger before the proof starts)
-\begin{proof} TO BE REVIEWED.
+
+\begin{proof} 
+    \todo{TO BE REVIEWED.}
     Now use the induction on the height $n$ of the GGM tree for $\nu(\lambda)
-    \in \poly{\lambda} $ .\\
+    \in \poly{\lambda} $.
     
-    \textbf{Base Case $\Rightarrow n=1$} follows by security of PRG $G$ function,
-    because
-    \[
+    \textbf{Base Case $\Rightarrow n=1$} follows by security of PRG $G$ function, because
+    \begin{equation*}
         (F_{k}(0), F_{k}(1))=(G_{0}(k), G_{1}(k)) \approx_{c} U_{2\lambda}
-    \]
+    \end{equation*}
+
     This means that, chosen $k$, the two values returned by $F$ are
     indistinguishable from 2 values taken at random and inserted in the
     truth table of a possible random function. Since these values are
     indistinguishables, the source functions are indistinguishables and $F_{k}$
-    is pseudorandom.\\
+    is pseudorandom.
     
-    Now, for the \textbf{Inductive step} :\\
+    Now, for the \textbf{Inductive step}:
+
     \begin{lemma}
        Let $F':\{0,1\}^{n-1} \to \{0,1\}^{\lambda} $ be a PRF.
        Now define $F_{k}(x,y)=G_{x}(F_{k}'(y))$ where $F_{k}:\{0,1\}^{n} \to
-       \{0,1\}^{\lambda} $.\\
+       \{0,1\}^{\lambda} $.
+
        If $\{F_{k}'\}$ is a PRF so is $ \{F_{k}\}$.
     \end{lemma}
     
@@ -170,245 +174,186 @@ For this proof we use the following simple lemma.
     for $k_{1}, ..., k_{t} \leftarrow\$ U_{\lambda}$
 \end{lem}
 
-Assume that it exists a distinguisher $D_{1, 2}$ which is capable of distinguish
-$H(x, y)$ and $R(x, y)$.\\
+Assume that it exists a distinguisher $D_{1, 2}$ which is capable of distinguish $H(x, y)$ and $R(x, y)$.
 
 ...TO REVIEW, NOT UNDERSTOOD AT ALL ...
 \end{proof}
 
-\section{CPA SECURITY}
+\section{\textsc{Cpa}-security}
 
-Suppose $G$ is a PRG.\\
-Given $Enc(k,m)=G(k) \xor m$, and a known $(\bar{m}, \bar{c})$ where
-$c=G(k)\xor m$, then this function is not 2 time secure, since $c \xor
-\bar{c}=m \xor \bar{m}$, easy to invert.\\
-(??? some glue arguments missing ???)\\
-\[
-\]
+Now it's time to define a stronger notion of security, which is widely used in cryptology for first assessments on cryptographic schemes. Let $\Pi := (Enc, Dec)$ be a \ske{} scheme, and consider the game depicted in figure \ref{cryptogame:cpadef}. Observe that this time, the adversary can ``query'' the challenger for the ciphertexts of any messages of his choice, with the only reasonable restriction that the query amount must be polynomially bound by $\lambda$. This kind of game/attack is called the \emph{Chosen Plaintext Attack}, because of the adversary's capability of obtaining ciphertexts from messages. The usual victory conditions found in n-time security games, which are based on ciphertext distinguishability, apply.
 
+\begin{cryptogame}
+    {cpadef}
+    {The \cpa-security game: $\cryptog{cpa}(\lambda, b)$}
+    {cpa}
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.7]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
-      
-      \postlevel
-      \mess{A}{$m_{i} \in \M$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c_{i}=Enc(k, m_{i})$}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
-      
-   \postlevel 
-    \mess{A}{$m_{0}^{*}, m_{1}^{*} \in \M$}{B}
-      \node[anchor=west] at (mess to) {  };
+    \cseqchallenger{$k \pickUAR \{0, 1\}^\lambda$}
 
-      \postlevel
-      \mess{B}{$c*$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-      		$ k \leftarrow\$ \K   $ 
-            \\
-            $b \leftarrow\$ \{0,1\} $ 
-            \\
-    $ c=Enc(k, m_{b})   $ }};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{$m_{i} \in \M$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c_{i}=Enc(k, m_{i})$}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
-      \postlevel
-      \mess{A}{$b' \in \{0,1\}$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-   \caption{$Game_{\Pi, \A}^{cpa}(\lambda, b)$}
-   \label{fig:cpa1}
-\end{figure}
-The adversary wins if finds which $m_{b}^{*}$ message was previously encrypted.
-For sure $m_{i}$ can be equal to $m_{0}$ or $m_{1}$.\\
-The two cyclic requests, before and after the starred messages, can be
-arbitrarily long (also 0, there is no constraint).
+    \cseqbeginloop
+    \send{}{$m$}{}
+    \receive{$c \pickUAR Enc(k, m)$}{$c$}{}
+    \cseqendloop
+
+    \cseqdelay
+
+    \send{}{$m_0^*, m_1^*$}{}
+    \receive{\shortstack[l]{
+        $b \pickUAR \{0, 1\}$ \\
+        $c^* \pickUAR Enc(k, m_b^*)$
+    }}{$c^*$}{}
+
+    \cseqdelay
+
+    \cseqbeginloop
+    \send{}{$m$}{}
+    \receive{$c \pickUAR Enc(k, m)$}{$c$}{}
+    \cseqendloop
+
+    \cseqdelay
+
+    \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
+
+\end{cryptogame}
+
 \begin{definition}
-  A scheme is CPA-secure if $Game_{\Pi, \A}^{cpa}(\lambda,0)
-    \approx_{c}Game_{\Pi, \A}^{cpa}(\lambda,1)  $
+    A scheme is \cpa-secure if $\cryptog{cpa}(\lambda, 0) \compindist \cryptog{cpa}(\lambda, 1)$
 \end{definition}
 
+
+Having given this definition of security, recall the $\Pi_{\xor}$ scheme defined in the previous lesson. It is easy to see that $\Pi_{\xor}$ is not \cpa-secure for the same reasons that it is not computationally 2-time secure; however this example sheds some new light about a deeper problem:
+
+%AP181230: Refer to page 72 of Katz-Lindell for a good explanation
 \begin{observation}
-    No deterministic scheme can achieve CPA security.
+    No deterministic scheme can achieve \cpa-security.
 \end{observation}
-This is because the Adversary is not limited in what he can ask to the
-Challenger: if he asks $m_{0}$ and $m_{1}$ before sending the starred messages,
-he will know in advance the encrypted form of the messages, and he will be able
-to distinguish with $ \P [Game^{cpa}]=1 $ the two games.\\
 
-So, a way to obtain a CPA-secure encryption scheme consists of returning
-different cyphertexts for the same message, and we can build a scheme which
-tries to generate this kind of output using PRFs.\\
+This is true, because nothing prevents the adversary from asking the challenger to encrypt either $m_0$ or $m_1$, or even both, before starting the actual challenge; just as in the 2-time case for $\Pi_{\xor}$, he will know the messages' ciphertexts in advance, so he will be able to tell which message the challenger has encrypted every time. The solution for obtaining a \cpa-secure encryption scheme consists of returning different ciphertexts for the same message, even better if they look random. This can be achieved by using \prf{}s.
 
-Consider the following SKE scheme $\Pi$.\\
-Let $\F=\{ F_{k}:\{0,1\}^{n} \to \{0,1\}^{l} \}$ be a
-PRF:
+Consider the following \ske{} scheme $\Pi_{\F}$, with $\F=\{ F_{k}:\{0,1\}^{n} \to \{0,1\}^{l} \}$ being a \prf:
+
 \begin{itemize}
-    \item $k \leftarrow\$ U_{\lambda}$
-    \item $Enc(k, m)$, picking a random $r \leftarrow\$ \{0,1\}^{n} $ with an
-        output of $c=(c_{1}, c_{2})=(r, F_{k}(r) \xor m) \leftarrow\$
-        \{0,1\}^{n+l}$
+    \item $Enc(k, m) = (c_1, c_2) = (r, F_k(r) \xor m)$, where $k \pickUAR \{0,1\}^\lambda$ and $r \pickUAR \{0,1\}^n$
     
     \item $Dec(k, (c_{1}, c_{2}))=F_{k}(c_{1}) \xor c_{2}$
 \end{itemize}
-.
-In this scheme, the only secret thing is $k$, which gives a \textit{flavour} to
-the random function; Adversary can see $c=(r, F_{k}(r) \xor m)$, so he can see
-$r$.
+
+Observe that the random value $r$ is part of the ciphertext, making it long $n+l$ bits; also more importantly, the adversary can and will always see $r$. The key $k$ though, which gives a \textit{flavour} to the \prf, is still secret.
+
 \begin{theorem}
-    If $\F$ is a family of PRF functions, then $\Pi$ is  CPA-secure
+    If $\F$ is a \prf, then $\Pi_{\F}$ is \cpa-secure.
 \end{theorem}
-To prove this, we have to prove that $Game_{\Pi, \A}^{cpa}(\lambda, 0)
-\approx_{c} Game_{\Pi, \A}^{cpa}(\lambda, 1)$.
+
 \begin{proof}
-    Consider hybrid arguments
-    \[
-        \H\Y\B_{0} \equiv Game_{\Pi, \A}^{cpa}(\lambda, 0)
-    \]
-    and 
-    \[ \H\Y\B_{1}\], like $\H\Y\B_{0}$ but with another distribution of $Enc(k,
-    m_{b})$: \begin{itemize}
-        \item picking $r \leftarrow\$ \{0,1\}^{n} $
-        \item $R \leftarrow\$ \R(\lambda, n, l)$
-        \item output obtained is $(r, R(r) \xor m_{b})$
+    We have to prove that $\cryptog{cpa}[\Pi_{\F}](\lambda, 0) \compindist \cryptog{cpa}[\Pi_{\F}](\lambda, 1)$; to this end, the hybrid argument will be used. Let the first hybrid $\hybridg{0}$ be the original game, the second hybrid $\hybridg{1}$ will have a different encryption routine:
+
+    \begin{itemize}
+        \item $r \pickUAR \{0, 1\}^n$
+        \item $R \pickUAR \R(\lambda, n, l)$
+        \item $c = (r, R(r) \xor m)$, where $m$ is the plaintext to be encrypted
     \end{itemize}
-    and 
-    \[ \H\Y\B_{2}(\lambda, b)\] which simply outputs $(r_{1}, r_{2})
-    \leftarrow\$ U_{n+l}$.
 
-\begin{lemma}
-    $\H\Y\B_{0} \approx_{c} \H\Y\B_{1}$ for each $b \in
-    \{0,1\} 
-    $
-\end{lemma}
-\begin{proof}
-    Suppose these two hybrids are distinguishable; but then we can use the related
-    distinguisher to break the starting assumption saying $\F$ is a PRF.\\
+    and then the last hybrid $\hybridg{2}$ will simply output $(r_1, r_2) pickUAR U_{n+l}$.
 
-    Since they are two similar games (but just for the encryption function), we can use
-    the CPA game for this reduction.
-\newpage
-    Fix $b=0$ and build the following
+    \begin{lemma}
+        $\forall b \in \{0, 1\} \implies \hybridg{0}(\lambda, b) \compindist \hybridg{1}(\lambda, b)$.
+    \end{lemma}
+
+    \begin{proof}
+        As usual, the proof is by reduction: suppose there exists a distinguisher $\distinguisher$ capable of telling the two hybrids apart; then $\distinguisher$ can be used to break $\F$'s property of being a \prf. The way to use $\distinguisher$ is to make it play a \cpa-like game, as shown in figure \ref{cryptoredux:prfcpa}\footnotemark, where the adversary attempting to break $\F$ decides which message to encrypt between $m_0$ and $m_1$ beforehand, and checks whether $\distinguisher$ guesses which message has been encrypted. Either way, the adversary can get a sensible probability gain in guessing if the received values from the challenger were random, or generated by $\F$. Thus, assuming such $\distinguisher$ exists, $\adversary$ can efficiently break $\F$, which is absurd.
+
+        \footnotetext{An observant student may notice a striking similarity with a previously exposed reduction in figure \ref{cryptoredux:xorotprg}}
+
+        % AP190101: Potrei includere una definizione alternativa di prf più su, in modo tale che questa riduzionie sia un po' più chiara
+
+        \begin{cryptoredux}
+            {prfcpa}
+            {Breaking a \prf, for fixed message choice of $m_0$}
+            {prf}
+            {}
+
+            \cseqchallenger{\shortstack[l]{
+                $k \pickUAR \{0, 1\}^\lambda$ \\
+                $b \pickUAR \{0, 1\}$
+            }}
+        
+            \cseqbeginloop
+            \return{}{$m$}{}
+            \send{$r \pickUAR \{0, 1\}^n$}{$r$}{}
+            \receive{\shortstack[l]{
+                $z_0 \pickUAR F_k(r)$ \\
+                $z_1 \pickUAR R(r)$
+            }}{$z_b$}{}
+            \invoke{$c = (r, z_b \xor m)$}{$c$}{}
+            \cseqendloop
+
+            \cseqdelay
+        
+            \return{}{$m_0^*, m_1^*$}{}
+            \send{$r^* \pickUAR \{0, 1\}^n$}{$r^*$}{}
+            \receive{\shortstack[l]{
+                $z_0^* \pickUAR F_k(r)$ \\
+                $z_1^* \pickUAR R(r)$
+            }}{$z_b^*$}{}
+            \invoke{$c^* = (r^*, z_b^* \xor m_0^*)$}{$c^*$}{}
+
+            \cseqdelay
+        
+            \cseqbeginloop
+            \return{}{$m$}{}
+            \send{$r \pickUAR \{0, 1\}^n$}{$r$}{}
+            \receive{\shortstack[l]{
+                $z_0 \pickUAR F_k(r)$ \\
+                $z_1 \pickUAR R(r)$
+            }}{$z_b$}{}
+            \invoke{$c = (r, z_b \xor m)$}{$c$}{}
+            \cseqendloop
+            
+            \cseqdelay
+        
+            \return{}{$b'$}{}
+
+            \cseqdelay
+
+            \send{$b'' = \begin{cases}
+                0 &\textsc{iff } b'=0 \\
+                1 &\textsc{else}
+            \end{cases}$
+            }{$b''$}{\textsc{Output 1 iff} $b'' = b$}
+        
+        \end{cryptoredux}
+
+    \end{proof}
+
+    \begin{lemma}
+        $\forall b \in \{0, 1\} \implies \hybridg{1}(\lambda, b) \compindist \hybridg{2}(\lambda, b)$.
+    \end{lemma}
+
+    \begin{proof}
+        Firstly, it can be safely assumed that any ciphertext $(r_i, R(r_i) \xor m_b)$ distributes equivalently with its own sub-value $R(r_i)$, because of $R$'s true randomness, and independency from $m_b$.
+
+        Having said that, the two hybrids apparently distribute uniformly, making them perfectly equivalent; however there is a caveat: if both games are run and one value $\bar{r}$ is queried twice in both runs, then om the second query, the adversary will receive the same image in $\hybridg{1}$, but almost certainly a different one in $\hybridg{2}$. This is because the first hybrid uses a function, which is deterministic by its nature, whereas the image in the second hybrid is picked completely randomly from the codomain. Nevertheless, this sneaky issue about "collisions" can be proven to happen with negligible probability.
+
+        Call \textsc{Repeat} this collision event on $\bar{r}$ between 2 consecutive games. Then:
+        
+        % AP190102: Could use some clarifications? Especially about what the indices represent
+        \begin{align*}
+        \Pr[\textsc{Repeat}] &= \Pr[\exists i, j \in q \text{ such that } r_i = r_j] \\
+            &\leq \sum_{i \neq j} \Pr[r_i=r_j] \\
+            &= Col(U_n) \\
+            &= \sum_{i \neq j} \sum_{e \in \{0, 1\}^n} \Pr[r_1 = r_2 = e] \\
+            &= \sum_{i \neq j} \sum_{e \in \{0, 1\}^n} \Pr[r = e]^{2} \\
+            &= {q \choose 2} 2^{n} \frac{1}{2^{2n}} \\
+            &= {q \choose 2} 2^{-n} \\
+            &\leq q^{2}2^{-n} \in \negl{\lambda} 
+        \end{align*} 
 
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.65]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \D_{01} $}
-      \newinst[5]{B}{$ \D_{PRF} $} % Increase "5" to widen
-      \newinst[4]{C}{$ \C $}
+        which proves that the \textsc{Repeat} influences negligibly on the two hybrids' equivalence. Thus $\hybridg{1}(\lambda, b) \compindist \hybridg{2}(\lambda, b)$\footnotemark.
+        
+        \footnotetext{Do note that the hybrids lose their originally supposed perfect equivalence ($\hybridg{1}(\lambda, b) \equiv \hybridg{2}(\lambda, b)$) because of the \textsc{Repeat} event. The lemma, though, is still proven.}
+    \end{proof}
 
-      \postlevel
-      \mess{A}{$m_{i} \in \M$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$r_{i}$}{C}
-      \node[anchor=west] at (mess to) {  };
-
-      \postlevel
-      \mess{C}{$z_{i}$}{B}
-      \node[anchor=west] at (mess from) {\shortstack[l] {
-                  $z_{i}=F_{k}(r_{i})$
-                  \\
-                  $z_{i}=R(r_{i})$
-          } };
-      \postlevel:
-      \mess{B}{$c_{i}=(c_{i_{1}}, c_{i_{2}})=(z_{i}, z_{i} \xor m_{i})$}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-5.7) to[out=240,in=110] (1.2,-1.6);
-    \postlevel
-    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
-      \node[anchor=west] at (mess to) {  };
-
-    \postlevel
-    \mess{B}{$r^{*}$}{C}
-      \node[anchor=west] at (mess to) {  };
-    
-    \postlevel
-    \mess{C}{$z^{*}$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c^{*}=(z^{*}, z^{*} \xor m_{0})$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-      		$    $ 
-            \\
-            $    $ }};
-      
-%      \postlevel
-%      \mess{A}{$b' \in {0,1}$}{B}
-%      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-      \sdend{}
-   \end{tikzpicture}
-  % \caption{}
-  % \label{fig:}
-\end{figure}
-
-After the last message, $D_{01}$ will reply with a $b' \in \{0,1\}$ which
-expresses which one of the encryption functions has been used; since this result
-can be used for solving the PRF game, the starting assumption fails and the
-lemma is proven.
+    With the above lemmas, and observing that $\hybridg{2}(\lambda, 0) \equiv \hybridg{2}(\lambda, 1)$, we can reach the conclusion that $\hybridg{0}(\lambda, 0) \compindist \hybridg{0}(\lambda, 1)$, which is what we wanted to demonstrate.
 
 \end{proof}
-
-\begin{lemma}
-
-    $\H\Y\B_{1} \approx_{c} \H\Y\B_{2}$
-    
-\end{lemma}
-\begin{proof}
-Even if the output of the first  hybrid is $(r_{i}, R(r_{i}) \xor m_{b})$,
-the distribution of the second member of this couple doesn't depend on $m_{b}$,
-hence we can assume that $R(r_{i}) \xor m_{b} \equiv R(r_{i})$.\\
-
-The difference between $\H\Y\B_{1}$ and $\H\Y\B_{2}$ comes if we play the game
-once more and we pick up the same $c_{1}$ of the first game: while in
-$\H\Y\B_{2}$ $r_{2}$ is independent from $r_{1}$ and will be different from the
-previous $r'_{2}$  with probability near to 1, in $\H\Y\B_{1}$ ( if $r_{i}$ is
-the same of the previous game) 
-$R(r_{i})$ will be the same of the previous game (because $R()$ is a
-random function).\\
-
-Anyway, we can show that this "collision" happens with very low probability.\\
-
-Call \textbf{REPEAT}  this event of collision of $r_{i}$ between 2 consecutive
-games.\\
-To show the statement of the lemma, it suffices to show that 
-$P[REPEAT] \in \negl{\lambda} $, therefore the two distributions are
-indistinguishable (or distinguishable with a negligible probability) .\\
-
-In fact, if I make $q$ queries to $\H\Y\B_{1}$, 
-\begin{gather*}
-P[REPEAT]=P[ \exists i, j \in q \text{ such that } r_{i}=r_{j}] \leq \\
-\leq \sum_{i,j \wedge i \not= j}^{} \P [ r_{i}=r_{j} ]   = Col(U_{n}) = \\
-= \sum_{i \wedge j, i \not= j} \sum_{e \in \{0,1\}^{n}} \P [ r_{1}=r_{2}=e ]  = \\
-=\sum_{i \wedge j, i \not= j} \sum_{e \in \{0,1\}^{n}} \P[ r=e ]^{2}  = \\
-= {q \choose 2} 2^{n} \frac{1}{2^{2n}} = \\
-={q\choose 2} 2^{-n} \leq \\
-\leq q^{2}2^{-n} \in \negl{\lambda} 
-\end{gather*} 
-\end{proof}
-
-Since $\H\Y\B_{0} \equiv Game(\lambda, 0)$ but the same proofs can be made for
-$Game(\lambda, 1)$,  
-$ Game(\lambda, 0) \equiv \H\Y\B_{0}(Game(\lambda, 0)) \approx_{c} \H\Y\B_{2} \approx_{c} 
-\H\Y\B'_{0}(Game(\lambda,1)) \equiv Game(\lambda, 1)$
-\end{proof}
-

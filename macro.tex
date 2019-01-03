@@ -1,5 +1,13 @@
 \usepackage{titletoc}
-\usepackage{hyperref}
+
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor={red!70!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amsthm}
@@ -20,7 +28,6 @@
 \usepackage{preview}
 \usepackage{color}
 \usepackage{framed}
-\hypersetup{colorlinks=false}
 \usepackage{preview}
 \usepackage{stackengine}
 \usepackage{scalerel}
@@ -43,8 +50,6 @@
     \chapter*{#2}
     \addcontentsline{toc}{chapter}{#2}
 }
-% Cryptography arrow symbol denoting a uniformly random sampling action
-\newcommand\pickUAR{\mathrel{{\leftarrow}\vcenter{\hbox{\tiny\rmfamily\upshape\!\!\$}}}}
 
 
 %this is used to create space between \forall, \exist [ and others ] with the

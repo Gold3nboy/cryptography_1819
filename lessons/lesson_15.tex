@@ -268,8 +268,7 @@ $g^{z}$ for a $z \in \mathbb{Z}_{p}$,
     y=x^{2} \Leftrightarrow y=(g^{z})^{2}=g^{2z}
 \]
 
-So, $y=g^{z'} \in \QR[p] \Leftrightarrow z'$ is even. If $z'$ is odd, then $y
-\not\in \QR[p] $.\\
+So, $y=g^{z'} \in \QR[p] \Leftrightarrow z'$ is even. If $z'$ is odd, then $y \notin \QR[p] $.
 
 Since $\frac{p-1}{2}$ is odd, then $g^{\frac{p-1}{2}} \not\in \QR[p]$, and since
 it is possible to generate all of the other numbers with odd exponents 
@@ -281,14 +280,14 @@ and $g$ powered to odd exponents will have this form.\\
 
 From that, it's possible to state the following
 \begin{lemma}
-    $\forall z, z\in \QR[p]$ \Leftrightarrow $ -z \notin \QR[p]$
+    $\forall z, z\in \QR[p] \implies  -z \notin \QR[p]$
 \end{lemma}
 
 
 
 \subsection{Rabin's Trapdoor permutation}
-Now we study a one way function built on previous deductions about number
-theory and modular arithmetic.\\
+
+Now we study a one way function built on previous deductions about number theory and modular arithmetic.
 
 The \textit{Rabin trapdoor permutation} is defined as 
 \[
@@ -296,8 +295,7 @@ The \textit{Rabin trapdoor permutation} is defined as
 \]
 where $n=p*q$ for primes $p,q=3 \text{mod} 4$.\\
 
-We can observe that the image of this function is $\QR[n]$, a subset of $
-\mathbb{Z}^{*}_{n} $.\\
+We can observe that the image of this function is $\QR[n]$, a subset of $\mathbb{Z}^{*}_{n} $.
 
 For \textbf{Chinese remainder theorem} it is possible to state that $f$ maps
 as follows
@@ -348,9 +346,9 @@ is OWF thanks to the hardness of factoring.
         x + z \in \{(0,2x_{q}), (2x_{p}, 0)\}
     \]
 
-    Now assume $x + z = (2x_{p}, 0)$ without loss of generality, since the proof
-    for the other case is the same.\\
-    We have that $x+z \equiv 0$ mod $q$ and $x+z \not\equiv 0 $ mod $p$.\\
+    Now assume $x + z = (2x_{p}, 0)$ without loss of generality, since the proof for the other case is the same.
+
+    We have that $x+z \equiv 0$ mod $q$ and $x+z \not\equiv 0 $ mod $p$.
 
     But then $gcd( x+z , n)=q$, and we obtain $q$.
 \end{proof}
@@ -376,7 +374,7 @@ The following proof is by contraddiction.
 
     We can build the following reduction to show that $\A$ choses $x$:
 
-\begin{figure}[h!]
+\begin{figure}[ht]
    \centering
    \sdinit{}
    \begin{tikzpicture}
