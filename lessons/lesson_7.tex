@@ -1,182 +1,171 @@
 \mychapter{7}{Lesson 7}
-\textbf{WARNING : I was absent} 
+
+% Reminders: k is the scheme key
+Recall the \textsc{ggm}-tree construct used to define a function family $\F := \{F_k\}$ from a \prg{} G. From now on we will refer to this function family as $F_k$, implicitly stating that $k$ represents a uniform probability distribution. Our wish is that $F_k$ is indeed a \prf. 
+
 \begin{theorem}
-    If $G$ is a PRG, then $F_{GGM}$ is a PRF.
+    If $G$ is a \prg, then $F_k$ is a \prf.
 \end{theorem}
-(this definition should mean implicitly that the $k$ key has been chosen by the
-challenger before the proof starts)
 
-\begin{proof} 
-    \todo{TO BE REVIEWED.}
-    Now use the induction on the height $n$ of the GGM tree for $\nu(\lambda)
-    \in \poly{\lambda} $.
-    
-    \textbf{Base Case $\Rightarrow n=1$} follows by security of PRG $G$ function, because
-    \begin{equation*}
-        (F_{k}(0), F_{k}(1))=(G_{0}(k), G_{1}(k)) \approx_{c} U_{2\lambda}
-    \end{equation*}
+% AP190103: All notation is still left in an inconsistent state, it's difficult here to establish which things can go where...
+\begin{proof}
 
-    This means that, chosen $k$, the two values returned by $F$ are
-    indistinguishable from 2 values taken at random and inserted in the
-    truth table of a possible random function. Since these values are
-    indistinguishables, the source functions are indistinguishables and $F_{k}$
-    is pseudorandom.
-    
-    Now, for the \textbf{Inductive step}:
+    Concerning $F_k$'s efficiency, one can observe that it involves computing $G$ a polynomial number of times, and $G$ itself is efficient, thus $F_k$ is indeed easy to compute.
 
-    \begin{lemma}
-       Let $F':\{0,1\}^{n-1} \to \{0,1\}^{\lambda} $ be a PRF.
-       Now define $F_{k}(x,y)=G_{x}(F_{k}'(y))$ where $F_{k}:\{0,1\}^{n} \to
-       \{0,1\}^{\lambda} $.
-
-       If $\{F_{k}'\}$ is a PRF so is $ \{F_{k}\}$.
-    \end{lemma}
+    The rest of the proof, regarding $F_k$'s hardness, will proceed by induction over $F_k$'s domain length $n$, which indirectly defines its \textsc{ggm}-tree's height.
     
-    Consider the following images:
-
-    
-    \newpage
-    \begin{figure}[h!]
-       \centering
-       \sdinit{}
-       \begin{tikzpicture}[scale=.6]
-          % Define symbols and names for the parties
-          \sdbegin{}
-          \newinst{A}{$ \A $}
-          \newinst[5]{B}{$C$} % Increase "5" to widenC
-          
-          \mess{A}{$x,y$}{B}
-          \node[anchor=west] at (mess to) {  };
-    
-          \postlevel
-          \mess{B}{z}{A}
-          \node[anchor=west] at (mess from) {\shortstack[l]{
-          		$ k \leftarrow\$ {0,1}^{\lambda}
-          		   $ 
-                \\
-        $  z=F_{k}(x,y)=G_{x}(F_{k}'(y))  $ }};
-          
-          % Message from Bob to Alice, with computations by both sides
-          
-          \sdend{}
-       \end{tikzpicture}
-       \caption{$ \H\Y\B_{\F, \A}^{0}(\lambda) $}
-       \label{fig:hib0}
-    \end{figure}
-    
-    
-    \begin{figure}[h!]
-        \centering
-       \sdinit{}
-       \begin{tikzpicture}[scale=.6]
-          % Define symbols and names for the parties
-          \sdbegin{}
-          \newinst{A}{$ \A $}
-          \newinst[5]{B}{$C$} % Increase "5" to widen
-          
-          \mess{A}{$x,y$}{B}
-          \node[anchor=west] at (mess to) {  };
-    
-          \postlevel
-          \mess{B}{z}{A}
-          \node[anchor=west] at (mess from) {\shortstack[l]{
-                      $ R' \leftarrow\$ \R'(\lambda, n-1, \lambda) $ 
-                \\
-        $  z=H(x, y)=G_{x}(R'(y))  $ }};
-          
-          % Message from Bob to Alice, with computations by both sides
-          
-          \sdend{}
-       \end{tikzpicture}
-       \caption{$ \H\Y\B_{\R', G, \A}^{1}(\lambda) $}
-       \label{fig:hib1}
-    \end{figure}
-    
-    
-    \begin{figure}[h!]
-       \centering
-       \sdinit{}
-       \begin{tikzpicture}[scale=.5]
-          % Define symbols and names for the parties
-          \sdbegin{}
-          \newinst{A}{$ \A $}
-          \newinst[5]{B}{$C$} % Increase "5" to widen
-          
-          \mess{A}{$x,y$}{B}
-          \node[anchor=west] at (mess to) {  };
-    
-          \postlevel
-          \mess{B}{z}{A}
-          \node[anchor=west] at (mess from) {\shortstack[l]{
-                      $ R \leftarrow\$ \R(\lambda, n, \lambda) $ 
-                \\
-        $  z=R(x, y)  $ }};
-          
-          % Message from Bob to Alice, with computations by both sides
-          
-          \sdend{}
-       \end{tikzpicture}
-       \caption{$ \H\Y\B_{\R, \A}^{2}(\lambda) $}
-       \label{fig:hib2}
-    \end{figure}
-    
-    \begin{lemma}
-$\H\Y\B^{0} \approx_{c} \H\Y\B^{1} \approx_{c} \H\Y\B^{2}$.
-    \end{lemma}
-
-    \begin{clm}
- $\H\Y\B^{0} \approx_{c} \H\Y\B^{1}$       
-    \end{clm}
-
-   Assume $ \exists .PPT. D_{01}$ that can distinguish $F_{k}$ and $H$ ; then
-   there may exist a distinguisher $D$ as in the image which breaks the
-   assumption made by inductive step.
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ D_{01}  $}
-      \newinst[3]{B}{$ D $} % Increase "5" to widen
-      \newinst[3]{C}{$\C  $}
-
-      \mess{A}{$x, y$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \mess{B}{$y$}{C}
-      \node[anchor=west] at (mess to) {  };
-
-      \postlevel
-      \mess{C}{$z'$}{B}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-      		$  k \leftarrow\$ U_{\lambda}  $ 
-            \\
-            $z'=F_{k}(y)$ or $z'=R'(y)$
-            \\
-    $ R' \leftarrow\$ \R'(\lambda, n-1, \lambda)$;}};     
-      \mess{B}{$G_{x}(z')$}{A}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-\end{figure}
-
-\begin{clm}
- $\H\Y\B^{1} \approx_{c} \H\Y\B^{2}$       
-\end{clm}
-
-For this proof we use the following simple lemma.
-\begin{lem}
-    If $ G:\{0,1\}^{\lambda} \to \{0,1\}^{2\lambda} $ is a PRG, then for any
-    $t(\lambda) \in \poly{\lambda} $
+    % AP190103: Some rewording is in order...
+    \textbf{Base case} ($n=1$): $F_k$'s domain is restricted to $\{0, 1\}$, meaning that its images will be respectively the two halves on a single iteration of $G(k)$, which are pseudorandom by $G$'s definition:
     \[
-        (G(k_{1}), ..., G(k_{t})) \approx_{c} (U_{2\lambda}, ..., U_{2\lambda})
+        (F_k(0), F_k(1))=(G_0(k), G_1(k)) \compindist U_{2\lambda}
     \]
-    for $k_{1}, ..., k_{t} \leftarrow\$ U_{\lambda}$
-\end{lem}
+    therefore, in this case, $F_k$ is pseudorandom.
 
-Assume that it exists a distinguisher $D_{1, 2}$ which is capable of distinguish $H(x, y)$ and $R(x, y)$.
+    % AP190103: Here too...
+    \textbf{Inductive step}: Let $F_k' : \{0, 1\}^{n-1} \to \{0, 1\}^\lambda$ be a \prf. Define $F_k(x,y)$ as $G_x(F_k'(y))$, where $F_k : \{0, 1\}^n \to \{0, 1\}^\lambda$ and $x \in \{0, 1\}$. It must be proven that if $F_k'$ is a \prf, then so is $F_k$.
+    
+    Consider the following images depicting hybrid games:
 
-...TO REVIEW, NOT UNDERSTOOD AT ALL ...
+    \begin{cryptogame}
+        {ggmhyb0}
+        {$\hybridg{0}[\F](\lambda) = \cryptog{prf}[\F](\lambda)$}
+        {}
+
+        \send{}{$r = (r_0, r_{1 \dots n})$}{}
+        \receive{\shortstack[l]{
+            $k \pickUAR \{0, 1\}^\lambda$ \\
+            $z = F_k(r) = G_{r_0}(F_k'(r_{1 \dots n}))$
+        }}{$z$}{}
+
+    \end{cryptogame}
+
+    \begin{cryptogame}
+        {ggmhyb1}
+        {$\hybridg{1}[\overline{\R}](\lambda)$}
+        {}
+
+        \send{}{$r = (r_0, r_{1 \dots n})$}{}
+        \receive{\shortstack[l]{
+            $\overline{R} \pickUAR \R(\lambda, n-1, \lambda)$ \\
+            $z = H(r) = G_{r_0}(\overline{R}(r_{1 \dots n}))$
+        }}{$z$}{}
+
+    \end{cryptogame}
+
+    \begin{cryptogame}
+        {ggmhyb2}
+        {$\hybridg{2}[\R](\lambda)$}
+        {}
+
+        \send{}{$r = (r_0, r_{1 \dots n})$}{}
+        \receive{\shortstack[l]{
+            $R \pickUAR \R(\lambda, n, \lambda)$ \\
+            $z = R(r)$
+        }}{$z$}{}
+
+    \end{cryptogame}
+    
+    %AP190103: Actually, we're going to be inductive twice, one time for each hybrid couple
+
+    \begin{lemma}
+        $\hybridg{0}[\F](\lambda) \compindist \hybridg{1}[\overline{\R}](\lambda)$       
+    \end{lemma}
+
+    \begin{proof}
+        Assume $\exists\; \ppt\; \distinguisher$ that can distinguish $F_k$ from $H$; then an adversary $\adversary$ can use \distinguisher{} as in figure \ref{cryptoredux:ggmhyb01} to break the induction hypothesis (i.e. can distinguish $F_k'$ from $\overline{R}$).
+
+        % AP190103: It is not immediately clear by the sequence that we're simulating two games in two different "inductive" steps, instead of trying to break one standard assumption
+        % The reasoning is: distinguish the hybrids, simulate the induction steps
+        \begin{cryptoredux}
+            {ggmhyb01}
+            {}
+            {}
+            {}
+
+            \cseqchallenger{\shortstack[l]{
+                $k \pickUAR U_\lambda$ \\
+                $\overline{R} \pickUAR \R(\lambda, n-1, \lambda)$
+            }}
+
+            \return{}{$(r_0, r_{1 \dots n})$}{}
+
+            \send{}{$r_{1 \dots n}$}{}
+
+            \receive{\shortstack[l]{
+                $z_0 = F_k'(r_{1 \dots n})$ \\
+                $z_1 = \overline{R}(r_{1 \dots n})$ \\
+                $b \pickUAR \{0, 1\}$
+            }}{$z_b$}{}
+
+            \invoke{}{$G_{r_0}(z_b)$}{}
+
+            \return{}{$b'$}{}
+
+            \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
+
+        \end{cryptoredux}
+
+    \end{proof}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Before tackling the reduction from the last two hybrids, it is best to introduce another lemma:
+
+    \begin{lemma}
+        If $G : \{0, 1\}^\lambda \to \{0, 1\}^{2\lambda}$ is a PRG, then for any $t(\lambda) \in \poly{\lambda}$:
+        \[
+            (G(k_1), \dots , G(k_t)) \compindist (U_{2\lambda}, \dots , U_{2\lambda}) \quad \forall k_i \pickUAR U_\lambda
+        \]
+    \end{lemma}
+
+    \begin{proof}
+        Intuitively, this is true because, by \prg{} definition, any \ppt{} adversary cannot efficiently tell pseudorandom outputs apart from truly random outputs. A formal proof involves the hybrid argument: assume that it exists a distinguisher \distinguisher{} capable of distinguishing such tuples. Then, by doing a progressive hybridization of the starting tuple with the finishing one, the difference at each step $i$ is how the $i$-th value distributes: either pseudorandomly in the preceding case, or randomly in the following case. This difference is indeed negligible because of pseudorandomness being indistinguishable from true randomness; the fact that the tuples' lengths is polynomial in $\lambda$ makes them indistinguishable as a whole, which proves the lemma.
+    \end{proof}
+
+    Now for the final lemma:
+
+    \begin{lemma}
+        $\hybridg{1}[\overline{\R}](\lambda) \compindist \hybridg{2}[\R](\lambda)$       
+    \end{lemma}
+
+    \todo{WIP}
+
+    \begin{proof}
+        The proof is a reduction, and consists in using the ability to distinguish $H(r)$ from $R(r)$ to break $G$'s \prg{} property.
+
+        
+        \begin{cryptoredux}
+            {ggmhyb12}
+            {}
+            {}
+            {}
+
+            \cseqchallenger{\shortstack[l]{
+                $R \pickUAR \R(\lambda, n, \lambda)$ \\
+                $\overline{R} \pickUAR \R(\lambda, n-1, \lambda)$
+            }}
+
+            \return{}{$(r_0, r_{1 \dots n})$}{}
+
+            \send{}{$r_{1 \dots n}$}{}
+
+            \receive{\shortstack[l]{
+                $z_0 = G_{r_0}(\overline{R}(r_{1 \dots n}))$ \\
+                $z_1 = R(r)$ \\
+                $b \pickUAR \{0, 1\}$
+            }}{$z_b$}{}
+
+            \invoke{}{$z_b$}{}
+
+            \return{}{$b'$}{}
+
+            \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
+
+        \end{cryptoredux}
+        
+    \end{proof}
+
+    In the end the hybrids are mutually indistinguishable, therefore the theorem is proven.
+
 \end{proof}
 
 \section{\textsc{Cpa}-security}
@@ -325,6 +314,8 @@ Observe that the random value $r$ is part of the ciphertext, making it long $n+l
 
     \end{proof}
 
+    \pagebreak
+
     \begin{lemma}
         $\forall b \in \{0, 1\} \implies \hybridg{1}(\lambda, b) \compindist \hybridg{2}(\lambda, b)$.
     \end{lemma}
@@ -332,6 +323,7 @@ Observe that the random value $r$ is part of the ciphertext, making it long $n+l
     \begin{proof}
         Firstly, it can be safely assumed that any ciphertext $(r_i, R(r_i) \xor m_b)$ distributes equivalently with its own sub-value $R(r_i)$, because of $R$'s true randomness, and independency from $m_b$.
 
+        %AP190102: An image visualizing the repeat event might be very useful
         Having said that, the two hybrids apparently distribute uniformly, making them perfectly equivalent; however there is a caveat: if both games are run and one value $\bar{r}$ is queried twice in both runs, then om the second query, the adversary will receive the same image in $\hybridg{1}$, but almost certainly a different one in $\hybridg{2}$. This is because the first hybrid uses a function, which is deterministic by its nature, whereas the image in the second hybrid is picked completely randomly from the codomain. Nevertheless, this sneaky issue about "collisions" can be proven to happen with negligible probability.
 
         Call \textsc{Repeat} this collision event on $\bar{r}$ between 2 consecutive games. Then:
