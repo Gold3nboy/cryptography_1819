@@ -22,9 +22,7 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
     therefore, in this case, $F_k$ is pseudorandom.
 
     % AP190103: Here too...
-    \textbf{Inductive step}: Let $F_k' : \{0, 1\}^{n-1} \to \{0, 1\}^\lambda$ be a \prf. Define $F_k(x,y)$ as $G_x(F_k'(y))$, where $F_k : \{0, 1\}^n \to \{0, 1\}^\lambda$ and $x \in \{0, 1\}$. It must be proven that if $F_k'$ is a \prf, then so is $F_k$.
-    
-    Consider the following images depicting hybrid games:
+    \textbf{Inductive step}: Let $F_k' : \{0, 1\}^{n-1} \to \{0, 1\}^\lambda$ be a \prf. Define $F_k(x,y)$ as $G_x(F_k'(y))$, where $F_k : \{0, 1\}^n \to \{0, 1\}^\lambda$ and $x \in \{0, 1\}$. It must be proven that if $F_k'$ is a \prf, then so is $F_k$. We will proceed by hybrid games, depicted in figures \ref{cryptogame:ggmhyb0}, \ref{cryptogame:ggmhyb1} and \ref{cryptogame:ggmhyb2}:
 
     \begin{cryptogame}
         {ggmhyb0}
@@ -110,6 +108,8 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Before tackling the reduction from the last two hybrids, it is best to introduce another lemma:
 
+    \todo{This lemma isn't used at all, why is it here? It's actually used in a different proof for this theorem...}
+
     \begin{lemma}
         If $G : \{0, 1\}^\lambda \to \{0, 1\}^{2\lambda}$ is a PRG, then for any $t(\lambda) \in \poly{\lambda}$:
         \[
@@ -120,23 +120,20 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
     \begin{proof}
         Intuitively, this is true because, by \prg{} definition, any \ppt{} adversary cannot efficiently tell pseudorandom outputs apart from truly random outputs. A formal proof involves the hybrid argument: assume that it exists a distinguisher \distinguisher{} capable of distinguishing such tuples. Then, by doing a progressive hybridization of the starting tuple with the finishing one, the difference at each step $i$ is how the $i$-th value distributes: either pseudorandomly in the preceding case, or randomly in the following case. This difference is indeed negligible because of pseudorandomness being indistinguishable from true randomness; the fact that the tuples' lengths is polynomial in $\lambda$ makes them indistinguishable as a whole, which proves the lemma.
     \end{proof}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     Now for the final lemma:
 
     \begin{lemma}
         $\hybridg{1}[\overline{\R}](\lambda) \compindist \hybridg{2}[\R](\lambda)$       
     \end{lemma}
-
-    \todo{WIP}
-
+    
     \begin{proof}
-        The proof is a reduction, and consists in using the ability to distinguish $H(r)$ from $R(r)$ to break $G$'s \prg{} property.
-
+        Consider the distinguishing game for $H$ and $R$ in figure \ref{cryptogame:ggmhyb12}. The random functions $\overline{R}$ and $R$ are entirely independant, and $G$ transforms randomness in pseudorandomness, so this game boils down into distinguishing pseudorandom values from random ones, which is possible only with negligible probability.
         
-        \begin{cryptoredux}
+        \begin{cryptogame}
             {ggmhyb12}
-            {}
-            {}
+            {The distinguishing game between $H$ in $\hybridg{1}$ and $R$ in $\hybridg{2}$}
             {}
 
             \cseqchallenger{\shortstack[l]{
@@ -144,9 +141,11 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
                 $\overline{R} \pickUAR \R(\lambda, n-1, \lambda)$
             }}
 
-            \return{}{$(r_0, r_{1 \dots n})$}{}
+            \cseqdelay
 
-            \send{}{$r_{1 \dots n}$}{}
+            \send{}{$(r_0, r_{1 \dots n})$}{}
+
+            \cseqdelay
 
             \receive{\shortstack[l]{
                 $z_0 = G_{r_0}(\overline{R}(r_{1 \dots n}))$ \\
@@ -154,17 +153,15 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
                 $b \pickUAR \{0, 1\}$
             }}{$z_b$}{}
 
-            \invoke{}{$z_b$}{}
-
-            \return{}{$b'$}{}
+            \cseqdelay
 
             \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
 
-        \end{cryptoredux}
+        \end{cryptogame}
         
     \end{proof}
 
-    In the end the hybrids are mutually indistinguishable, therefore the theorem is proven.
+    In the end the hybrids are proven to mutually indistinguishable, therefore the inductive step is correct, proving the theorem.
 
 \end{proof}
 
