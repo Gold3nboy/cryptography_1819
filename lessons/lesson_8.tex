@@ -1,334 +1,304 @@
 \mychapter{8}{Lesson 8}
+
 \section{Domain extension}
 
-How can we encrypt long messages , say $m=(m_{1}, m_{2}, ..., m_{t})$ where for $i \in [t], m_{i} \in \{0,1\}^{n} $?
+Up until now, encryption has been dealt with messages of fixed size around a polynomial function to $\lambda$. How to deal with messages with aritrary size? Setting a maximum bound to message length seems impractical, both for waste reasons when messages are too short, and for practicality when messages eventually get too long. The solution takes the form of a ``block-cipher'', where a message of a given size is split into equally-sized blocks, and then encrypted using a fixed-size encryption scheme. Various instances of this technique, called \emph{modes}, have been devised.
 
-Mode of operation: let's build $P_{k}$, a blockcypher.
+\subsection{Electronic Codebook mode}
 
-\subsection{Electronic CodeBook (ECB)}
-
-(In notes, this name is associated with CTR-mode, or \textbf{counter mode}, but
-why?)\\
-The principle is that I have many blocks of information and I encrypt all of
-them individually (maybe in parallel):
+The operation of \textsc{ecb}-mode is straightforward: Given a message split into blocks $(m_1, \dots, m_t)$, apply the scheme's encryption routine to each block, as shown in figure \ref{fig:ecb}:
 \[
-    c_{i}=P_{k}(m_{i}) \forall i \in [t]
+    c_i = F_k(r) \xor m_i \quad \forall i \in \{0, \dots, t\}
 \]
-and outputs $c_{1}, c_{2}, ..., c_{t}$.\\
+Decryption is trivially implemented by \textsc{xor}-ing the ciphered blocks with $F_k(r)$.
 
-If I encrypt the same message, I obtain the same cyphertext. So it's not
-CPA-secure as the encryption function is \textbf{deterministic.}
 
-\begin{preview}
-    \tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=20pt,inner sep=0pt]
-    \tikzstyle{encrypt}=[draw,fill=black!15,rectangle,minimum size=20pt,inner sep=0pt]
+\begin{figure}[ht]
     \centering
-    \begin{tikzpicture}
-        \newcommand{\n}{2}
-        \foreach \nr in {0, ..., \n}{
-            \node (r\nr) at (0,{(\n-\nr)*2}) {$r+\nr$};
-            \node (c\nr) at (6,{(\n-\nr)*2}) {$c_{\nr+1}$};
-            \node (F\nr)[encrypt] at (2,{(\n-\nr)*2}) {$F_{k}$};
-            \node (m\nr) at (4,{(\n-\nr)*2+1}) {$m_{\nr}$};
-            \node (x\nr) at (4,{(\n-\nr)*2}) {$\xor$};
 
-            \draw[->,very thick] (r\nr) -- (F\nr);
-            \draw[->,very thick] (m\nr) -- (x\nr);
-            \draw[->,very thick] (F\nr) -- (x\nr);
-            \draw[->,very thick] (x\nr) -- (c\nr);
-        }
+    \tikzstyle{box}  = [draw, minimum size=2em]
+    \tikzstyle{init} = [pin edge={to-,thin,black}, pin distance = 0.3cm]
 
-    \node (rx) at (0,-1) {$\vdots$};
-    \node (Fx) at (2,-1) {$\vdots$};
-    \node (cx) at (6,-1) {$\vdots$};
+    \begin{tikzpicture}[node distance = 1.2cm, auto, >=latex']
 
-            \node (rt) at (0,{(-1)*2}) {$r + t - 1$};
-            \node (ct) at (6,{(-1)*2}) {$c_{t-1}$};
-            \node (Ft)[encrypt] at (2,{(-1)*2}) {$F_{k}$};
-            \node (mt) at (4,{(-1)*2+1}) {$m_{t-1}$};
-            \node (xt) at (4,{(-1)*2}) {$\xor$};
+        \node (r1) {$r$};
+        \node (r2) [right of = r1, node distance = 2cm] {$r$};
+        \node (rd) [right of = r2, node distance = 2cm] {$\dots$};
+        \node (rt) [right of = rd, node distance = 2cm] {$r$};
 
-            \draw[->,very thick] (rt) -- (Ft);
-            \draw[->,very thick] (mt) -- (xt);
-            \draw[->,very thick] (Ft) -- (xt);
-            \draw[->,very thick] (xt) -- (ct);
+        \node (f1) [box, below of = r1] {$F_k$};
+        \node (f2) [box, below of = r2] {$F_k$};
+        \node (fd) [below of = rd] {$\dots$};
+        \node (ft) [box, below of = rt] {$F_k$};
+        
+        \node (x1) [below of = f1, pin={[init]left:$m_1$}] {$\xor$};
+        \node (x2) [below of = f2, pin={[init]left:$m_2$}] {$\xor$};
+        \node (xd) [below of = fd] {$\dots$};
+        \node (xt) [below of = ft, pin={[init]left:$m_t$}] {$\xor$};
+        
+        \node (c1) [below of = x1] {$c_1$};
+        \node (c2) [below of = x2] {$c_2$};
+        \node (cd) [below of = xd] {$\dots$};
+        \node (ct) [below of = xt] {$c_t$};
 
+        \path[->] (r1) edge (f1);
+        \path[->] (r2) edge (f2);
+        \path[->] (rt) edge (ft);
 
+        \path[->] (f1) edge (x1);
+        \path[->] (f2) edge (x2);
+        \path[->] (ft) edge (xt);
+        
+        \path[->] (x1) edge (c1);
+        \path[->] (x2) edge (c2);
+        \path[->] (xt) edge (ct);
 
-
-            \node (alala) at (6,6) {$c_{0}=r$};
-            \draw[->,very thick] (r0) -- (alala);
     \end{tikzpicture}
-\end{preview}
+    \caption{\textsc{ecb}-mode block-cipher in action, using a \prf{} as the encryption routine}
+    \label{fig:ecb}
+\end{figure}
 
-In the image, each message is long exactly \textbf{n bits}, and 
-\begin{equation*}
-    r \leftarrow\$ \{0,1\}^{n}
-\end{equation*}
-so the sums made over $r$ are done in \textbf{mod $2^{n}$}, since $r$ can be a
-number in the range $[0, 2^{n} -1]$.
+This approach has the advantage of being completely parallelizable, as each block can clearly be encrypted separately; however there is a dangerous flaw in being not \cpa-secure, even when using a \prf-based encryption scheme. To understand why, observe that random nonces for ciphertext randomization are chosen per-message; this means the encryption of message blocks become deterministic in the message scope, enabling an adversary to attack the scheme within a single plaintext. It is sufficient to choose an all-0 or all-1 message to realize that all its blocks would encrypt to the same ciphered block.
 
-This is also called streamcipher, cause as input flows ECB produces the ciphertext.How to decrypt this schema?
+\subsection{Cipher block chaining mode (\textsc{cbc})}
 
-Since I know $r_{i}$, if I compute $F_{k}(r_{i})$ I can use the $\xor$-operation to calculate the message.
-
-\subsection{Cipher block chaining (CBC)}
-
-\todo{CBC IMAGE}
-
-The schema to cipher here is 
-\[ 
-    \forall i \in [1,t] c_{i}=P_{k}(C_{i-1}\xor m_{1})
+% AP190105: The explanation anticipates PRPs, which may be a problem. Should be reviewed at later times...
+This mode serializes block encryption by using the preceding ciphered block in the formula:
+\[
+    c_i = P_k(r) \xor m_i \quad \forall i \in \{0, \dots, t\}
 \]
-How to decipher?
-\begin{equation*}
-    P_{k}^{-1}(i)= c_{i-1} \xor m_{i}
-\end{equation*}
+This time, a \emph{pseudorandom permutation}(\prp) is used instead of a \prf; they will be discussed later on. The diagram in figure \ref{fig:cbc} shows a general view of \textsc{cbc}-mode's operation. The decryption process is analogous but in a reversed fashion, by computing the preimage of a ciphered block and \textsc{xor}-ing it with the preceding ciphered block:
+\[
+    m_i = P_k^{-1}(c_i) \xor c_{i-1}
+\]
 
-so $m_{i}= P_{k}^{-1}(c_{i}) \xor c_{i-1}$.
+\begin{figure}[ht]
+    \centering
+
+    \tikzstyle{box}  = [draw, minimum size=2em]
+    \tikzstyle{init} = [pin edge={to-,thin,black}, pin distance = 0.3cm]
+
+    \begin{tikzpicture}[node distance = 1cm, auto, >=latex']
+
+        \node (r1) {$m_1$};
+        \node (r2) [right of = r1, node distance = 2cm] {$m_2$};
+        \node (rd) [right of = r2, node distance = 2cm] {$\dots$};
+        \node (rt) [right of = rd, node distance = 2cm] {$m_t$};
+        
+        \node (x1) [below of = r1] {$\xor$};
+        \node (x2) [below of = r2] {$\xor$};
+        \node (xd) [below of = rd] {$\dots$};
+        \node (xt) [below of = rt] {$\xor$};
+
+        \node (f1) [box, below of = x1] {$P_k$};
+        \node (f2) [box, below of = x2] {$P_k$};
+        \node (fd) [below of = xd] {$\dots$};
+        \node (ft) [box, below of = xt] {$P_k$};
+        
+        \node (c1) [below of = f1] {$c_1$};
+        \node (c2) [below of = f2] {$c_2$};
+        \node (cd) [below of = fd] {$\dots$};
+        \node (ct) [below of = ft] {$c_t$};
+
+        
+        \path[->] (r1) edge (x1);
+        \path[->] (r2) edge (x2);
+        \path[->] (rt) edge (xt);
+
+        \path[->] (x1) edge (f1);
+        \path[->] (x2) edge (f2);
+        \path[->] (xt) edge (ft);
+        
+        \path[->] (f1) edge (c1);
+        \path[->] (f2) edge (c2);
+        \path[->] (ft) edge (ct);
+
+        \node (r) [left of = x1, node distance = 2cm] {$r$};
+        \node (c0) [left of = c1, node distance = 2cm] {$c_0$};
+        \path[->] (r) edge (c0);
+        
+        \draw[->] (c0) -- +(1cm, 0) -- +(1cm, 2cm) -- (x1);
+        \draw[->] (c1) -- +(1cm, 0) -- +(1cm, 2cm) -- (x2);
+        \draw[->] (c2) -- +(1cm, 0) -- +(1cm, 2cm) -- (xd);
+        \draw[->] (cd) -- +(1cm, 0) -- +(1cm, 2cm) -- (xt);
+
+    \end{tikzpicture}
+    \caption{\textsc{cbc}-mode block-cipher in action, using a \prp{} as the encryption routine}
+    \label{fig:cbc}
+\end{figure}
+
+\subsection{Counter mode}
+
+This mode closely resembles \textsc{ecb}-mode but uses a ``rolling'' nonce instead of a static one, as shown in figure \ref{fig:ctr}. At each successive block, the nonce is incremented by 1 and then used in a single block encryption. Since the nonce is in $\{0,1\}^n$, the increment is done modulo $2^{n}$ so that the value will wrap around to 0 it it ever overflows. Decryption is analogous.
+
+\begin{figure}[ht]
+    \centering
+
+    \tikzstyle{box}  = [draw, minimum size=2em]
+    \tikzstyle{init} = [pin edge={to-,thin,black}, pin distance = 0.3cm]
+
+    \begin{tikzpicture}[node distance = 1cm, auto, >=latex']
+
+        \node (r1) {$r$};
+        \node (r2) [right of = r1, node distance = 2cm] {$r + 1$};
+        \node (rd) [right of = r2, node distance = 2cm] {$\dots$};
+        \node (rt) [right of = rd, node distance = 2cm] {$r + t - 1$};
+
+        \node (f1) [box, below of = r1] {$F_k$};
+        \node (f2) [box, below of = r2] {$F_k$};
+        \node (fd) [below of = rd] {$\dots$};
+        \node (ft) [box, below of = rt] {$F_k$};
+        
+        \node (x1) [below of = f1, pin={[init]left:$m_1$}] {$\xor$};
+        \node (x2) [below of = f2, pin={[init]left:$m_2$}] {$\xor$};
+        \node (xd) [below of = fd] {$\dots$};
+        \node (xt) [below of = ft, pin={[init]left:$m_t$}] {$\xor$};
+        
+        \node (c1) [below of = x1] {$c_1$};
+        \node (c2) [below of = x2] {$c_2$};
+        \node (cd) [below of = xd] {$\dots$};
+        \node (ct) [below of = xt] {$c_t$};
+        
+        \node (c0) [left of = c1, node distance = 2cm] {$c_0$};
+        
+        \path[->] (r1) edge (r2);
+        \path[->] (r2) edge (rd);
+        \path[->] (rd) edge (rt);
+
+        \path[->] (r1) edge (f1);
+        \path[->] (r2) edge (f2);
+        \path[->] (rt) edge (ft);
+
+        \path[->] (f1) edge (x1);
+        \path[->] (f2) edge (x2);
+        \path[->] (ft) edge (xt);
+        
+        \path[->] (x1) edge (c1);
+        \path[->] (x2) edge (c2);
+        \path[->] (xt) edge (ct);
+
+        \draw[->] (r1) -- (-2cm, 0) -- (c0);
+
+    \end{tikzpicture}
+    \caption{Counter-mode block-cipher in action, using a \prf{} as the encryption routine}
+    \label{fig:ctr}
+\end{figure}
+
+This apparently innocuous change to \textsc{ebc} is enough to ensure \cpa-security, at the cost of perfect parallelization.
 
 \begin{theorem}
-    Assume $\F$ ($F_{k}$ in the image above is part of this family) is a PRF,
-    then CTR-mode yields a CPA-secure SKE for variable length messages.
-\end{theorem}.\\
-\textit{Variable length messages}  means that  every message 
-\[
-    m=(m_{1}, ..., m_{t})
-\]
+    Assume $F_k$ is a \prf, then the counter-mode block cipher (\textsc{ctr}) is \cpa-secure for variable length messages\footnotemark.
+\end{theorem}
+\footnotetext{\emph{Variable length messages} exactly means every message $m = (m_1, \dots, m_t)$ is made of $t$ blocks, and $t$ can change from any message to a different one.}
 
-has t subsets, and $t$ can change from message $m$ to another message
-$m'=(m'_{1}, ..., m'_{t'})$.
-Consider the following hybrids:
-
-\begin{figure}[ht!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.65]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
-      
-      \postlevel
-      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c=(c_{0}=r, c_{1}, ..., c_{t})$}{A}
-      \node[anchor=west] at (mess from) { \shortstack[l] {
-                  $r \leftarrow\$ [r, r+t-1] mod 2^{n}$    
-          \\
-          $c_{i}=F_{k}(r + i -1) \xor m_{i}$
-          }};
-    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
-      
-   \postlevel 
-    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
-      \node[anchor=east] at (mess from) { both of length $t$ };
-
-      \postlevel
-      \mess{B}{$r^{*}, c_{1}^{*}, ..., c_{t}^{*}$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-        $r* \leftarrow\$ [r, r+t-1] mod 2^{n}$    
-          \\
-          $c_{i}^{*}=F_{k}(r^{*} + i -1) \xor m_{i}^{*}$
-          }};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c$}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
-      \postlevel
-      \mess{A}{$b' \in \{0,1\}$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-   \caption{$Game_{CTR, \A}^{cpa}(\lambda, b)$}
-\end{figure}
-
-
-\begin{figure}[ht!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.5]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
-      
-      \postlevel
-      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c=(c_{0}=r, c_{1}, ..., c_{t})$}{A}
-      \node[anchor=west] at (mess from) { \shortstack[l] {
-                  $R \leftarrow\$ R(\lambda, n, n)$    
-          \\
-          $c_{i}=R(r + i -1) \xor m_{i}$
-          }};
-    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
-      
-   \postlevel 
-    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
-      \node[anchor=east] at (mess from) { both of length $t$ };
-
-      \postlevel
-      \mess{B}{$r^{*}, c_{1}^{*}, ..., c_{t}^{*}$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-        $r* \leftarrow\$ [r, r+t-1] mod 2^{n}$    
-          \\
-          $c_{i}^{*}=R(r^{*} + i -1) \xor m_{i}^{*}$
-          }};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c$}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
-      \postlevel
-      \mess{A}{$b' \in \{0,1\}$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-   \caption{$\H\Y\B_{1}(\lambda, b)$}
-\end{figure}
-\newpage
-\begin{figure}[ht!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.5]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C^{cpa} $} % Increase "5" to widen
-      
-      \postlevel
-      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c=(c_{0}=r, c_{1}, ..., c_{t})$}{A}
-      \node[anchor=west] at (mess from) { \shortstack[l] {
-                  $c_{i} \leftarrow\$ U_{n}$    
-          }};
-    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
-      
-   \postlevel 
-    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
-      \node[anchor=east] at (mess from) { both of length $t$ };
-
-      \postlevel
-      \mess{B}{$c_{0}^{*}, c_{1}^{*}, ..., c_{t}^{*}$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-                  $c_{i}^{*} \leftarrow\$ U_{n}$    
-          }};
-      
-      % Message from Bob to Alice, with computations by both sides
-      \postlevel
-      \mess{A}{$m=(m_{0}, ..., m_{t})$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c$}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-8.3) to[out=240,in=110] (1.2,-6.3);
-      \postlevel
-      \mess{A}{$b' \in \{0,1\}$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-   \caption{$\H\Y\B_{2}(\lambda, b)$}
-\end{figure}
-
-Now we want to show that $Game_{\Pi, \lambda}^{cpa}(\lambda,0)
-\approx_{c}Game_{\Pi, \lambda}^{cpa}(\lambda,1) $
 \begin{proof}
+    Figure \ref{cryptogame:ctrcpa} models a \cpa{} attack to a counter-mode block-cipher. The proof will proceed by hybrid argument starting from this game, therefore the statement to verify will be $\cryptog{cpa}[\textsc{ctr}](\lambda, 0) \compindist \cryptog{cpa}[\textsc{ctr}](\lambda, 1)$.
 
-    \begin{exercise}
-        \begin{lemma}
-        Show that $Game_{\Pi, \lambda}^{cpa}(\lambda,b) \approx_{c} \H\Y\B_{1}
-        (\lambda, b), \forall b \in \{0,1\} $
-        \end{lemma}
+    \begin{cryptogame}
+        {ctrcpa}
+        {A chosen plaintext attack to counter-mode block-cipher}
+        {cpa}
+        
+        \cseqbeginloop
 
-        (Since this $Game(\lambda, b)$ is a CPA scheme and the second one is        very similar, we can use a distinguisher which plays the CPA game; since this is a lemma, our precondition to "break" during the reduction is the precondition contained in the theorem statement)
-    \end{exercise}
+        \send{}{$m = (m_1, \dots, m_t)$}{}
+        \receive{\shortstack[l]{
+            $r = c_0 \pickUAR \{0, 1\}^n$ \\
+            $c_i = F_k(r + i - 1) \xor m_i \quad \forall i$
+        }}
+        {$c = (c_0, c_1, \dots, c_t)$}{}
+
+        \cseqendloop
+
+        \cseqdelay
+        
+        \send{$|\mu_0| = |\mu_1| \in \mathcal{M}$}{$\mu_0, \mu_1$}{}
+        \receive{\shortstack[l]{
+            $\rho = \gamma_0 \pickUAR \{0, 1\}^n$ \\
+            $b \pickUAR \{0, 1\}$ \\
+            $(\gamma_b)_i = F_k(\rho + i - 1) \xor (\mu_b)_i \quad \forall i$
+        }}
+        {$\gamma_b = (\gamma_0, \gamma_1, \dots, \gamma_t)$}{}
+
+        \cseqdelay
+        
+        \cseqbeginloop
+
+        \send{}{$m = (m_1, \dots, m_t)$}{}
+        \receive{\shortstack[l]{
+            $r = c_0 \pickUAR \{0, 1\}^n$ \\
+            $c_i = F_k(r + i - 1) \xor m_i \quad \forall i$
+        }}
+        {$c = (c_0, c_1, \dots, c_t)$}{}
+
+        \cseqendloop
+
+        \cseqdelay
+        
+        \send{}{$b'$}{\textsc{Output 1 iff} $b'=b$}
+
+    \end{cryptogame}
+
+    Define the two hybrid games from the original \cpa{} game as follows:
+
+    \begin{itemize}
+        \item $\hybridg{1}[\textsc{ctr}](\lambda, b)$: A random function $R$ is chosen \uar{} from $\R(\lambda, n, n)$ at the beginning of the game, and is used in place of $F_k$ in all block encryptions;
+        \item $\hybridg{2}[\textsc{ctr}](\lambda, b)$: The challenger will pick random values from $\{0, 1\}^n$ as ciphered blocks, disregarding any encryption routine.
+    \end{itemize}
 
     \begin{lemma}
-        $\H\Y\B_{1}(\lambda,b) \approx_{c} \H\Y\B_{2} (\lambda), \forall b \in
-        \{0,1\}$
+        $\cryptog{cpa}[\textsc{ctr}](\lambda, b) \compindist \hybridg{1}[\textsc{ctr}](\lambda, b) \quad \forall b \in \{0, 1\}$
     \end{lemma}
 
-    The two hybrids are identical but for the encryption function, which is completely random in the second one while the first one uses a random function.
-    
-    Since  $R(r + i ) \xor m_{i} \approx R(r + i ) $ (because $m_{i}$ doesn't affect the distribution of the result at all), if  $R(r^{*})$ behaves like a true random extractor , the two hybrids are indistinguishable.
+    \begin{proof} The proof is left as exercise.
+        
+        \emph{Hint}: Since the original game and the first hybrid are very similar, we can use a distinguisher which plays the \cpa-game; since this is a lemma, our goal in the reduction is to break the precondition contained in the theorem statement.
+    \end{proof}
 
-    Now, if I examine a simple query and the consecutive challenge query $(q, q^{*})$ in a game in $\H\Y\B_{2}$, the responses will be chosen at random with very low probability of being the same; but in a game in $\H\Y\B_{1}$, the problem comes if the challenger creates an $r^{*}+ j'$ for $q^{*}$ which overlaps some chosen $r_{i} + j$ previously chosen for $q$.
-
-    This is bad, because $R(r_{i} + j)=R(r^{*} + j')$ since $R$ is a random function, and the probability of outputting the same response ciphertext will be much higher in $\H\Y\B_{1}$.
-
-    It's possible to show that these collisions happen very few times (with \textbf{negligible} probability) in $\H\Y\B_{1}$ and  that the two hybrids are distinct and distinguishable for a negligible factor.
+    \begin{lemma}
+        $\hybridg{1}[\textsc{ctr}](\lambda, b) \compindist \hybridg{2}[\textsc{ctr}](\lambda, b) \quad \forall b \in \{0, 1\}$
+    \end{lemma}
 
     \begin{proof}
-        Let:
+    
+        Since $m_i$ doesn't affect the distribution of the result at all, for any $i$, if $R(r^{*})$ behaves like a true random extractor, then the two hybrids are indistinguishable in the general case ($R(r + i) \xor m_i \approx R(r + i)$). However, there is a sneaky issue: if in both games it happens that a given nonce $r_i$ is used in both one query encryption and the challenge mesage encryption at any step, the subsequent encrypted blocks will be completely random in the second hybrid, whereas in the first hybrid the function's images, albeit random, become predictable, enabling a \cpa.
+
+        Nevertheless, it can be proved that these ``collisions'' happen with negligible probability within $\hybridg{1}[\textsc{ctr}]$. Let:
         \begin{itemize}
-            \item $q$= \# of encryption queries
-            \item $t_{i}$ = \# of blocks for the i-th query
-            \item $t^{*}$ = \# of blocks for challenge
+            \item $q$ = number of encryption queries in a game run
+            \item $t_i$ = number of blocks for the $i$-th query
+            \item $\tau$ = number of blocks for the challenge ciphertext
+            \item \textsc{Overlap} event: $\exists i, j, \iota : r_i + j = \rho + \iota$
         \end{itemize}
 
-        and let the function $R$ run: we will have $R(r*), ...R(r^{*}+t^{*}-1)$ and $R(r_{i}), ..., R(r_{i}+t_{i}-1)$ sequences of random function outputs.
+        The \textsc{Overlap} event exaclty models our problematic scenario. Now it suffices to show that it occurs negligibly. For simplicity, assume the involved messages are of same length, that is $t_i = \tau =: t$. Denote with $\textsc{Overlap}_i$ to be the event that the $i$-th query overlaps the challenge sequence as specified above.
 
- \begin{definition}
-     \textbf{OVERLAP event}: $\exists$ i, j, j', $r_{i} + j=r^{*} + j'$ (here $j \leq t_{i}$ and $j' \leq t^{*}$), for some query $q_{i}$.
- \end{definition}
- 
- If \textbf{OVERLAP}  does not happen , the sequence $(R(r^{*}), ..., R(r^{*}+t^{*}-1))$ is made of \textbf{ \textit{uniform} } and \textbf{ \textit{independent}} values.
- Thus $\H\Y\B_{1}(b)$ is identical to $\H\Y\B_{2}(b)$ for all $b \in \{0,1\}$.
+        Fix some $\rho$. One can see that $\textsc{Overlap}_i$ happens if:
+        \[
+            \rho - t + 1 \leq r_i \leq \rho + t - 1
+        \]
+        which means that $r_i$ should be chosen \emph{at least} in a way that:
+        \begin{itemize}
+            \item the sequence $\rho, \dots, \rho + t - 1$ comes before the sequence $r_i, \dots, r_i + t - 1$, and they overlap just for the last element $\rho + t - 1 = r_i$ or
+            \item the sequence $r_i, \dots, r_i + t - 1$ comes before the sequence the sequence $\rho, \dots, \rho + t - 1$, and they overlap just for the last element $r_i + t - 1 = \rho$.
+        \end{itemize}
 
- Now it suffices to show that $ \P [ OVERLAP ] \in \negl{\lambda}  $.
+        Then:
 
- For simplicity, assume $q=$(length of each query) and also $t_{i}=t^{*}=q$.
-Let $OVERLAP_{i}$ be the event that the $i-th$ query $r_{i}, ..., r_{i} + q - 1 $ partially or totally overlaps the challenge sequence $r^{*}, ..., r^{*} + q - 1 $.
-
-Fix some $r*$. One can see that $OVERLAP_{i}$ happens if 
-\[
-r^{*}-q+1 \leq r_{i} \leq r^{*} + q - 1
-\]
-, which means that $r_{i}$ should be chosen \textit{at least} in a way that :
-\begin{itemize}
-    \item the sequence $r^{*}, ..., r^{*} + q - 1 $ comes before the sequence $r_{i},
-        ..., r_{i} + q - 1 $, and they overlap just for the last element  $r^{*}
-        + q -1 = r_{i}$ or
-    \item the sequence $r_{i},..., r_{i} + q - 1 $ comes before the sequence the
-        sequence $r^{*}, ..., r^{*} + q - 1 $, and they overlap just for the
-        last element $r_{i} + q - 1 = r^{*}$
-\end{itemize}.
-
-So now
-\[
-    \P [ OVERLAP_{i} ] = \frac{(r^{*} +q - 1) - (r^{*}-q+1) + 1}{2^{n}} =
-    \frac{2q-1}{2^{n}}
-\]
-
-It is obvious that, for definition of \textbf{OVERLAP} , 
-\[
-    \P [ OVERLAP ] \leq \sum_{i=1}^{q} \P [ OVERLAP_{i} ] \leq 2
-    \frac{q^{2}}{2^{n}} \in \negl{\lambda}  
-\]
-
+        \begin{align*}
+            \Pr[\textsc{Overlap}_i] &= \frac{(\rho + t - 1) - (\rho - t + 1) + 1}{2^n} \\
+            &= \frac{2t-1}{2^n} \\
+            \Pr[\textsc{Overlap}] &\leq \sum_{i = 1}^{t} \Pr[\textsc{Overlap}_i] \\
+            &\leq 2 \frac{t^2}{2^n} \in \negl{\lambda} 
+        \end{align*}
+            
+        which proves that our collision scenario happens with negligible pobability, thus the two hybrids are indistinguishable.
 
     \end{proof}
     
-    Since $\H\Y\B_{1} \approx_{c} \H\Y\B_{2}$ and $\H\Y\B_{1}\equiv Game(b)$
-    with $b$ equal to 0 and 1 respectively, we can state that 
+    Having proven the indistinguishability between the hybrids, the conclusion is reached:
     \[
-        Game(0) \approx_{c} \H\Y\B_{2} \approx_{c} Game(1)
+        \cryptog{cpa}[\textsc{ctr}](\lambda, 0) \compindist \cryptog{cpa}[\textsc{ctr}](\lambda, 1)
     \]
-    .
     
 \end{proof}
-
