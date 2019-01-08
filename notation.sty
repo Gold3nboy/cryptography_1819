@@ -40,11 +40,13 @@
 % Probabilistic Polynomial time
 \newcommand{\ppt}{\textsc{ppt}}
 % Universally unforgeable from chosen message attack
-\newcommand{\ufcma}{\textsc{uf-cma}}
+\newcommand{\ufcma}{\textsc{ufcma}}
 % Decisional Diffie-Hellman
 \newcommand{\ddh}{\textsc{ddh}}
 % Computational Diffie-Hellman
 \newcommand{\cdh}{\textsc{cdh}}
+% Message Authentication Code
+\newcommand{\mac}{\textsc{mac}}
 % Secret Key Encryption
 \newcommand{\ske}{\textsc{ske}}
 % Public Key Encryption
@@ -176,7 +178,7 @@
 
 
 % Arguments: Identifier (used as label) | description | challengername
-\NewDocumentEnvironment{cryptogame}{m m m}
+\NewDocumentEnvironment{cryptogame}{m m m O{2.2}}
 { % Crypto-game BEGIN
 
     \cseqcraftfloat
@@ -198,7 +200,7 @@
             \ifnum\thelooplabel=0
             \setcounter{looplabel}{\thesequencecursor}
             \stepcounter{looplabel}
-            \else \PackageError{notation}{Attempting to nest loops in a         cryptosequence. Close the former loop first}
+            \else \PackageError{notation}{Attempting to nest loops in a cryptosequence. Close the former loop first}
             \fi
         }
 
@@ -209,16 +211,16 @@
             \ifnum\thelooplabel>\thesequencecursor\relax
                 \PackageError{notation}{Closing an empty loop}
             \fi
-            \draw[->](A)+(-0.2,         -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+            \draw[->](A)+(-0.2, -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
             .. controls +(-0.6, -1.3)
             and         +(-0.6, +1.3)
-            ..          +(-0.2,         0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
+            ..          +(-0.2, 0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
             \setcounter{looplabel}{0}
         }
 
         % Add the game's participants
         \cseqentity{A}{$\adversary$}
-        \cseqentity[2.5]{C}{$\challenger^{\textsc{#3}}$}
+        \cseqentity[#4]{C}{$\challenger^{\textsc{#3}}$}
 
 }
 { % Crypto-game END
@@ -241,7 +243,7 @@
 
 
 % Arguments: Identifier (used as label) | description | challengername | Second adversary name
-\NewDocumentEnvironment{cryptoredux}{m m m m}
+\NewDocumentEnvironment{cryptoredux}{m m m m O{2.2}}
 { % Crypto-game BEGIN
 
     \cseqcraftfloat
@@ -263,7 +265,7 @@
             \ifnum\thelooplabel=0
             \setcounter{looplabel}{\thesequencecursor}
             \stepcounter{looplabel}
-            \else \PackageError{notation}{Attempting to nest loops in a       cryptosequence. Close the former loop first}
+            \else \PackageError{notation}{Attempting to nest loops in a cryptosequence. Close the former loop first}
             \fi
         }
 
@@ -274,17 +276,17 @@
             \ifnum\thelooplabel>\thesequencecursor\relax
                 \PackageError{notation}{Closing an empty loop}
             \fi
-            \draw[->](D)+(-0.2,         -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
+            \draw[->](D)+(-0.2, -0.15-\thesequencecursor*\unitfactor-0.7*\unitfactor)
             .. controls +(-0.6, -1.3)
             and         +(-0.6, +1.3)
-            ..          +(-0.2,         0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
+            ..          +(-0.2, 0.15-\thelooplabel*\unitfactor-0.7*\unitfactor);
             \setcounter{looplabel}{0}
         }
 
         % Add the reduction's participants
         \cseqentity{D}{$\distinguisher^{\textsc{#4}}$}
-        \cseqentity[2.2]{A}{$\adversary$}
-        \cseqentity[2.2]{C}{$\challenger^{\textsc{#3}}$}
+        \cseqentity[#5]{A}{$\adversary$}
+        \cseqentity[#5]{C}{$\challenger^{\textsc{#3}}$}
 
 }
 { % Crypto-game END

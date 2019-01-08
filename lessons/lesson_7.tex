@@ -239,7 +239,7 @@ Observe that the random value $r$ is part of the ciphertext, making it long $n+l
         \item $c = (r, R(r) \xor m)$, where $m$ is the plaintext to be encrypted
     \end{itemize}
 
-    and then the last hybrid $\hybridg{2}$ will simply output $(r_1, r_2) pickUAR U_{n+l}$.
+    and then the last hybrid $\hybridg{2}$ will simply output $(r_1, r_2) \pickUAR U_{n+l}$.
 
     \begin{lemma}
         $\forall b \in \{0, 1\} \implies \hybridg{0}(\lambda, b) \compindist \hybridg{1}(\lambda, b)$.
@@ -321,9 +321,9 @@ Observe that the random value $r$ is part of the ciphertext, making it long $n+l
         Firstly, it can be safely assumed that any ciphertext $(r_i, R(r_i) \xor m_b)$ distributes equivalently with its own sub-value $R(r_i)$, because of $R$'s true randomness, and independency from $m_b$.
 
         %AP190102: An image visualizing the repeat event might be very useful
-        Having said that, the two hybrids apparently distribute uniformly, making them perfectly equivalent; however there is a caveat: if both games are run and one value $\bar{r}$ is queried twice in both runs, then om the second query, the adversary will receive the same image in $\hybridg{1}$, but almost certainly a different one in $\hybridg{2}$. This is because the first hybrid uses a function, which is deterministic by its nature, whereas the image in the second hybrid is picked completely randomly from the codomain. Nevertheless, this sneaky issue about "collisions" can be proven to happen with negligible probability.
+        Having said that, the two hybrids apparently distribute uniformly, making them perfectly equivalent; however there is a caveat: if both games are run and one value $\overline{r}$ is queried twice in both runs, then on the second query the adversary will receive the same image in $\hybridg{1}$, but almost certainly a different one in $\hybridg{2}$. This is because the first hybrid uses a function, which is deterministic by its nature, whereas the image in the second hybrid is picked completely randomly from the codomain. Nevertheless, this sneaky issue about "collisions" can be proven to happen with negligible probability.
 
-        Call \textsc{Repeat} this collision event on $\bar{r}$ between 2 consecutive games. Then:
+        Call \textsc{Repeat} this collision event on $\overline{r}$ between 2 consecutive games. Then:
         
         % AP190102: Could use some clarifications? Especially about what the indices represent
         \begin{align*}
