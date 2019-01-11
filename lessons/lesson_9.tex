@@ -291,69 +291,59 @@ If $\epsilon = 2^{-n}$, meaning the collision probability is minimized, then the
     Let $\Pi = (\textit{Tag}, \textit{Verify})$ be a variable length message \mac{} scheme where, given a \prf{} $F_k$ and an \textsc{au} hash funcion family $h_s$, the tagging function is defined as $F_k(h_s)$. Then $\Pi$ is \ufcma-secure.
 \end{corollary}
 
-\subsection{$\H$ family using Galois Fields}
-Now we want to show a possible shrinking/hash function which can be used in a
-UFCMA-secure MAC.
+\subsection{Hash function families from finite fields}
+
+% AP190110: A "finite field" aka galois field, is a field with finite elements. (...)
+%       - Finite fields exist only for carrier cardinality of q^k, where q is prime and k is nonnegative
+%       - Both operations are done modulo 
+
+A generic $2^n$-order finite field has very useful properties: adding two of its elements is equal to \textsc{xor}-ing their binary representations, while multiplying them is done modulo $2^n$. It is possible to define a hash function family that makes good use of these properties, and is suitable for a \ufcma-secure \mac{} scheme.
 
 \begin{construction}
-    Take $ \mathbb{F}=GF(2^{n})$, a \textit{Galois field} of $2^{n}$
-    elements.\\
-    Let $m=(m_{1}, ..., m_{t}) \in \mathbb{F}^{t} $ and $s=(s_{1}, ...,
-    s_{t}) \in \mathbb{F}^{t} $. We state that 
+    Let $\mathbb{F} = GF(2^n)$ be a \textit{finite field} (or ``Galois field'') of $2^n$ elements, and let $m = (m_1, \dots, m_t) \in \mathbb{F}^t$ and $s = (s_1, \dots, s_t) \in \mathbb{F}^t$. The desired hash function family will have this form:
     \[
-        h_{s}(m)= \sum_{i=1}^{t}s_{i}m_{i}=<s,m>=q_{m}(s)
-       \]
+        h_{s}(m)= \sum_{i = 1}^{t} s_i m_i = \left<s, m\right> = q_m(s)
+    \]
 \end{construction}
 
-A generic \textit{galois field} has very interesting properties, like the
-following :
-\begin{itemize}
-    \item addition of two elements is like applying the XOR operation on their
-        binary forms;
-    \item multiplication of two elements is like the product $mod 2^{n}$
-\end{itemize}.
-Now, since this family must be almost universal to be used as part of
-UFCMA-secure MAC protocol, collisions must happen a negligible amount of
-time.\\
-Suppose we have a collision with two different messages:
-\[
-     \sum_{i=1}^{t} m_{i}s_{i}=\sum_{i=1}^{t} m'_{i}s_{i}
-\]
-Let $\delta_{i}=m_{i}-m'_{i}$, assuming  without loss of generality that
-$\delta \not= 0$.\\
-Now we have that, when a collision happens, 
-\begin{gather*}
-    \sum_{i=1}^{t} m_{i}s_{i}=\sum_{i=1}^{t} m'_{i}s_{i}\Leftrightarrow \\
-    \sum_{i=1}^{t} m_{i}s_{i}-\sum_{i=1}^{t} m'_{i}s_{i}=0 \Leftrightarrow \\
-    \sum_{i=1}^{t} \delta_{i}s_{i}=0 
-\end{gather*}
+\begin{lemma}
+    The above function family $h_s$ is almost universal.
+\end{lemma}
 
-Taking $m, m'$ such that $m \not= m'$ means that $m$ is distinct from $m'$ at least for one subsequence $m_{i}\not=m'_{i}$.
+\begin{proof}
 
-So we can assume, without loss of generality, that $i=1$ is an index (or the only index) which $m$ and $m'$ differ on.
+    In order for $h_s$ to be almost universal, collisions must happen negligibly. Suppose we have a collision with two distinct messages $m$ and $m'$:
+    \[
+        \sum_{i = 1}^t m_i s_i = \sum_{i = 1}^t m'_i s_i
+    \]
 
-So we can split the last summation in 2 parts, choosing $\delta_{1}s_{1}$ as the first element and $ \sum_{i=2}^{t} \delta_{i}s_{i}$ as second element:
+    Let $\delta_i = m_i - m'_i$ and assume, without loss of generality, that $\delta \neq 0$. Then, by using the previous equation, when a collision happens:
+    \[
+        0 = \sum_{i = 1}^t m_i s_i - \sum_{i = 1}^t m'_i s_i = \sum_{i = 1}^t \delta_i s_i
+    \]
 
-\begin{gather*}
-    \delta_{1}s_{1}+\sum_{i=2}^{t} \delta_{i}s_{i}=0 \Leftrightarrow \\
-    \delta_{1}s_{1}=-\sum_{i=2}^{t} \delta_{i}s_{i} \Leftrightarrow \\
-    s_{1}=\frac{-\sum_{i=2}^{t} \delta_{i}s_{i}}{\delta_{1}}
-\end{gather*}
+    Since the messages are different from each other, there is at least some $i$-th block that contains some of the differences. Assume, without loss of generality, that some of the differences are contained in the first block ($i = 1$); the sum can then be split between the first block itself $\delta_1 s_1$ and the rest:
 
-and this means that when a collision happens $s_{1}$ must be exactly equal two the second member of the equation, which isan element of $\mathbb{F}$. But since every seed is chosen at random among $ \mathbb{F} $, what's the probability of picking the element $s_{1}$ which zeroes the above equation?
+    \begin{align*}
+        \sum_{i = 1}^t \delta_i s_i = \delta_1 s_1 + \sum_{i = 2}^{t} \delta_i s_i &= 0 \\
+        \delta_ 1 s_1 &= -\sum_{i = 2}^{t} \delta_i s_i \\
+        s_1 &= \frac{-\sum_{i = 2}^{t} \delta_i s_i}{\delta_1}
+    \end{align*}
 
-This probability is just $\frac{1}{ \mathbb{F} } = \frac{1}{2^{n}} \in \negl{\lambda} $.
+    which means when a collision happens, $s_1$ must be exactly equal to the sum of the other blocks, which is another element of $\mathbb{F}$. But since every seed is chosen at random among $\mathbb{F}$, the probability of picking the element $s_1$ satisfying the above equation is just $\left|\mathbb{F}\right|^{-1} = 2^{-n} \in \negl{\lambda}$. By repeating this reasoning for every difference-block, a sum of negligible probabilities is obtained, which is in turn negligible; therefore the hash function family $h_s$ is almost universal.
 
+\end{proof}
+
+% AP190111: Leaving this section as-is; will come back to it at a later time
 \subsubsection{$\H$ with Galois fields elements and polynomials}
 
 \begin{construction}
-    Take $ \mathbb{F}=GF(2^{n})$, a \textit{Galois field} of $2^{n}$
-    elements.\\
-    Let $m=(m_{1}, ..., m_{t}) \in \mathbb{F}^{t} $ and $s \leftarrow\$ 
-    \mathbb{F}^{t} $. We state that 
+    Take $ \mathbb{F}=GF(2^{n})$, a \textit{Galois field} of $2^{n}$ elements.
+    
+    Let $m=(m_{1}, ..., m_{t}) \in \mathbb{F}^{t} $ and $s \pickUAR \mathbb{F}^t$. We state that 
     \[
         h_{s}(m)= \sum_{i=1}^{t}s^{i-1}m_{i}
-       \]
+    \]
 \end{construction}
 
 
@@ -364,9 +354,9 @@ This probability is just $\frac{1}{ \mathbb{F} } = \frac{1}{2^{n}} \in \negl{\la
 
     So consider a collision as above: it must be true that  
     \[
-     \sum_{i=1}^{t} m_{i}s^{i-1}=\sum_{i=1}^{t} m'_{i}s^{i-1} \Leftrightarrow 
-     \sum_{i=1}^{t} m_{i}s^{i-1}-\sum_{i=1}^{t} m'_{i}s^{i-1}=0 \Leftrightarrow
-     q_{m-m'}(s)=0
+        \sum_{i=1}^{t} m_{i}s^{i-1}=\sum_{i=1}^{t} m'_{i}s^{i-1} \Leftrightarrow 
+        \sum_{i=1}^{t} m_{i}s^{i-1}-\sum_{i=1}^{t} m'_{i}s^{i-1}=0 \Leftrightarrow
+        q_{m-m'}(s)=0
     \]
     How can we make a polynomial equal to 0? We have to find the \textbf{roots} of the polynomial, which we know are at most the \textbf{grade} of the polynomial. So, the grade of this polynomial is $t-1$, and the probability of picking a root from $ \mathbb{F} $ as seed of $h_{s}(.)$ is 
     \[
