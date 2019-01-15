@@ -1,0 +1,111 @@
+\mychapter{2}{Lesson 2}
+
+\section{Message Authentication}
+\todo{Msg auth image (bob, eve, tag)}
+
+\subsection{Message Authentication Code (MAC or Tag)}
+
+\textbf{Syntax:}
+
+\begin{itemize}
+    \item $\K =$ Key space, $\M=$ Message space, $\Phi$ = Tag space
+    \item $K$ is uniform over $\K$
+    \item Tag: $\K \times \M \to \Phi$
+    \item Verify: $\K \times \M \times \Phi \to \{0,1\}$
+\end{itemize}
+
+\textbf{Correctness:}
+\begin{gather*}
+    \forall m \in \M, \forall k \in \K \\
+    \text{Verify}(k,m,\text{Tag}(k,m))=1    
+\end{gather*}
+
+Assume Tag is \underline{deterministic}, then $Vrf(k,m,\phi)=1 \Leftrightarrow Tag(k,m)=\phi$
+
+\noindent\textbf{Security:} Unforgeability $\rightarrow$ The attacker is not able to forge $\phi$
+
+\noindent\textbf{Definition} ($\epsilon$-statistical one-time security): we say that Mac has $\epsilon$-statistical one-time security if
+$\forall m,m' \in \M s.t. m\neq m', \forall \phi,phi' \in \Phi$
+$$Pr[Mac(K,m')=\phi'|Mac(K,m)=\phi]\leq \epsilon$$
+
+\todo{Not really sure of the Correctness of the following thins}
+\noindent Think of an "Unbounded" adversary choosing $m \in \M$ and obtaining $\phi=Mac(k,m)$. His goal is to forge on $m'\neq m'$ a tag $\phi'$ such that $Mac(k,m')=\phi'$ (with no knowledge of $k$).
+
+\bigskip
+Tool:\textbf{ Pairwise Independent Hashing} 
+\begin{definition}
+    A family of (Hash) functions $H=\{h_s:\M \to \Phi\}_{s\in S}$ is \underline{Pairwise Independent} if $\forall m,m' \in \M s.t m\neq m'$ we have that $(h_s(m),h_s(m'))$ is uniform over $\Phi^2$ for random choice of seed $s \in S$. Meaning that:
+    \begin{gather*}
+        \forall m,m' s.t. m\neq m',\forall \phi,\phi' \in \Phi \\
+        Pr[h_s(m)=\phi \wedge h_s(m')=\phi']=\frac{1}{|\Phi|^2}
+    \end{gather*}
+\end{definition}
+
+\textbf{Construction: } Let $p$ be a prime number.\\
+Define $h_{(a,b)}(x)=ax+b \mod p$ now $S=\Z_p^2, M=\Phi=Z_p=\{0,1,...,p-1\}$
+Thus the following group will be defined $(\Z_p,+)$
+
+\begin{theorem}
+    Above $H$ is Pairwise Independent
+\end{theorem}
+\begin{proof}
+    \begin{gather*}
+        \text{Fix} m,m' \in \Z_p s.t. m\neq m', \phi,\phi' \in \Z_p\\
+        Pr_{(a,b)}[h_{a,b}(m)=\phi \wedge h_{a,b}(m')=\phi']=\\
+        =Pr_{(a,b)}[am+b=\phi \wedge am'+b=\phi']=\\
+        =Pr_{(a,b)}[
+        \begin{pmatrix}
+            m & 1 \\
+            m' & 1
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            a \\
+            b
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \phi \\
+            \phi'
+        \end{pmatrix}
+        ]=\\
+        =Pr_{(a,b)}[
+        \begin{pmatrix}
+            a \\
+            b
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            m & 1 \\
+            m' & 1
+        \end{pmatrix}^{-1}
+        \cdot
+        \begin{pmatrix}
+            \phi \\
+            \phi'
+        \end{pmatrix}
+        ]=\\
+        =\frac{1}{|\Z_p|^2}=\frac{1}{p^2}
+    \end{gather*}
+    Where $Pr_{(a,b)}$ denotes the probability over (a,b) random in $\Z_p$
+\end{proof}
+
+\begin{theorem}
+    Let $Mac(K,m)=h_k(m)$ for $\H=\{h_k:\M \to \Phi \}_k$ be Pairwise Independent. The Mac is $\frac{1}{|\Phi|}$-statistical one-time secure. 
+\end{theorem}
+
+\begin{proof}
+    \begin{gather*}
+        \forall m \in \M, \phi \in \Phi\\
+        Pr[Mac(K,m)=\phi]=Pr_k[h_k(m)=\phi]=\frac{1}{|\Phi|}\\
+        \text{For any } m\neq m', \phi,\phi' \in \Phi\\
+        Pr[Mac(K,m)=\phi \wedge Mac(K,m')=\phi']=\frac{1}{|\Phi|^2}\\
+        \implies Pr[Mac(K,m')=\phi'| Mac(K,m)=\phi]=\\
+        =\frac{\Pr[Mac(K,m)=\phi \wedge Mac(K,m')=\phi']}{Pr[Mac(K,m)=\phi]}=\\
+        =\frac{1}{|\Phi|^2}/\frac{1}{|\Phi|}=\frac{1}{|\Phi|}
+    \end{gather*}
+\end{proof}
+\begin{theorem}
+    Any t-time($\epsilon=2^{-\lambda}$)-statistical secure MAC has a key of size $(t+1) \lambda$ for any $\lambda > 0$.\\
+    \underline{No proof}
+\end{theorem}
