@@ -3,21 +3,95 @@
 
 How can we encrypt long messages , say $m=(m_{1}, m_{2}, ..., m_{t})$ where for $i \in [t], m_{i} \in \{0,1\}^{n} $?
 
-Mode of operation: let's build $P_{k}$, a blockcypher.
+Mode of operation: let's build $P_{k}$, a blockcipher (we can think at this like a PRP).
 
 \subsection{Electronic CodeBook (ECB)}
 
-(In notes, this name is associated with CTR-mode, or \textbf{counter mode}, but
-why?)\\
-The principle is that I have many blocks of information and I encrypt all of
-them individually (maybe in parallel):
+%(In notes, this name is associated with CTR-mode, or \textbf{counter mode}, but why?)\\
+The principle is that I split the plaintext into many blocks (of length \textit{n}) and I encrypt all of them individually (maybe in parallel):
 \[
     c_{i}=P_{k}(m_{i}) \forall i \in [t]
 \]
-and outputs $c_{1}, c_{2}, ..., c_{t}$.\\
+So the final ciphertext will be: $c=c_{1}, c_{2}, ..., c_{t}$.\\
 
+\textbf{PROBLEM:}\\
 If I encrypt the same message, I obtain the same cyphertext. So it's not
 CPA-secure as the encryption function is \textbf{deterministic.}
+
+\subsection{Cipher block chaining (CBC)}
+
+% is better if we use cycles in the image but right now i'm too lazy and i will stick with copy and paste
+% use curve lines instead of helping nodes
+\begin{preview}
+    \tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{encrypt}=[draw,fill=black!15,rectangle,minimum size=20pt,inner sep=0pt]
+    \centering
+    \begin{tikzpicture}
+
+        \node (r) at (0,3) {$r$};
+        \node (c) at (6,3) {$c_1$};
+        \node (x) at (2,3) {$\xor$};
+        \node (m) at (2,4) {$m_0$};
+        \node (F)[encrypt] at (4,3) {$P_{k}$};
+
+        \draw[->,very thick] (r) -- (x);
+        \draw[->,very thick] (m) -- (x);
+        \draw[->,very thick] (x) -- (F);
+        \draw[->,very thick] (F) -- (c);
+
+        \node (h1) at (6,2.4) {};
+        \node (h2) at (0,2.4) {};
+        \node (h3) at (0,1) {};
+
+        \node (c1) at (6,1) {$c_2$};
+        \node (x1) at (2,1) {$\xor$};
+        \node (m1) at (2,2) {$m_1$};
+        \node (F1)[encrypt] at (4,1) {$P_{k}$};
+
+        \draw[->,very thick] (c) -- (h1) -- (h2) -- (h3) -- (x1);
+        \draw[->,very thick] (m1) -- (x1);
+        \draw[->,very thick] (x1) -- (F1);
+        \draw[->,very thick] (F1) -- (c1);
+        
+        \node (rx) at (0,0.4) {$\vdots$};
+        \node (Fx) at (2,0.4) {$\vdots$};
+        \node (cx) at (5,0.4) {$\vdots$};
+
+        \node (c-1) at (6,-0.10) {$c_{n-1}$};
+        \node (h4) at (6,-0.45) {};
+        \node (h5) at (0,-0.45) {};
+        \node (h6) at (0,-1.5)  {};
+
+        \node (cx) at (6,-1.5) {$c_n$};
+        \node (xx) at (2,-1.5) {$\xor$};
+        \node (mx) at (2,-0.75) {$m_n$};
+        \node (Fx)[encrypt] at (4,-1.5) {$P_{k}$};
+
+        \draw[->,very thick] (c-1) -- (h4) -- (h5) -- (h6) -- (xx);
+        \draw[->,very thick] (mx) -- (xx);
+        \draw[->,very thick] (xx) -- (Fx);
+        \draw[->,very thick] (Fx) -- (cx);
+
+        \node (al) at (0, 4.5) {};
+        \node (alala) at (6,4.5) {$c_{0}=r$};
+    \draw[->,very thick] (r) -- (al) -- (alala);
+    
+\end{tikzpicture}
+\end{preview}
+
+Here $P_k$ needs to be a permutation since we must be able to do $P^{-1}_k$.\\
+
+To encrypt we simply do $\forall i \in [1,t]$  
+\[ 
+    c_{i}=P_{k}(c_{i-1}\xor m_{1})
+\]
+
+The decryption is given by:
+\begin{gather*}
+    P_{k}^{-1}(i)= c_{i-1} \xor m_{i} \implies m_{i}= P_{k}^{-1}(c_{i}) \xor c_{i-1}
+\end{gather*}
+
+\subsection{Counter Mode (CTR)}
 
 \begin{preview}
     \tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=20pt,inner sep=0pt]
@@ -61,6 +135,8 @@ CPA-secure as the encryption function is \textbf{deterministic.}
     \end{tikzpicture}
 \end{preview}
 
+Here we "don't care" about the invertibility of $F_k$ since we can simply recompute it on $r$ given the key.
+
 In the image, each message is long exactly \textbf{n bits}, and 
 \begin{equation*}
     r \leftarrow\$ \{0,1\}^{n}
@@ -68,29 +144,19 @@ In the image, each message is long exactly \textbf{n bits}, and
 so the sums made over $r$ are done in \textbf{mod $2^{n}$}, since $r$ can be a
 number in the range $[0, 2^{n} -1]$.
 
-This is also called streamcipher, cause as input flows ECB produces the ciphertext.How to decrypt this schema?
+This is also called stream cipher, because as input flows ECB produces the ciphertext. How to decrypt this schema?
 
 Since I know $r_{i}$, if I compute $F_{k}(r_{i})$ I can use the $\xor$-operation to calculate the message.
 
-\subsection{Cipher block chaining (CBC)}
-
-\todo{CBC IMAGE}
-
-The schema to cipher here is 
-\[ 
-    \forall i \in [1,t] c_{i}=P_{k}(C_{i-1}\xor m_{1})
-\]
-How to decipher?
-\begin{equation*}
-    P_{k}^{-1}(i)= c_{i-1} \xor m_{i}
-\end{equation*}
-
-so $m_{i}= P_{k}^{-1}(c_{i}) \xor c_{i-1}$.
+\begin{gather*}
+    F_k(c_0)\xor c_1=m_0 \implies F_k(c_0+i)\xor c_i = m_1
+\end{gather*}
 
 \begin{theorem}
     Assume $\F$ ($F_{k}$ in the image above is part of this family) is a PRF,
     then CTR-mode yields a CPA-secure SKE for variable length messages.
 \end{theorem}.\\
+
 \textit{Variable length messages}  means that  every message 
 \[
     m=(m_{1}, ..., m_{t})

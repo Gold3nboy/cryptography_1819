@@ -189,10 +189,11 @@ Some useful observations can be made about this scheme:
         & (c_1\cdot c_1', c_2\cdot c_2') \\
         =\;& (g^{r+r'}, h^{r+r'}(m\cdot m')) \\
     \end{align*}
-    thus, decrypting $c\cdot c'$, gives $m\cdot m'$.
-
+    thus, decrypting $c\cdot c'$, gives $m\cdot m'$.\\
+    
     \item It is \textbf{re-randomizable}: Given a ciphertext $(c_1, c_2)$, and $r' \pickUAR \mathbb{Z}_q$, then computing $(g^{r'}\cdot c_1, h^{r'}\cdot c_2)$ results in a ``fresh'' encryption for the same message: the random value used at the encryption step will change from the original $r$ to $r+r'$
 \end{itemize}
+\textbf{So this is not CCA-Secure!}
 
 These properties of the El Gamal scheme can be desirable in some use cases, where a message must be kept secret to the second party. In fact, there are some \textsc{pke} schemes which are designed to be \textbf{fully homomorphic}, i.e. they are homomorphic for any kind of function.
 
