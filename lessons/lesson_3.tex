@@ -1,0 +1,104 @@
+\mychapter{3}{Lesson 3}
+
+\section{Randomness Extraction}
+\textbf{Goal:} extract "real" randomness from "imperfect" randomness.\\
+
+\bigskip
+Suppose to have a biased coin $B s.t. Pr[B=0]=p\neq \frac{1}{2}$ and\\ $Pr[B=1]=1-p$.\\
+Can you make it uniform?
+
+\subsection{Von Neumann Extractor}
+\begin{enumerate}
+    \item Sample $b_1\pickUAR B; b_2\pickUAR B$
+    \item If $b_1=b_2$ go to 1.
+    \item Else:
+    \begin{itemize}
+        \item If $b_1=0;b_2=1$ output 1
+        \item If $b_1=1;b_2=0$ output 0 
+    \end{itemize}
+\end{enumerate}
+\textbf{Considerations: }
+\begin{itemize}
+    \item The probability of both cases in 3. is $p(p-1)$
+    \item The probability to reach 3. is $2p(p-1)$
+    \item $Pr[\text{Fail n-times}]=(1-2p(1-p))^n$ which is very small
+\end{itemize}
+
+\textbf{Goal: } Let $X$ be a Random Variable, I want to design an Extractor such that $Ext(X)$ is uniform.
+\underline{PROBLEM: } Impossible as stated. What if $X$ is constant? $\implies$ Add the requirement that $X$ has uncertainty (ENTROPY)
+
+\begin{definition}
+    MIN-ENTROPY of $X$ (written as $H_{\infty}$) is:
+
+    $$H_{\infty}(X)=-log_2 max_x Pr[X=x]$$
+    Where $max_x$ is the x that maximize the probability.
+\end{definition}
+\begin{example}
+    Say $X=\{0,1\}^n$\\
+    \begin{enumerate}
+        \item $X$ is constant($Pr[X=\bar{x}]=1, Pr[X=x\neq \bar{x}]=0$)\\
+        $\implies H_{\infty}(X)=0$
+        \item $X\equiv U_n \implies H_{\infty}(x)=n$ (since $X$ is uniform $Pr[X=x]=2^{-n}$)   
+    \end{enumerate}
+\end{example}
+
+\textbf{Question: }We want $Ext:\{0,1\}^n \to \{0,1\}$ working $\forall X s.t. H_{\infty}(X)\geq k$\\
+\textbf{Claim: } Impossible even for $k=n-1$
+\begin{proof}
+    Let Ext be any candidate extractor, Let b be any binary value s.t. $|Ext^-1(b)|$ is maximal ($Ext^-1: \{0,1\} \to \{0,1\}^n$)\\
+    $\implies |Ext^-1(b)|\geq 2^{n-1}=\frac{2^2}{2}$
+
+    \begin{tikzpicture}[line width=1pt,>=latex]
+        \sffamily
+        \node (a1) {};
+        \node[below=0.5cm of a1] (a2) {};
+        \node[below=0.5cm of a2] (a3) {};
+
+        \node[below=0.5cm of a3] (a4) {};
+        \node[below=0.5cm of a4] (a5) {};
+        \node[below=0.5cm of a5] (a6) {};
+        
+        \node[right=4cm of a1] (aux1) {};
+        \node[right=4cm of a2] (b1) {$x=0$};
+        
+        \node[right=4cm of a5] (b3) {$x=1$};
+        \node[right=4cm of a4] (aux2) {};
+        
+        \node[ellipse,draw=black,minimum size=3cm,fit={(a1) (a6)}] {};
+        
+        \node[below=1cm of a6,font=\color{black}\Large] {$\{0,1\}^n$};
+        
+        \draw[-,black] (a3) to[out=-10,in=190] (b1.190);
+        \draw[-,black] (a2) -- (b1.180);
+        \draw[-,black] (a1) to[out=10,in=170] (b1.170);
+        
+        \draw[-,black] (a6) to[out=-10,in=190] (b3.190);
+        \draw[-,black] (a5) -- (b3.180);
+        \draw[-,black] (a4) to[out=10,in=170] (b3.170);
+    \end{tikzpicture}\\
+    %how do you split an ellipse in haf? I don't know
+    \bigskip
+    Define $X$ to be uniform over $Ext^-1(b)$ so $H_{\infty}(x)=n-1$ but $Ext(X)=b$ CONSTANT.
+    \todo{Help with the proof}
+\end{proof}
+
+\begin{theorem}
+    \textbf{Way-Out-Seeded-Extractor} allow $X$ to take SMALL uniformly random SEED(catalyst)\\
+    $$Ext: \underbrace{\{0,1\}^d}_{seed(public)}\times \underbrace{\{0,1\}^n}_{input} \to \underbrace{\{0,1\}^m}_{output}$$
+\end{theorem}
+\begin{definition}
+    We say that $Ext:\{0,1\}^d \times \{0,1\}^n \to \{0,1\}^l$ is a $(k,\epsilon)$-extractor ("good") if $\forall x s.t. H_{\infty}(X)\geq k$ we have:
+    $$SD((S,Ext(S,x)),(S,U_l))\leq \epsilon$$ 
+    where $S\equiv U_d$, $SD$ denotes the statistical distance and we are basically comparing two uniform values ($x$ and $U_l$) 
+\end{definition}
+
+\textbf{Idea: } Even if the seed is public the $SD$ must not be influenced. Therefore the two compared variables should be uniform so that $\epsilon$ is small. In this way the output of the extractor can't be distinguished from a uniform string.
+
+\begin{definition}
+    \textbf{Statistical Distance:} a distance between two random variables.\\
+    Say that $X,X'$ are Random Variables over $\X$.\\
+    $SD(x,x')=\frac{1}{2}\sum_{x\in \X }|Pr[X=x]-Pr[X'=x]|$
+    \todo{Image of the statistical distance}
+\end{definition}
+
+\todo{Leftover hash lemma}

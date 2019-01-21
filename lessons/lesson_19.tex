@@ -1,4 +1,56 @@
 \mychapter{19}{Lesson 19}
+\todo{Warining: e' venuto fuori un casino in questa lezione, ho cercato di riordinare le cose}
+\section{Bilinear Map}
+Let's define a \textbf{Bilinear Group} as $(\G, \G_t, q, g, \hat{e})\leftarrow BilGen(1^{\lambda})$ where:
+\begin{itemize}
+    \item $\G, \G_t$ are prime order groups (order $q$).
+    \item $g$ is a random generator of $\G$.
+    \item $(\G, \cdot)$ is a multiplicative group and $\G_t$ is called \underline{target} group.
+    \item $\hat{e}$ is a (bilinear) MAP: $\G \times \G \rightarrow \G_t$ efficiently computable. Defined as follows:
+    
+    \centering{$\rightarrow$ Take a generator $g$ for $\G$ and an element $h$ in $\G$.\\
+    $\forall g,h \in \G, a, b \in \Z_q \hat{e}(g^a,h^b)=\hat{e}(g,h)^{ab}=\hat{e}(g^{ab},h)$ \\and $\hat{e}(g,g)\neq 1$ (Non degenerative)}
+\end{itemize}
+"I can move the exponents"
+
+Venturi said something here related to Weil pairing over an elliptic curve. I found \href{https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf}{this}. Interesting but not useful.
+ 
+\noindent\textbf{Assumption:} CDH is HARD in $\G$.\\
+\textbf{Observation:} DDH is EASY in $\G$!
+\begin{proof}
+    $(g,g^a,g^b,g^c)\approx_c (g,g^a,g^b,g^{ab}) \implies \hat{e}(g^a,g^b)=_?\hat{e}(g,g^c)$ now just move the exponents and I can transform the first element in $\hat{e}(g,g^{ab})$ and check if it is equal to $\hat{e}(g,g^c)$.
+\end{proof}
+
+Now $KGen(1^{\lambda})$ will:
+\begin{itemize}
+    \item Generate some params $ =(\G,\G_t,g,q,\hat{e})\leftarrow BilGen(1^{\lambda})$ 
+    \item Pick $a \leftarrow\$ \Z_q$ then $g_1=g^a$
+    \item Pick $g_2=g^b$ and $g_2,u_0,u_1,...,u_k \leftarrow\$ \G$.
+    \item Then output: 
+    \begin{itemize}
+        \item $P_k=(params, g_1,g_2,u_0,...,u_k)$
+        \item $S_k=g_2^a=g^{ab}$
+    \end{itemize}
+\end{itemize}
+
+Sign($S_k$, m):
+\begin{itemize}
+    \item Divide the message $m$ of length $k$ in bits and not it as follows: $m=(m[1],...,m[k])$
+    \item Now define $\alpha(m)=u_0\prod_{i=1}^k u_i^{m[i]}$
+    \item Pick $r\leftarrow \Z_q$ and output the signature $\sigma =(\underbrace{g_2^a}_{S_k} \cdot \alpha(m)^r,g^r)=(\sigma_1,\sigma_2)$
+\end{itemize}
+
+Vrf($P_k$, m, ($\sigma_1,\sigma_2$))
+\begin{itemize}
+    \item Check $\hat{e}(g,\sigma_1)=\hat{e}(\sigma_2,\alpha(m))=\hat{e}(g_1,g_2)$
+\end{itemize}
+
+\textbf{Correctness:} \textit{"Just move the exponents"} 
+
+$\hat{e}(g,\sigma_1)=\overbrace{\hat{e}(g,g_2^a\cdot \alpha(m)^a)}^{\text{I can separate the second part for bilinearity}}=\hat{e}(g,g_2^a)\cdot \hat{e}(g,\alpha(m)^r)=\hat{e}(\underbrace{g^a}_{g_1},g_2)\cdot \hat{e}(\underbrace{g^r}_{\sigma_2},\alpha(m))=\hat{e}(g_1,g_2)\cdot\hat{e}(\sigma_2,\alpha(m))$\\
+We can say that we are moving the exponents from the "private domain" to the "public domain".
+
+\section{Waters signatures}
 \begin{theorem}
     The Waters' signature scheme is \ufcma
 \end{theorem}
@@ -10,7 +62,7 @@
 
     \todo{Sequence is incomplete/incorrect, have to study it more...}
 
-    \begin{figure}[h]
+    \begin{figure}[ht]
         \centering
         \sdinit{}
         \begin{tikzpicture}
@@ -85,56 +137,4 @@
 
 \end{proof}
 
-\todo{Mi sono perso durante il rebase, quindi divido la parte di sotto da quella
-di sopra, e domando : chi viene prima??? Ai posteri l'ardua sentenza. }
-\subsection{Waters Signature}
 %https://eprint.iacr.org/2011/703.pdf
-This is a standard model for PKI which \textbf{does not need a Random Oracle}. (or at least I think so)
-
-Let's define a \textbf{Bilinear Group} as $(\G, \G_t, q, g, \hat{e})\leftarrow BilGen(1^{\lambda})$ where:
-\begin{itemize}
-    \item $\G, \G_t$ are prime order groups (order $q$).
-    \item $g$ is a random generator of $\G$.
-    \item $(\G, \cdot)$ is a multiplicative group and $\G_t$ is called \underline{target} group.
-    \item $\hat{e}$ is a (bilinear) MAP: $\G \times \G \rightarrow \G_t$ efficiently computable. Defined as follows:
-    
-    \centering{$\rightarrow$ Take a generator $g$ for $\G$ and an element $h$ in $\G$.\\
-    $\forall g,h \in \G, a, b \in \Z_q \hat{e}(g^a,h^b)=\hat{e}(g,h)^{ab}=\hat{e}(g^{ab},h)$ \\and $\hat{e}(g,g)\neq 1$ (Non degenerative)}
-\end{itemize}
-
-Venturi said something here related to Weil pairing over an elliptic curve. I found \href{https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf}{this}. Interesting but not useful.
-
-\noindent\textbf{Assumption:} CDH is HARD in $\G$.\\
-\textbf{Observation:} DDH is EASY in $\G$!
-\begin{proof}
-    $(g,g^a,g^b,g^c)\approx_c (g,g^a,g^b,g^{ab}) \implies \hat{e}(g^a,g^b)=_?\hat{e}(g,g^c)$ now just move the exponents and I can transform the first element in $\hat{e}(g,g^{ab})$ and check if it is equal to $\hat{e}(g,g^c)$.
-\end{proof}
-
-Now $KGen(1^{\lambda})$ will:
-\begin{itemize}
-    \item Generate some params $ =(\G,\G_t,g,q,\hat{e})\leftarrow BilGen(1^{\lambda})$ 
-    \item Pick $a \leftarrow\$ \Z_q$ then $g_1=g^a$
-    \item Pick $g_2=g^b$ and $g_2,u_0,u_1,...,u_k \leftarrow\$ \G$.
-    \item Then output: 
-    \begin{itemize}
-        \item $P_k=(params, g_1,g_2,u_0,...,u_k)$
-        \item $S_k=g_2^a=g^{ab}$
-    \end{itemize}
-\end{itemize}
-
-Sign($S_k$, m):
-\begin{itemize}
-    \item Divide the message $m$ of length $k$ in bits and not it as follows: $m=(m[1],...,m[k])$
-    \item Now define $\alpha(m)=u_0\prod_{i=1}^k u_i^{m[i]}$
-    \item Pick $r\leftarrow \Z_q$ and output the signature $\sigma =(\underbrace{g_2^a}_{S_k} \cdot \alpha(m)^r,g^r)=(\sigma_1,\sigma_2)$
-\end{itemize}
-
-Vrf($P_k$, m, ($\sigma_1,\sigma_2$))
-\begin{itemize}
-    \item Check $\hat{e}(g,\sigma_1)=\hat{e}(\sigma_2,\alpha(m))=\hat{e}(g_1,g_2)$
-\end{itemize}
-
-\textbf{Correctness:} \textit{"Just move the exponents"} 
-
-$\hat{e}(g,\sigma_1)=\overbrace{\hat{e}(g,g_2^a\cdot \alpha(m)^a)}^{\text{I can separate the second part for bilinearity}}=\hat{e}(g,g_2^a)\cdot \hat{e}(g,\alpha(m)^r)=\hat{e}(\underbrace{g^a}_{g_1},g_2)\cdot \hat{e}(\underbrace{g^r}_{\sigma_2},\alpha(m))=\hat{e}(g_1,g_2)\cdot\hat{e}(\sigma_2,\alpha(m))$\\
-We can say that we are moving the exponents from the "private domain" to the "public domain".
