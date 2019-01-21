@@ -6,9 +6,9 @@ After having explored the security conerns and challenges of the \ske{} realm, i
 
 The desirable property that a \mac{} scheme should hold is to prevent any attacker from generating a valid couple $(m^*, \phi^*)$, even after querying a tagging oracle polynomially many times\footnotemark.
 \footnotetext{Do note how this property resembles \cpa-security in the encryption setting}
-The act of generating a valid couple from scratch is called \emph{forging}, and the aforementioned propery is defined as \emph{unforgeability against chosen-message attacks} (or \ufcma, in short); its game diagram is shown in figure \ref{cryptogame:ufcma}. Do note that $m^*$ is stated to be outside the query set $M$, justifying the ``freshness'' of the forged couple\footnotemark. In formal terms:
+The act of generating a valid couple from scratch is called \emph{forging}, and the aforementioned propery is defined as \emph{unforgeability against chosen-message attacks} (or \ufcma, in short); its game diagram is shown in figure \ref{cryptogame:ufcma}. Do note that $m^*$ is stated to be outside the query set $M$, expressing the ``freshness'' of the forged couple\footnotemark. In formal terms:
 
-\footnotetext{This cannot be said about the message tags; this security variant will be discussed later}
+\footnotetext{Observe how this setup resembles the original \owf{} game}
 
 \begin{definition}
     A \textsc{mac} scheme $\Pi$ is \textsc{ufcma}-secure iff:
@@ -84,8 +84,8 @@ Having defined a good notion of security in the \mac{} scheme domain, we turn ou
         }}
     
         \cseqbeginloop
-        \return{}{$m_i \in M$}{}
-        \send{}{$m_i$}{}
+        \return{}{$m \in M$}{}
+        \send{}{$m$}{}
         \receive{\shortstack[l]{
             $\phi_0 \pickUAR F_k(r)$ \\
             $\phi_1 \pickUAR R(r)$
@@ -166,7 +166,10 @@ To overcome this problem, we can consider two options:
     \]
 \end{definition}
 
-If $\epsilon = 2^{-n}$, meaning the collision probability is minimized, then the family is also called \emph{perfectly universal}; in the case where $\epsilon \in \negl{\lambda}$ isntead, it is defined as \emph{almost universal} (\textsc{au}).
+If $\epsilon = 2^{-n}$, meaning the collision probability is minimized, then the family is also called \emph{perfectly universal}; in the case where $\epsilon \in \negl{\lambda}$ isntead, it is defined as \emph{almost universal} (\textsc{au}). Take care abotu telling the difference between universality and pairwise independence, which states:
+\[
+    (h_s(x), h_s(x')) \equiv U_{2n}
+\]
 
 \begin{lemma}
     Show that any pairwise independent hash function is perfectly universal.
