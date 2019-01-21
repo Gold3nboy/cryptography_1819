@@ -106,7 +106,9 @@ Here, in this scheme, we combine randomness and the notion of hardcore predicate
     % Exercise: If obscure, do the petty algebra on paper
 \end{itemize}
 
-Theorem: if $(\mathcal{KG}en, f, g)$ is a TDP, and $\mathfrak{hc}$ is hardcore for $f$, then the above scheme is CPA-secure.
+\begin{theorem}
+    If $(\mathcal{KG}en, f, g)$ is a TDP, and $\mathfrak{hc}$ is hardcore for $f$, then the above scheme is CPA-secure.    
+\end{theorem}
 
 Proof: (Execrcise)
 \todo{Apparently, the reduction here is not easy at all. Some hints are needed
@@ -116,7 +118,8 @@ to solve this exercise.}
 
 One example stems form the factoring problem: let's look again at $\mathbb{Z}_n^\times$, where $n = pq$, $p, q \in \mathbb{P}$;
 
-Theorem (Chinese remainder, or CRT): The following isomorphisms to $\mathbb{Z}_n^\times$ are true:
+\begin{theorem}
+    (Chinese remainder, or CRT): The following isomorphisms to $\mathbb{Z}_n^\times$ are true:
 
 \begin{itemize}
     \item $\mathbb{Z}_n \simeq \mathbb{Z}_p \times \mathbb{Z}_q$
@@ -124,6 +127,7 @@ Theorem (Chinese remainder, or CRT): The following isomorphisms to $\mathbb{Z}_n
 \end{itemize}
 
 Note that the theorem is more general, and holds for any $p, q$ that are coprime.
+\end{theorem}
 
 How to use this theorem for constructing a PKE scheme:
 
@@ -325,8 +329,7 @@ only 1 is a quadratic residue since we said, in the
 last lemma, that only one out of
 $-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.\\
 
-Therefore, we have that the Rabin's TDP is a permutation in $\QR[n]$, and that the
-cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.\\
+Therefore, we have that the Rabin's TDP is a permutation in $\QR[n]$, and that the cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.\\
 
 Furthermore, with the following claim we can state that the Rabin cryptosystem
 is OWF thanks to the hardness of factoring.
