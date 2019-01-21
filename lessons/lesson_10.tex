@@ -1,456 +1,351 @@
 \mychapter{10}{Lesson 10}
-\section{Domain extension for PRFs/MACs}
 
-\textit{Almost universal approach} : I have a family $\F(\H)$ with $\H$ AU and with PRF $f \in \F$.
+\section{Domain extension for \prf-based \mac{} schemes}
 
-\textit{Computational AU} : we want to build a family $\H$ using some other
-PRFs. We expect to have:
+\subsection{Hash function families from \prf{}s}
+
+Another way to obtain domain extension for a \mac{} scheme, using the $\F_k(h_s)$ approach, is to construct the hash function family from another \prf{}. We expect to have:
 \begin{itemize}
-    \item $ \P [ h_{s}(m)=h_{s}(m'), s\leftarrow\$\{0,1\}^{\lambda} , (m, m')\leftarrow\$A(1^{\lambda}) ] \in \negl{\lambda} $;
-    \item We need two PRFs. One is $F_{k}$, and the other is $F_{s}j$
-    \item \todo{something related to $f_{s}(1,.)$ and $f_{s}(0, . )$, but I didn't get it.}
-\end{itemize}.
+    \item $\Pr[h_s(m) = h_s(m'), s \pickUAR \{0, 1\}^\lambda, (m, m') \pickUAR A(1^\lambda)] \in \negl{\lambda}$;
+    \item We need two \prf{}s: one is $F_{k}$, and the other is $F_{s}$
+\end{itemize}
 
-\subsection{XOR mode}
+\subsection{\textsc{xor}-mode}
+
 Assume that we have this function
 \[
     h_{s}(m)=F_{s}(m_{1}||1) \xor ... \xor F_{s}(m_{t}||t)
 \]
 so that the input to the PRF $F_{s}(.)$ is $n + log_{2} t$ bytes long.
-\begin{lemma}
-    Above $\H$ is computational AU if $\F$ is a PRF.
-\end{lemma}
-\begin{exercise}
-    Prove this !
-\end{exercise}
-Possible proof:
 
-we have to show that
+\begin{lemma}
+    Above $\H$ is computational AU if $F_s$ is a PRF.
+\end{lemma}
+
+\begin{proof} The proof is left as exercise.
+
+    (Hint: The pseudorandom functions can be defined as $F_s = F_k'(0, \dots)$ and $F_k = F_k'(1 \dots)$).
+    
+    Possible proof: we have to show that
+    \[
+        \P [ h_{s}(m)=h_{s}(m') ] \in \negl{\lambda}   
+    \]
+    with $m \neq m'$. This means that 
+    \begin{align*}
+        &\Pr\left[\left(\bigxor_{i = 1}^{t} F_s(m_i, i)\right) = \left(\bigxor_{i = 1}^{t} F_s(m_i', i)\right)\right] \\
+        = &\Pr[\forall i \quad F_s(m_i, i) \xor F_s(m'_i, i) = \bigxor_{j = 1, j \neq i}^{t} F_s(m_j, j) \xor F_s(m'_j, j) = \alpha]
+    \end{align*}
+    for each $i \in [1,t]$. But $\alpha$ is one unique random number chosen over $2^{n}$ possible candidates, so the collision probability is negligible.
+    
+\end{proof}
+
+\subsection{\textsc{cbc}-mode \mac{} scheme}
+This is part of the standard, used in TLS. It's used with a \prf{} $F_{s}$, setting the starting vector as $\textsc{iv} = 0^n = c_0$ and running this \prf{} as part of \textsc{cbc}. The last block otained by the whole process is the message's signature:
 \[
-    \P [ h_{s}(m)=h_{s}(m') ] \in \negl{\lambda}   
-\]
-with $m\not=m'$.\\
-This means that 
-    \begin{gather*}
-        \P [F_{s}(m_{1}||1) \xor ... \xor F_{s}(m_{t}||t) = F_{s}(m'_{1}||1) \xor ...
-        \xor F_{s}(m'_{t}||t)]  =\\
-        = \P [ F_{s}(m_{i}\|i) \xor  F_{s}(m'_{i}\|i)= \alpha  = \bigxor_{j=1, j\not=i}^{t} 
-        F_{s}(m_{j}\|j) \xor  F_{s}(m'_{j}\|j)]
-    \end{gather*}
-    for each $i \in [1,t]$.\\
-    But $\alpha$ is one unique random number chosen over $2^{n}$ possible
-    candidates, so the collision probability is negligible.\\
-\subsection{CBC MAC}
-This is part of the standard, used in TLS. It's used with a PRF $F_{s}$, setting
-the starting vector $IV=0^{n}=c_{0}$ and running this PRF as part of CBC. The
-output of the CBC process is just the last block:
-\[
-    h_{s}(m_{1}, ..., m_{t})=F_{s} ( m_{t} \xor F_{s}(m_{t-1} \xor ... \xor 
-    F_{s}(m_{2} \xor F_{s}(m_{1} \xor IV))  ))
+    h_s(m) = F_s(m_t \xor F_s(m_{t-1} \xor F_s(\dots F_s(m_2 \xor F_s(m_1 \xor \textsc{iv})) \dots)))
 \]
 \begin{lemma}
-    CBC MAC defines completely an AU family.\\
+    CBC MAC defines completely an AU family.
+\end{lemma}
+
+\begin{proof}
     (not proven)
-\end{lemma}
+\end{proof}
 
-We can use this function to create an \textbf{encrypted CBC}, or \textbf{E-CBC}  :
+We can use this function to create an \textbf{encrypted CBC}, or \textbf{E-CBC}:
 \[
     E-CBC_{K, S}(m)=F_{k}(h_{s}^{CBC}(m))
 \]
-.
+
 \begin{theorem}
-    Actually if $\F$ is a PRF, CBC-MAC is already a MAC with domain $nt$ for
-    arbitrary but fixed $t \in \mathbb{N} $.\\
-    (not proven)
+    Actually if $F_k$ is a \prf, CBC-MAC is already a MAC with domain $n\cdot t$ for arbitrarily fixed $t \in \mathbb{N}$.
 \end{theorem}
 
+\begin{proof}
+    (not proven)
+\end{proof}
+
 \subsection{XOR MAC}
-Instead of $\F(\H)$ now the $Tag()$ function outputs $\phi = (\eta , F_{k}(\eta)
-\xor h_{s}(m))$ where $\eta \leftarrow\$ \{0,1\}^{n}$ is random and it's called
-\textit{nonce} .\\
-When I want to authenticate, I should send the
+Instead of $\F(\H)$ now the $Tag()$ function outputs $\phi = (\eta , F_{k}(\eta) \xor h_{s}(m))$ where $\eta \leftarrow\$ \{0,1\}^{n}$ is random and it's called \textit{nonce}.
+
+Authentication is done as:
 \[
     (m,( \eta, F_{k}(\eta)\xor h_{s}(m)))
 \]
-couple.\\
-When I want to verify a message and I get the couple $(m, (\eta, v))$, I just
-check that $v=F_{k}(\eta) \xor h_{s}(m)$. It should be hard to find a value
-called $a$ such that, given $m \not= m'$, 
+
+When I want to verify a message and I get the couple $(m, (\eta, v))$, I just check that $v=F_{k}(\eta) \xor h_{s}(m)$. It should be hard to find a value called $a$ such that, given $m \not= m'$, 
 \[
     h_{s}(m) \xor a= h_{s}(m')
 \]
-In fact, since an adversary who wants to break this scheme has to send a valid
-couple $(m^{*}, \phi^{*})$ after some queries, he could:
+
+In fact, since an adversary who wants to break this scheme has to send a valid couple $(m^{*}, \phi^{*})$ after some queries, he could:
 \begin{itemize}
     \item ask for message $m$ and store the tag $( \eta, F_{k}(\eta)\xor h_{s}(m))$
-    \item try to find $a=h_{s}(m) \xor h_{s}(m')$ and modify the previous stored
-        tag adding $v \xor a$, 
+    \item try to find $a=h_{s}(m) \xor h_{s}(m')$ and modify the previous stored tag adding $v \xor a$, 
 \end{itemize}
 so now he could send the authenticated message
 \[
     (m', (\eta, F_{k}(\eta) \xor h_{s}(m'))) 
 \]
-which is a valid message.\\
+which is a valid message.
 
-==============================================================\\
-WHAT IS IT ABOUT?
+\todo{AXU property definition is missing}
+
 \begin{lemma}
-    XOR mode gives computational AXU (Almost Xor Universal).\\
-    (not proven)
+    XOR mode gives computational AXU (Almost Xor Universal)
 \end{lemma}
-WAHT DOES IT MEAN AXU?? Has something to do with the first 2 definitions given
-in the start of this subsection ?
-==============================================================\\
+
+\begin{proof}
+    (not proven)
+\end{proof}
 
 \begin{theorem}
-    If $\F$ is a PRF and $\H$ is computational AXU, then XOR-MAC is a MAC.\\
-    (not proven)
+    If $\F$ is a PRF and $\H$ is computational AXU, then XOR-MAC is a MAC.
 \end{theorem}
 
-==============================================================\\
-NOT CLEAR WHAT TO DO 
-\begin{exercise}
-    Now with variable input lenght:
-    \begin{itemize}
-        \item AXU based XOR mode 
-        \item $\F(\H)$ is insecure with polynomial construction
-            $h_{s}(m)=q_{m}(s)$, but can be fixed.
-        \item CBC-MAC not secure. (exercise)
-        \item E-CBC is secure.
-    \end{itemize}
-==============================================================\\
-    
-\end{exercise}
-\newpage
-\section{Chosen Ciphertext Attack security}
-In this kind of attack, the adversary has a decryption capability added to
-the previous encryption capability. A scheme which is CCA-secure is also
-\textbf{non-malleable}, since the attacker cannot modify the obtained
-ciphertexts to obtain new valid ciphertexts.\\
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.7]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[7]{B}{$ C^{cca}_{k \leftarrow\$ \K} $} % Increase "5" to widen
-      
-      \postlevel
-      \mess{A}{$m$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c$}{A}
-      \node[anchor=west] at (mess from) {$c\leftarrow\$Enc(k, m)$ or $c=Enc(k,
-          m, r)$};
-    \draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.7);
-      
-    \postlevel
-      \mess{A}{$c'$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$m'$}{A}
-      \node[anchor=west] at (mess from) {$m'=Dec(k, c')$ };
-    \draw [->] (1.2,-5.6) to[out=240,in=110] (1.2,-4);
-      
-   \postlevel 
-    \mess{A}{$m_{0}^{*}, m_{1}^{*}$}{B}
-      \node[anchor=east] at (mess from) {  };
-      \postlevel
-      \mess{B}{$c^{*}$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-        $r^{*} \leftarrow\$ \{0,1\}^{*} 
-        $    
-          \\
-          $c^{*}=Enc(k, m_{b}^{*}, r^{*})$
-          }};
-      
-      % Message from Bob to Alice, with computations by both sides
-    \postlevel
-      \mess{A}{$m$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c$}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-10.5) to[out=240,in=110] (1.2,-9);
-
-
-    \postlevel
-      \mess{A}{$c'$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$m'$}{A}
-      \node[anchor=west] at (mess from) { };
-    \draw [->] (1.2,-13) to[out=240,in=110] (1.2,-11.5);
-
-
-
-      \postlevel
-      \mess{A}{$b' \in \{0,1\}$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-   \end{tikzpicture}
-   \caption{ $Game_{\Pi, \A}^{cca}(\lambda, b)$}
-\end{figure}
-
-\begin{exercise}
-    Show that $(r, F_{k}(r) \xor m)$ which is CPA-secure, is not CCA-secure.
-\end{exercise}
 \begin{proof}
-    \begin{figure}[h!]
-       \centering
-       \sdinit{}
-       \begin{tikzpicture}[scale=0.8]
-          % Define symbols and names for the parties
-          \sdbegin{}
-          \newinst{A}{$ \A $}
-          \newinst[5]{B}{$ C $} % Increase "5" to widen
-          
-          \mess{A}{$0^{n}, 1^{n}$}{B}
-          \node[anchor=west] at (mess to) {  };
+    (not proven)
+\end{proof}
+
+\subsubsection{Summary}
+
+\todo{not sure what to do with this bullet list...}
+
+With variable input lenght:
+\begin{itemize}
+    \item AXU based XOR mode is secure;
+    \item $\F(\H)$ is insecure with polynomial construction $h_{s}(m)=q_{m}(s)$, but can be fixed;
+    \item CBC-MAC is not secure, left as exercise;
+    \item E-CBC is secure.
+\end{itemize}
+
+% AP190111: The cca figure is too big and too important to let it slide through a whole page, so I'm breaking here to ensure it stays with the section title
+\pagebreak
+
+\section{\textsc{Cca}-security}
+
+Going back to the encryption realm, a new definition of attack to a \ske{} scheme will be introduced. Now the adversary can query a decryption oracle, along with the \cpa-related encryption oracle, for polynomially many queries. This attack is called the \emph{Chosen Ciphertext Attack}\footnotemark, and schemes that are proven to be \cca-secure are also defined as \emph{non-malleable}, on the reasoning that an attacker cannot craft fresh valid ciphertexts from other valid ones.
+
+\footnotetext{Different versions of the \cca{} notion exist. The one defined here is also called \cca2, or \emph{adaptive Chosen Ciphertext Attack}}
+
+% AP190112: An important rule is forgotten here: the adversary cannot query the decryption oracle on the challenge ciphertext; otherwise the game becomes useless
+
+\begin{cryptogame}
+    {cca}
+    {The chosen ciphertext attack, on top of \cpa}
+    {cca}
+
+    \cseqchallenger{$k \pickUAR \K$}
+
+    %cpa
+    \cseqbeginloop
+    \send{}{$m$}{}
+    \receive{\shortstack[l]{
+        $r \text{ chosen \uar}$ \\
+        $c = Enc_k(m, r)$
+    }}{$c$}{}
+    \cseqendloop
+
+    \cseqdelay
+
+    %cca
+    \cseqbeginloop
+    \send{}{$c$}{}
+    \receive{$m = Dec_k(c)$}{$m$}{}
+    \cseqendloop
+
+    \cseqdelay
+
+    %challenge
+    \send{}{$m_0^*, m_1^*$}{}
+    \receive{\shortstack[l]{
+        $r^* \text{ chosen \uar}$ \\
+        $b \pickUAR \{0, 1\}$ \\
+        $c^* = Enc_k(m_b^*, r^*)$
+    }}{$c_b^*$}{}
+
+    \cseqdelay
     
-          \postlevel
-          \mess{B}{$c_{\alpha}=(r_{\alpha},s_{\alpha} )$}{A}
-          \node[anchor=west] at (mess from) {$c_{\alpha}=(r_{\alpha},
-              F_{k}(r_{\alpha} \xor m_{b}))$};
-          
-          % Message from Bob to Alice, with computations by both sides
-          \postlevel
-          \mess{A}{$c=(r_{\alpha}, s_{\alpha} \xor 1000...000)$}{B}
-          \node[anchor=west] at (mess to) {$Dec(k, c)$  };
-          
-          \sdend{}
-       \end{tikzpicture}
-    \end{figure}
-    with 
-    
-    \begin{gather*}
-        Dec(k, c) =  F_{k}(r_{\alpha}) \xor s_{\alpha} \xor
-        1000...000 =\\
-        F_{k}(r_{\alpha}) \xor F_{k}(r_{\alpha}) \xor m_{b} \xor
-        1000...000 =\\
-        m_{b} \xor 1000...000 
-    \end{gather*}
-   At this point we have that the output is  
-   \begin{itemize}
-       \item $1000...000$ if $m_{b}$ was $000...000$
-       \item $0111...111$ if $m_{b}$ was $0111...111$
-   \end{itemize}
+    %cpa
+    \cseqbeginloop
+    \send{}{$m$}{}
+    \receive{\shortstack[l]{
+        $r \text{ chosen \uar}$ \\
+        $c = Enc_k(m, r)$
+    }}{$c$}{}
+    \cseqendloop
+
+    \cseqdelay
+
+    %cca
+    \cseqbeginloop
+    \send{}{$c$}{}
+    \receive{$m = Dec_k(c)$}{$m$}{}
+    \cseqendloop
+
+    \cseqdelay
+
+    %output
+    \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
+\end{cryptogame}
+
+\begin{exercise}
+    Show that the scheme $\Pi_{\F}$ defined in theorem \ref{thm:prfcpa}, while \cpa-secure, is not \cca-secure.
+\end{exercise}
+
+\begin{proof}
+
+    Let $m_0$ and $m_1$ be the messages the adversary sends to the challenger as the challenge plaintexts; on receiving the ciphertext $c_b = (r, F_k(r \xor m_b) : b \pickUAR \{0, 1\}$, the adversary crafts another ciphertext with an arbitrary value $\alpha$:
+    \[
+        \widehat{c_b} = (r, F_k(r) \xor m_b \xor \alpha)
+    \]
+    and queries the decryption oracle on it. The latter will decrypt the new ciphertext and return a plaintext, which can be easily manipulated by the adversary to reveal exactly which message was encrypted during the challenge:
+
+    \begin{align*}
+        Dec_k(\widehat{c_b}) &= Dec_k(r, F_k(r) \xor m_b \xor \alpha) \\
+        &= F_k(r) \xor F_k(r) \xor m_b \xor \alpha \\
+        &= m_b \xor \alpha
+    \end{align*}
+
+    Therefore, the adversary certainly wins after just one decryption query, proving the scheme's vulnerability to \cca{} attacks.
    
 \end{proof}
 
 \section{Authenticated encryption}
-\textbf{Idea}: what if we combine the target of authenticity with the
-target of encryption?\\
-The first property is satisfied when the receiver is able to understand if the
-received message was sent exactly by the trusted sender; the last property is
-satisfied when no information of the sent message is contained in the ciphertext,
-thus only the chosen receiver can fully read the original sent message.\\
-If we build up a schema with these 2 properties, we can obtain a new schema
-which should be \textit{cpa-secure} (to enforce the encryption/privacy property)
-and essentially secure against forgeries of chosen message attacks (to enforce
-the authentication property).\\
-In particular, a successful forgery can be obtained winning the following game:
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[5]{B}{$ C_{k \leftarrow\$ \K} $} % Increase "5" to widen
-      
-      \mess{A}{$m$}{B}
-      \node[anchor=west] at (mess to) {  };
-
-      \postlevel
-      \mess{B}{$c=Enc(k, m)$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-      		$    $ 
-            \\
-            $    $ }};
-      
-      \postlevel
-      \mess{A}{$c^{*}$}{B}
-      \node[anchor=west] at (mess to) {\shortstack[l]{
-                  Output 1 IFF $Dec(k, c^{*})\not=\perp$ and
-            \\
-        $c^{*} \not\in \{c\}$ }};
-
-    \draw [->] (1.2,-2.7) to[out=240,in=110] (1.2,-1.0);
-   \end{tikzpicture}
-   \caption{$Game _{\Pi, \A}^{auth}(\lambda)$}
-\end{figure}
-
-meaning that the $c^{*}$ challenge ciphertext should be a \textbf{fresh} and a
-valid one ciphertext, considering
-that the $Dec(.)$ function is defined as
-
-\begin{equation*}
+Instead of tackling the \cca-security problem upfront, it might be useful to consider a construction that achieves both secrecy and authentication: that is, a scheme that encrypts messages and authenticates their respective senders at the same time. In the encryption setting, such a scheme is defined as being \cpa-secure with an additional \textsc{auth} property denoting the scheme's resistance to forgeries, much like its \mac{} cousins. The game shown in figure \ref{cryptogame:authske} models this \textsc{auth} property of a scheme $\Pi = (Enc, Dec)$, with an additional quirk to the decryption routine:
+\[
     Dec:\K*\C \to M \cup \{\perp\}
-\end{equation*}
+\]
+where the $\perp$ value is returned whenever the decryption algorithm is supplied an invalid or malformed ciphertext.
 
-where $\perp$ represents invalid/meaningless messages.
+\begin{cryptogame}
+    {authske}
+    {$\cryptog{auth}(\lambda)$}
+    {auth}
 
-In the end, we want that our \textit{authenticated encryption schema} is
-cpa-secure and has this last property, called \textbf{strong unforgeability} or
-\textbf{auth} . 
+    \cseqchallenger{$k \pickUAR \K$}
+
+    \cseqbeginloop
+    \send{}{$m$}{}
+    \receive{\shortstack[l]{
+        $r \text{ chosen \uar}$ \\
+        $c = Enc_k(m, r)$
+    }}{$c$}{$c \in C$}
+    \cseqendloop
+
+    \cseqdelay
+
+    \send{$c' \notin C$}{$c'$}{\textsc{Output 1 iff} $Dec_k(c') \neq \perp$}
+
+\end{cryptogame} 
 
 \begin{theorem}
-    Let $\Pi$ be an SKE (shared key encryption). If $\Pi$ has \textbf{
-    \textit{CPA + auth} } security, then it also has \textbf{CCA} security.
+    Let $\Pi$ be a \ske{} scheme. If it is \cpa-secure, and has the \textsc{auth} property, then it is also \cca-secure.
 \end{theorem}
 
-\begin{exercise}
-    Prove it!\\
-    \textbf{Hint}: consider the experiment where $Dec(k, c)$:
+\begin{proof} The proof is left as an exercise.
+
+    \emph{Hint}: consider the experiment where $Dec(k, c)$:
+
     \begin{itemize}
-        \item if $c$ not fresh ( i.e. output of previous encryption query $m$,
-            output $m$)
+        \item if $c$ not fresh ( i.e. output of previous encryption query $m$, output $m$)
         \item else output $\perp$
     \end{itemize}
     
-    ====================================================\\
-    TO DO AND TO PROVE\\
-    Approach: reduce cca to cpa; given $D^{cca}$, we can build $D^{cpa}$.
-    $D^{cca}$ will ask decryption queries, but $D^{cpa}$ can answer just with
-    these two properties shown above, so it can reply just if he asked these
-    $(c, m)$ before to its challenger $\C$.
-    ====================================================\\
-\end{exercise}
+    The approach would be to reduce cca to cpa; given $D^{cca}$, we can build $D^{cpa}$. $D^{cca}$ will ask decryption queries, but $D^{cpa}$ can answer just with these two properties shown above, so it can reply just if he asked these $(c, m)$ before to its challenger $\C$.
 
-\subsection{Three approaches to authenticated encryption}
-Let $\Pi_{1}$ be a \textbf{cpa-secure} SKE and $\Pi_{2}$ be a \textbf{auth} MAC
-schema.\\
-We have 3 ways to combine these 2 schema to obtain a new one:
-\begin{enumerate}
-    \item \textbf{ \textit{Encrypt-and-MAC} } :
-        \begin{gather*}
-            c \leftarrow\$ Enc(k_{1}, m)\\
-            \phi = Tag(k_{2}, m)\\
-            c^{*}=(c, \phi)
-        \end{gather*}
+\end{proof}
+
+\subsection{Combining \ske{} \& \mac{} schemes}
+
+Let $\Pi_1 = (Enc, Dec)$ be a \ske{} scheme, and $\Pi_2 = (\textit{Tag}, \textit{Verify})$ be a \mac{} scheme; there are 3 ways to combine them into an authenticated encryption scheme:
+% AP190112: A note should be made about notation, for what it means to "pick at random" from an encryption/tagging function (random nonce in the encryption, seeded AU hash function in the tagging)
+% Plus, keys aren't curried, but subsubscripting may turn ugly...
+\begin{itemize}
+    \item \emph{Encrypt-and-Tag}:
+    \begin{enumerate}
+        \item $c \pickUAR Enc(k_1, m)$
+        \item $\phi \pickUAR Tag(k_2, m)$
+        \item $c^* = (c, \phi)$
+    \end{enumerate}
         
-    \item  \textbf{ \textit{MAC-then-encrypt} } :
-    \item 
-        \begin{gather*}
-            \phi = Tag(k_{2}, m)\\
-            c \leftarrow\$ Enc(k_{1}, \phi \| m)\\
-            c^{*}=c
-        \end{gather*}
+    \item \emph{Tag-then-encrypt}:
+    \begin{enumerate}
+        \item $\phi \pickUAR Tag(k_2, m)$
+        \item $c \pickUAR Enc(k_1, (\phi, m))$
+        \item $c^* = c$
+    \end{enumerate}
 
-===============================================================================\\
-DA RIVEDERE: come i $\phi$ sono randomici o no? A guardare la prima parte della
-prossima lezione , sembrerebbe di si.\\
-    \item  \textbf{ \textit{Encrypt-then-MAC} } :
-        \begin{gather*}
-            c \leftarrow\$ Enc(k_{1}, m)\\
-            \phi \leftarrow\$ Tag(k_{2}, c) \\
-            c^{*}=(c, \phi)
-        \end{gather*}
-        
-===============================================================================\\
-\end{enumerate}
+    \item \emph{Encrypt-then-Tag}:
+    \begin{enumerate}
+        \item $c \pickUAR Enc(k_1, m)$
+        \item $\phi \pickUAR Tag(k_2, c)$
+        \item $c^* = (c, \phi)$
+    \end{enumerate}
+\end{itemize}
 
-In a paper is clearly stated that the first solution doesn't work taking random combination of CPA-secure and MAC schemes, because there are couple which, mixed, are not CCA-secure. Furthermore the second solution doesn't work for the same above reason, even if it's now part of the standard.
+Of the three options, only the last one is proven to be \cca-secure for arbitrary scheme choices; the other approaches are not secure ``a-priori'', with some couples proven to be secure by themselves. Notable examples are the \emph{Transport Layer Security} (\textsc{tls}) protocol, which employs the second strategy, and has been proven to be secure because of the chosen ecnryption scheme; \emph{Secure SHell} (\textsc{ssh}) instead uses the first strategy.
 
-Instead, the third solution works always for a CPA-secure scheme $\Pi_{1}$ and
-strong unforgeability scheme $\Pi_{2}$ which, combined, they generate the final scheme
-$\Pi$.
 \begin{theorem}
-    If $\Pi$ is made combining $\Pi_{1}$ cpa-secure and $\Pi_{2}$
-    \textit{auth}-secure 
-    as stated in the third point,
-    then $\Pi$ is cpa-secure and \textit{auth-secure} . 
+    If an authenticated encryption scheme $\Pi$ is made by combining a \cpa-secure \ske{} scheme $\Pi_1$ with a \emph{strongly unforgeable} \mac{} scheme $\Pi_{2}$ in the \emph{Encrypt-then-tag} method. Then $\Pi$ is \cpa-secure and \textit{auth}-secure. 
 \end{theorem}
+
+% AP190113: Key-related notation issues, again
 \begin{proof}
-    By reduction, we negate that $\Pi$ has both the properties and we find
-    the contraddiction.\\
-    Suppose now that $\Pi$ hasn't the cpa-security property.
 
+    Assume that $\Pi$ is not \cpa-secure; then an adversary can use the resulting distinguisher $\distinguisher^{\cpa}$ to direct a succesful \cpa{} against $\Pi_1$, as shown in figure \ref{cryptoredux:ettcpa}: the point is to run the two components of $\Pi$ separately.
 
+    \begin{cryptoredux}
+        {ettcpa}
+        {}
+        {cpa$_1$}
+        {cpa}
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.5]
-      % Define symbols and names for the parties
-      \sdbegin{}
-      \newinst{A}{$ \A' $}
-      \newinst[5]{B}{$ \A $} % Increase "5" to widen
-      \newinst[4]{C}{$ \C_{k \leftarrow\$ \{0,1\}^{\lambda} 
-      } $}
+        \cseqchallenger{$k_1 \pickUAR \K_1$}
+        \cseqadversary{$k_2 \pickUAR \K_2$}
 
-      \postlevel
-      \mess{A}{$m$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$m$}{C}
-      \node[anchor=west] at (mess to) {  };
+        \cseqbeginloop
+        \return{}{$m$}{}
+        \send{}{$m$}{}
+        \receive{$c \pickUAR Enc_k(m)$}{$c$}{}
+        \invoke{$\phi \pickUAR Tag_k(c)$}{$(c, \phi)$}{}
+        \cseqendloop
 
-      \postlevel
-      \mess{C}{$c'$}{B}
-      \node[anchor=west] at (mess from) {\shortstack[l] {
-                  $c'\leftarrow\$ Enc(k, m)$
-          } };
-      \postlevel
-      \mess{B}{$(c',\phi=Tag(k_{2}, c')) $}{A}
-      \node[anchor=west] at (mess to) {  };
-    \draw [->] (1.2,-5.7) to[out=240,in=110] (1.2,-1.6);
-    \postlevel
-    \mess{A}{$m_{0}^{*},m_{1}^{*} $}{B}
-      \node[anchor=west] at (mess to) {  };
+        \cseqdelay
+        
+        \return{}{$m_0^*, m_1^*$}{}
+        \send{}{$m_0^*, m_1^*$}{}
+        \receive{\shortstack[l]{
+            $b \pickUAR \{0, 1\}$ \\
+            $c^* \pickUAR Enc_k(m_b)$
+        }}{$c^*$}{}
+        \invoke{$\phi^* \pickUAR Tag_k(c^*)$}{$(c, \phi^*)$}{}
 
-      \postlevel
-    \mess{B}{$m_{0}^{*}, m_{1}^{*}$}{C}
-      \node[anchor=west] at (mess to) {  };
-    
-    \postlevel
-    \mess{C}{$c^{*}$}{B}
-      \node[anchor=west] at (mess to) {  };
-    
-      \postlevel
-      \mess{B}{$c^{*}, \phi^{*}$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-      		$    $ 
-            \\
-            $    $ }};
-    \postlevel
-    \mess{A}{other messages}{C};
-    \postlevel
-    \mess{C}{other responses}{A};
+        \cseqdelay
 
-    \postlevel
-    \mess{A}{$b'$}{B}
-      \node[anchor=west] at (mess to) {  };
-      
-    \postlevel
-    \mess{B}{$b'$}{C}
-      \node[anchor=west] at (mess to) {  };
-      
-%      \postlevel
-%      \mess{A}{$b' \in {0,1}$}{B}
-%      \node[anchor=west] at (mess to) {  };
-      \sdend{}
-      \sdend{}
-   \end{tikzpicture}
-  % \caption{}
-  % \label{fig:}
-\end{figure}
+        \cseqbeginloop
+        \return{}{$m$}{}
+        \send{}{$m$}{}
+        \receive{$c \pickUAR Enc_k(m)$}{$c$}{}
+        \invoke{$\phi \pickUAR Tag_k(c)$}{$(c, \phi)$}{}
+        \cseqendloop
 
-Here we are supposing that $\A$ can break the cpa-security of a generic $\Pi_{1}$ scheme used by $\C$, while $\A'$ can break the cpa-security of a generic scheme $\Pi$. $\C$ can generate the $Tag(k_{2},.)$ function, randomly chosing $k_{2}$(((( and simulating $\Pi$.
+        \cseqdelay
 
-\todo{Professor says that we have to show that $Game^{cpa}(\lambda, 0) \approx_{c} Game^{cpa}(\lambda, 1)$ , but why??? Isn't this proof enough?}
+        \return{}{$b'$}{}
+        \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
 
-Proved for the cpa-security property, now we have to prove, in a similar way,
-that the auth property must be holded by $\Pi$ if $\Pi_{2}$ is an auth-secure
-scheme.
+    \end{cryptoredux}
+
+    \todo{Professor says that we have to show that $Game^{cpa}(\lambda, 0) \approx_{c} Game^{cpa}(\lambda, 1)$ , but why??? Isn't   this proof enough?}
+
+\end{proof}
+
+Proved for the cpa-security property, now we have to prove, in a similar way, that the auth property must be holded by $\Pi$ if $\Pi_{2}$ is an auth-secure scheme.
 \begin{exercise}
     Prove it!
 
     Similar to the cpa-security proof.
 \end{exercise}
 
-
-\end{proof}

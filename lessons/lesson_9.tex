@@ -4,9 +4,11 @@
 
 After having explored the security conerns and challenges of the \ske{} realm, it is time to turn the attention to symmetric \mac{} schemes. Recall that a \mac{} scheme is a couple $(\textit{Tag}, \textit{Verify})$, with the purpose of auhenticating the message's source. In this chapter, the tagging function will be denoted as $\textit{Tag}_k$, akin to a \prf.
 
-The desirable property that a \mac{} scheme should hold is to prevent any attacker from generating a valid couple $(m^*, \phi^*)$, even after querying a tagging oracle polynomially many times\footnotemark. The act of generating a valid couple from scratch is called \emph{forging}, and the aforementioned propery is defined as \emph{unforgeability against chosen-message attacks} (or \ufcma, in short); its game diagram is shown in figure \ref{cryptogame:ufcma}. Do note that $m^*$ is stated to be outside the query set $M$, justifying the ``freshness'' of the forged couple. In formal terms:
-
+The desirable property that a \mac{} scheme should hold is to prevent any attacker from generating a valid couple $(m^*, \phi^*)$, even after querying a tagging oracle polynomially many times\footnotemark.
 \footnotetext{Do note how this property resembles \cpa-security in the encryption setting}
+The act of generating a valid couple from scratch is called \emph{forging}, and the aforementioned propery is defined as \emph{unforgeability against chosen-message attacks} (or \ufcma, in short); its game diagram is shown in figure \ref{cryptogame:ufcma}. Do note that $m^*$ is stated to be outside the query set $M$, justifying the ``freshness'' of the forged couple\footnotemark. In formal terms:
+
+\footnotetext{This cannot be said about the message tags; this security variant will be discussed later}
 
 \begin{definition}
     A \textsc{mac} scheme $\Pi$ is \textsc{ufcma}-secure iff:
@@ -124,7 +126,7 @@ Having defined a good notion of security in the \mac{} scheme domain, we turn ou
 % AP190107: Don't want the next section to creep in before the above figure, so I'm breaking the page. THe best solution would be to put some more text into the previous proof...
 \pagebreak
 
-\section{Domain extension}
+\section{Domain extension for \mac{} schemes}
 
 The previous scheme works on fixed length messages; as in the encryption domain, there are techinques for tagging variable length messages which are \ufcma-secure. However, before showing them, some other apparently secure modes are described here to give some possible insights on how to tackle the problem. 
 
@@ -139,7 +141,7 @@ Assume the message $m = (m_1, \dots, m_t) \in \{0,1\}^{n\cdot t}$ for some $t \g
 
 \end{itemize}
 
-\subsection{Collision-resistant hash functions}
+\subsection{Universal hash functions}
 
 A devised solution which has been proven to be secure relies on the following definition: a function family $\H$ which can be used to ``shrink'' variable length messages and then composed with a \prf{}:
 \[

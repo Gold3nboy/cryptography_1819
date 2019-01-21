@@ -1,73 +1,55 @@
 \mychapter{11}{Lesson 11}
-\section{Authenticated encryption (Age of Ultron)}
-Last time we proved CPA-security of $\Pi$. Today we will explore the
-\textit{auth}  property.
-Consider $\Pi$ as
-    \begin{gather*}
-        Enc:\{0,1\}^{\lambda}*\M \to \C \\
-        Tag:\{0,1\}^{\lambda}*\C \to \Phi 
-    \end{gather*}
-   
-    \begin{lemma}
-        If $Tag(.,.)$ is \textbf{EUF-CMA} , then $\Pi$ has
-    auth-property. 
-    \end{lemma}
-    
-    What is \textbf{EUF-CMA} ?\\ 
-    It's a property similar to \textbf{uf-cma} ,
-    but now I want that the challenge message $(m^{*}, \phi^{*})$ is made by a
-    fresh $m^{*}$ and a valid \textbf{fresh} $\phi^{*}$.\\ 
-    The difference is that in ufcma we didn't care about the freshness of
-    $\phi^{*}$.
 
+% "The age of ULTRON" - wanted to keep that somewhere...
+\section{Authenticated encryption (continued)}
+
+Having proven \cpa-security of an authenticated encryption scheme in an \emph{Encrypt-then-Tag} mode, it remains to prove that it has the \textsc{auth} property. Before this, a new unforgeability definition is needed:
+
+\begin{definition}
+    Let $\Pi = (\textit{Tag}, \textit{Verify})$ be a \mac{} scheme. Then $\Pi$ is \textsc{eufcma}-secure iff it is \ufcma-secure, that is:
+    \[
+        \Pr[\cryptog{ufcma}(\lambda) = 1] \in \negl{\lambda}
+    \]
+    with the additional restriction that the tag $\phi^*$ of the forged message must be ``fresh'' itself.
+\end{definition}
+
+Note the small difference in security between \ufcma{} and \textsc{eufcma}.
+
+\begin{theorem}
+    Let $\Pi = (Enc, Dec, Tag, Verify)$ be an authenticated encryption scheme, composed by a \ske{} scheme $\Pi_1$ and a \mac{} scheme $\Pi_2$. If $\Pi_2$ is \textsc{eufcma}, then $\Pi$ has the \textsc{auth} property.
+\end{theorem}
+
+% AP190114: Need to phrase theorems differently
 \begin{proof}
-    Suppose $\Pi$ has not the \textit{auth}  property.\\ 
-    So we have an $\A'$ which can win the \textbf{auth} challenge of $\Pi$.\\
-    On the other hand, we have a $\Pi_{2}$ schema which uses an \textbf{euf-cma}
-    $Tag(.,.)$ function.\\
-    So, by reduction, we show that 
+    The proof is analogous to the previous proof regarding the scheme's \cpa{} security. Suppose that $\Pi$ has not the \textsc{auth} property; then an adversary can use the distinguisher $\distinguisher^{\textsc{auth}}$ to successfully forge authenticated messages with fresh signatures against $\Pi_2$, as depicted in figure \ref{cryptoredux:ettauth}.
     
+    \begin{cryptoredux}
+        {ettauth}
+        {Breaking authenticity of $\Pi_2$}
+        {eufcma$_2$}
+        {auth}
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.7]
-      \sdbegin{}
-      \newinst{A}{$ \A^{auth} $}
-      \newinst[4]{B}{$ \A_{k \leftarrow\$ \{0,1\}^{\lambda} 
-      } $}
-      \newinst[4]{C}{$\C^{eufcma}_{k_{2} \leftarrow\$ \{0,1\}^{\lambda} 
-      }$ }
+        \cseqbeginloop
 
-      \postlevel
-      \mess{A}{$m$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c \leftarrow\$ Enc(k_{1}, m)$}{C}
-      \node[anchor=west] at (mess to) {};
-      \postlevel
-      \mess{C}{$\phi$}{B}
-      \node[anchor=west] at (mess from) {$\phi \leftarrow\$ Tag(k_{2}, c)$};
-      \postlevel
-      \mess{B}{$(c, \phi)$}{A}
-      \node[anchor=west] at (mess to) {  };
-\draw [->] (1.2,-5.9) to[out=240,in=110] (1.2,-1.3);
+        \return{}{$m$}{}
+        \send{$c \pickUAR Enc(k_{1}, m)$}{$c$}{}
+        \receive{$\phi \pickUAR Tag(k_{2}, c)$}{$\phi$}{}
+        \invoke{}{$(c, \phi)$}{\shortstack[r]{
+            $c \in C$ \\
+            $\phi \in \Phi$
+        }}
 
-      \postlevel
-      \mess{A}{$(c^{*}, \phi^{*})$}{B}
-      \node[anchor=west] at (mess to) {  };
-      \postlevel
-      \mess{B}{$c^{*}, \phi^{*}$}{C}
-      \node[anchor=west] at (mess to) { };
+        \cseqendloop
 
-      \sdend{}
-      \sdend{}
-   \end{tikzpicture}
-\end{figure}
-The game returns 1 IFF
-\[
-    c^{*} \leftarrow\$ Enc(k_{1}, . ) \wedge \phi^{*} \leftarrow\$ Tag(k_{2}, c^{*}) \wedge (c^{*}, \phi) \not\in \{ (c, \phi ) \} 
-\]
+        \cseqdelay
+
+        \return{\shortstack[r]{
+            $c^* \notin C$ \\
+            $\phi^* \notin \Phi$
+        }}{$(c^{*}, \phi^{*})$}{}
+        \send{}{$(c^*, \phi^*)$}{\shortstack[l]{\textsc{Output 1 iff} \\ $\quad \textit{Verify}_k(c^*, \phi^*) = 1$}}
+
+    \end{cryptoredux}
 
 From $A^{auth}$ perspective, all the couples $(c_{i}, \phi_{i})$ received are made with the following schema:
 

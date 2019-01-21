@@ -226,7 +226,7 @@ Consider the following \ske{} scheme $\Pi_{\F}$, with $\F=\{ F_{k}:\{0,1\}^{n} \
 
 Observe that the random value $r$ is part of the ciphertext, making it long $n+l$ bits; also more importantly, the adversary can and will always see $r$. The key $k$ though, which gives a \textit{flavour} to the \prf, is still secret.
 
-\begin{theorem}
+\begin{theorem} \label{thm:prfcpa}
     If $\F$ is a \prf, then $\Pi_{\F}$ is \cpa-secure.
 \end{theorem}
 
