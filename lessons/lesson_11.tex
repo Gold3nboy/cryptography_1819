@@ -72,107 +72,145 @@ It could happen that, for $c^{*}=c$ previously seen, $\phi^{*}$ is a new fresh t
 Now we want an ufcma secure scheme able to resist against message-tag challenge couples where the tag is fresh but the message has been already requested to the challenger.
 
 \section{Pseudorandom permutations}
-Pseudorandom permutations are like PRFs, but efficiently invertible.
-Consider the following family of functions:
-\[
-    \F=\{ F_{k} : \{0,1\}^{n} \to \{0,1\}^{n} \}_{k \in \{0,1\}^{\lambda} }
-\]
 
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.45]
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[4]{B}{$ C_{k\leftarrow\$\{0,1\}^{\lambda} 
-      } $}
+\todo{Luby-Rackoff is cited here, but it's related to both \prf{}s-\prp{}s and the Feistel network analysis} 
 
-      \postlevel
-      \mess{A}{$x$}{B}
-      \node[anchor=west] at (mess to) {};
-      \postlevel
-      \mess{B}{$y$}{A}
-      \node[anchor=west] at (mess from) {$y=F_{k}(x)$  };
-\draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.6);
-      \postlevel
-      \mess{A}{$b'$}{B}
-      \node[anchor=west] at (mess to) {  };
-
-
-      \sdend{}
-      \sdend{}
-   \end{tikzpicture}
-   \caption{$Real_{\F, \A}(\lambda)$}
-\end{figure}
-
-\begin{figure}[h!]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}[scale=0.45]
-      \sdbegin{}
-      \newinst{A}{$ \A $}
-      \newinst[4]{B}{$C_{P \leftarrow\$ \P(\lambda, n, n)} $}
-
-      \postlevel
-      \mess{A}{$x$}{B}
-      \node[anchor=west] at (mess to) {};
-      \postlevel
-      \mess{B}{$y$}{A}
-      \node[anchor=west] at (mess from) {$y=P(x)$  };
-\draw [->] (1.2,-3.3) to[out=240,in=110] (1.2,-1.6);
-      \postlevel
-      \mess{A}{$b'$}{B}
-      \node[anchor=west] at (mess to) {  };
-
-
-      \sdend{}
-      \sdend{}
-   \end{tikzpicture}
-   \caption{$Ideal_{\P, \A}(\lambda)$}
-\end{figure}
-
-
-
-and the two games are indistinguishable
+Nothing prevents a \prf{} $F_k$ to be bijective, in fact they can be built from \owp{}s using the \ggm{} construct. In this case, it is referred to as a \emph{pseudorandom permutation}, or \prp{} in short. Their definition is analogous to a generic \prf: as shown in figures \ref{cryptogame:prpreal} and \ref{cryptogame:prpideal}, \prp{}s are computationally indistinguishable from a random permutation:
 \[
     Real_{\F, \A}(\lambda) \approx_{c} Ideal_{\F, \A}(\lambda)
 \]
-\subsection{Feistel Network}
-Let $F:\{0,1\}^{n} \to \{0,1\}^{n} $ and $\psi_{F}$ the invertible function
+An important difference is that $F_k$ is efficiently invertible, although knowledge of $k$ is reqiuired in order to do so.
 
-\begin{gather*}
-    \psi_{F}(\overbrace{x}^{\text{n bits}}, \overbrace{y}^{\text{n bits}})= (y,
-    x \xor F(y))=(x', y')\\
-    \psi^{-1}_{F}(\overbrace{x'}^{\text{n bits}}, \overbrace{y'}^{\text{n
-    bits}})= (F(x') \xor y', x')=(x, y)
-\end{gather*}
+\begin{cryptogame}
+    {prpreal}
+    {$Real_{\F, \A}(\lambda)$}
+    {}
 
-Is this function pseudorandom?
+    \cseqchallenger{$k \pickUAR \{0, 1\}^\lambda$}
 
-This is not pseudorandom, because the first n bits of the output of $\psi_{F}$
-are always equal to $y$, while in a PRF the probability that, given two
-different $(x, y)$ and $(x', y)$ in input, the first bits are equal is very
-low.
+    \cseqbeginloop
+    \send{}{$x$}{}
+    \receive{$y = F_k(x)$}{$y$}{}
+    \cseqendloop
 
-\todo{FEISTEL IMAGE}
+    \send{}{$b'$}{}
+    
+\end{cryptogame}
 
-The $l-th$ level outputs something like 
+\begin{cryptogame}
+    {prpideal}
+    {$Ideal_{\P, \A}(\lambda)$}
+    {}
+
+    \cseqchallenger{$P \pickUAR \P(\lambda, n)$}
+
+    \cseqbeginloop
+    \send{}{$x$}{}
+    \receive{$y = P(x)$}{$y$}{}
+    \cseqendloop
+
+    \send{}{$b'$}{}
+    
+\end{cryptogame}
+
+\subsection{Feistel network}
+
+\textsc{Prp}s have been successfully constructed by using existing \prf{}s into what is called a \emph{Feistel network}. Asa a starting point, let $F : \{0, 1\}^n \to \{0, 1\}^n$ be a \prf, and define the function $\psi_F$ as follows:
+
+\begin{align*}
+    \psi_F(x, y) &= (y, x \xor F(y)) = (x', y') \\
+    \psi^{-1}_F(x', y') &= (F(x') \xor y', x') = (F(y) \xor x \xor F(y), y) = (x, y)
+\end{align*}
+
+\begin{figure}[ht]
+    \centering
+    
+    \tikzstyle{box}  = [draw, minimum size=2em]
+
+    \begin{tikzpicture}[auto]
+        
+        \node (x) {$x$};
+        \node (y) [below of = x, node distance = 3cm] {$y$};
+
+        \node (xor) [right of = y] {$\xor$};
+        \node (F) [box, above of = xor, node distance = 1.5cm] {$F_k$};
+
+        \draw[->] (x) -- +(2cm, 0) -- +(3cm, -3cm) -- +(4cm, -3cm);
+        \draw[->] (y) -- (xor);
+        \draw[->] (xor) -- +(1cm, 0) -- +(2cm, 3cm) -- +(3cm, 3cm);
+
+        \draw[->] (x)+(1cm, 0)  -- (F);
+        \draw[->] (F) -- (xor);
+        
+    \end{tikzpicture}
+    
+    \label{fig:feistel}
+    \caption{A single-round Feistel network}
+\end{figure}
+
+% AP190121: Some more intermediate steps might be useful
+While this construct is invertible and uses a \prf{}, it is not pseudorandom itself, because the first $n$ bits of $\psi_{F}$'s image are always equal to $y$, and thus visible to any adversary. A first attempt at fixing this vulnerability would be to apply the construct two times on two different \prf{}s $\psi^2_{F, F'}$, in an attempt to ``hide'' $y$. Yet, this approach still leaks valuable information:
 \[
-    \psi_{F}[l](x,y)=\psi_{F_{k_{l}}}(\psi_{F_{k_{l-1}}}(...(\psi_{F_{k_{1}}}(x,y))...))
+    \psi_{F, F'}(x, z) \xor \psi_{F, F'}(y, z) = (x \xor y, \dots)
 \]
-Two XORed rounds of this function don't create a PRP. In particular, imagine 2 queries 
-$(x, y)$ and $(x', y)$ such that
-\begin{equation*}
-    \psi_{F, F'}(x,y) \xor  \psi_{F,F'}(x',y)=(x \xor F(y) \xor x' \xor F(y), \ldots)
-\end{equation*}
 
-Since for 2 random queries with the same $y$, the first member of the output is always equal to  $x \xor x'$ with probability 1, this XORed rounds cannot constitute a PRP (which, instead, for 2 queries with the same second member outputs a first member equal to $x \xor x'$ with negligible probability).
+However, this example with additional restrictions will be useful very soon, so it is reworded as the following lemma:
 
 \begin{lemma}
-    For every \textbf{unbounded}  distinguisher making $q \in poly(\lambda)$
-    queries, the following are statistically close as long as $y_{1}, \ldots,
-    y_{q}$ are \textbf{ \textit{y-nique} } , i.e. $ \forall i \not= j, y_{i}
-    \not= y_{j}$
+    For any unbounded adversary making $q \in \poly(\lambda)$ queries, the following games in figure \ref{fig:feisteltwins} are statistically close as long as $y_1, \ldots, y_q$ are mutually distinct.
 \end{lemma}
-figures
 
+% AP190122: Prefer a single, b-oriented game, but for the sake of compliance to the original lessons the sequences are drawn with the old environment
+% Also, cannot put them side by side now... 
+\begin{figure}[ht]
+    \centering
+    \sdinit{}
+    \begin{tikzpicture}[scale=0.6]
+        % Define symbols and names for the parties
+        \sdbegin{}
+        \newinst{A}{$ \A $}
+        \newinst[2.1]{B}{$ C $} % Increase "5" to widen
+        \mess{A}{$x, y$}{B}
+        \node[anchor=west] at (mess to) {  };
+        \postlevel
+        \mess{B}{$\psi^2_{F, F'}(x, y)$}{A}
+        \node[anchor=west] at (mess from) {$F, F' \pickUAR \R(\lambda, n, n)$};
+        \sdend{}
+    \end{tikzpicture}
+    \sdinit{}
+    \begin{tikzpicture}[scale=.5]
+        % Define symbols and names for the parties
+        \sdbegin{}
+        \newinst{A}{$ \A $}
+        \newinst[2.1]{B}{$ C $} % Increase "5" to widen
+        \mess{A}{$x, y$}{B}
+        \node[anchor=west] at (mess to) {  };
+        \postlevel
+        \mess{B}{$R(x, y)$}{A}
+        \node[anchor=west] at (mess from) {$R \pickUAR \R(\lambda, 2n, 2n)$};
+        \sdend{}
+    \end{tikzpicture}
+    \caption{}
+    \label{fig:feisteltwins}
+\end{figure}
+
+\begin{proof}
+    \todo{Idea: Hybridize over the queries before the challenge, from PR to random; prove that the stat distance between i and i+1 is negligible}
+\end{proof}
+
+
+Going back to the Feistel networks in general, it should be easy to see that they can be made of an arbitrary number of rounds, by simply chaining output with input. The $l$-th iteration is denoted as: 
+\[
+    \psi^l_\Phi(x, y) = \psi_{F}(\psi_{F''}( \ldots \psi_{F^{(l)}}(x, y) \ldots ))
+\]
+where $\Phi$ is the sequence of \prf{}s used at each single step. It can be shown that the rounds neeed to obtain a network that is indeed pseudorandom is just 3; also, the same \prf{} can be used, it is sufficient to change the seed on each iteration\footnotemark:
+
+\begin{theorem}
+    Let $F_i, F_j, F_k$ be a \prf{} over three seeds. Then $\psi^3_{i, j, k}$ is a \prp.
+\end{theorem}
+
+\footnotetext{That is actually the purpose of using a \prf}
+
+\begin{proof}
+    \todo{Idea: Four total games: original, swap prfs with random functions, swap the three functions with a single one (use previous lemma), swap random function with random permutation (avoid bad events generated by injection property)}
+\end{proof}
