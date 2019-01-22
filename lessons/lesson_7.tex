@@ -105,10 +105,7 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
 
     \end{proof}
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Before tackling the reduction from the last two hybrids, it is best to introduce another lemma:
-
-    \todo{This lemma isn't used at all, why is it here? It's actually used in a different proof for this theorem...}
 
     \begin{lemma}
         If $G : \{0, 1\}^\lambda \to \{0, 1\}^{2\lambda}$ is a PRG, then for any $t(\lambda) \in \poly{\lambda}$:
@@ -118,9 +115,8 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
     \end{lemma}
 
     \begin{proof}
-        Intuitively, this is true because, by \prg{} definition, any \ppt{} adversary cannot efficiently tell pseudorandom outputs apart from truly random outputs. A formal proof involves the hybrid argument: assume that it exists a distinguisher \distinguisher{} capable of distinguishing such tuples. Then, by doing a progressive hybridization of the starting tuple with the finishing one, the difference at each step $i$ is how the $i$-th value distributes: either pseudorandomly in the preceding case, or randomly in the following case. This difference is indeed negligible because of pseudorandomness being indistinguishable from true randomness; the fact that the tuples' lengths is polynomial in $\lambda$ makes them indistinguishable as a whole, which proves the lemma.
+        \todo{Idea: all values are independent and pseudorandom on their own, hybridize progressively...}
     \end{proof}
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     Now for the final lemma:
 
@@ -129,7 +125,10 @@ Recall the \textsc{ggm}-tree construct used to define a function family $\F := \
     \end{lemma}
     
     \begin{proof}
-        Consider the distinguishing game for $H$ and $R$ in figure \ref{cryptogame:ggmhyb12}. The random functions $\overline{R}$ and $R$ are entirely independant, and $G$ transforms randomness in pseudorandomness, so this game boils down into distinguishing pseudorandom values from random ones, which is possible only with negligible probability.
+        
+        \todo{Bad proof: the idea is to reduce to a distinguishing game for the previous lemma)}
+        
+        \sout{Consider the distinguishing game for $H$ and $R$ in figure \ref{cryptogame:ggmhyb12}. The random functions $\overline{R}$ and $R$ are entirely independant, and $G$ transforms randomness in pseudorandomness, so this game boils down into distinguishing pseudorandom values from random ones, which is possible only with negligible probability.}
         
         \begin{cryptogame}
             {ggmhyb12}
