@@ -75,7 +75,7 @@ Now we want an ufcma secure scheme able to resist against message-tag challenge 
 
 \todo{Luby-Rackoff is cited here, but it's related to both \prf{}s-\prp{}s and the Feistel network analysis} 
 
-Nothing prevents a \prf{} $F_k$ to be bijective, in fact they can be built from \owp{}s using the \ggm{} construct. In this case, it is referred to as a \emph{pseudorandom permutation}, or \prp{} in short. Their definition is analogous to a generic \prf: as shown in figures \ref{cryptogame:prpreal} and \ref{cryptogame:prpideal}, \prp{}s are computationally indistinguishable from a random permutation:
+Nothing prevents a \prf{} $F_k$ to be bijective; in this case, it is referred to as a \emph{pseudorandom permutation}, or \prp{} in short. Their definition is analogous to a generic \prf: as shown in figures \ref{cryptogame:prpreal} and \ref{cryptogame:prpideal}, \prp{}s are computationally indistinguishable from a random permutation:
 \[
     Real_{\F, \A}(\lambda) \approx_{c} Ideal_{\F, \A}(\lambda)
 \]
@@ -115,7 +115,7 @@ An important difference is that $F_k$ is efficiently invertible, although knowle
 
 \subsection{Feistel network}
 
-\textsc{Prp}s have been successfully constructed by using existing \prf{}s into what is called a \emph{Feistel network}. Asa a starting point, let $F : \{0, 1\}^n \to \{0, 1\}^n$ be a \prf, and define the function $\psi_F$ as follows:
+\textsc{Prp}s have been successfully constructed by using existing \prf{}s into what is called a \emph{Feistel network}. As a starting point, let $F : \{0, 1\}^n \to \{0, 1\}^n$ be a \prf, and define the function $\psi_F$ as follows:
 
 \begin{align*}
     \psi_F(x, y) &= (y, x \xor F(y)) = (x', y') \\
