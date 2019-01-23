@@ -1,4 +1,4 @@
-\mychapter{4}{Lesson 4}
+\mychapter{4}{Lesson 4} %181005
 
 \section{Negligible function}
 
@@ -188,7 +188,7 @@ What's the deep meaning of this formula? This is something to do.
         {$f(z_b)$}
         {}
 
-        \postlevel
+        \cseqdelay
 
         % Adversary attempts to guess from which distribution the value's image came from
         \send{}
@@ -196,43 +196,31 @@ What's the deep meaning of this formula? This is something to do.
         {\textsc{Output 1 iff} $b' = b$}
 
     \end{cryptogame}
+    
+    In the game depicted by figure \ref{cryptogame:fdistin}, the adversary can make use of $f$, because it is \textsc{ppt}. Thus, if such a distinguisher exists, then it can be used to distinguish $X$ from $Y$, as shown in figure \ref{cryptoredux:distin}. So, if $A$ could efficiently distinguish between $f(x)$ and $f(y)$, then $D$ can efficiently distinguish between $x$ and $y$. This contradicts the hypothesis $X \compindist Y$, which in turn means $f(X) \compindist f(Y)$.
 
-    \begin{figure}
-        \centering
-        \sdinit{}
-        \begin{tikzpicture}
-            \sdbegin{}
-
-            % Define symbols and names for the parties
-            \newinst{A}{A}
-            \newinst[2]{D}{D}
-            \newinst[2]{C}{C$^\textsc{dist}$}
+    \begin{cryptoredux}
+        {distin}
+        {Distinguisher reduction}
+        {dist}
+        {}
+        
+        % The distinguisher asks for the challenge
+        \receive{\shortstack[l]{
+            $z_0 \pickUAR X$ \\
+            $z_1 \pickUAR Y$ \\
+            $b \pickUAR \{0, 1\}$
+        }}{$z_b$}{}
       
-            % The distinguisher asks for the challenge
-            \mess{C}{$z_b$}{D}
-            \node[anchor=west] at (mess from) {\shortstack[l]{
-                $z_0 \pickUAR X$ \\
-                $z_1 \pickUAR Y$ \\
-                $b \pickUAR \{0, 1\}$
-            }};
-      
-            % The distinguisher applies f to z and relays the image to A
-            \mess{D}{$f(z_b)$}{A}
-            
-            % Adversary distinguishes betweeen the two distributions
-            \mess{A}{$b'$}{D}
+        % The distinguisher applies f to z and relays the image to A
+        \invoke{}{$f(z_b)$}{}
+        
+        % Adversary distinguishes betweeen the two distributions
+        \return{}{$b'$}{}
 
-            \mess{D}{$b'$}{C}
-            \node[anchor=west] at (mess to) {\textsc{Output 1 iff} $b' = b$};
-      
-            \sdend{}
-        \end{tikzpicture}
-        \caption{Distinguisher reduction}
-        \label{fig:distredux}
-    \end{figure}
-
-
-    In the game depicted by figure \ref{cryptogame:fdistin}, the adversary can make use of $f$, because it is \textsc{ppt}. Thus, if such a distinguisher exists, then it can be used to distinguish $X$ from $Y$, as shown in figure \ref{fig:distredux}. So, if $A$ could efficiently distinguish between $f(x)$ and $f(y)$, then $D$ can efficiently distinguish between $x$ and $y$. This contradicts the hypothesis $X \compindist Y$, which in turn means $f(X) \compindist f(Y)$.
+        \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
+        
+    \end{cryptoredux}
 
 \end{proof}
 

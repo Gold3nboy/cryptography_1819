@@ -1,4 +1,4 @@
-\mychapter{6}{Lesson 6}
+\mychapter{6}{Lesson 6} %181012
 
 \section{Computationally secure encryption}
 
@@ -275,37 +275,57 @@ $b' \in \{0,1\}$ is a convention and 1 is assigned to $Real$ or $Rand$; so in th
     Show the same as above, but for any \prf{} instead.
 \end{exercise}
 
+\pagebreak
+
 \subsection{\textsc{Ggm}-tree}
 
 In this section, it is described how to construct a \prf{} starting from a given \prg, using a technique devised form Goldreich, Goldwasser and Micali, called the \emph{\textsc{ggm}-tree}.
 
 \begin{construction}
-    Let $G : \{0,1\}^{\lambda} \to \{0,1\}^{2\lambda} $ be a PRG and let us write 
+    Let $G : \{0, 1\}^{\lambda} \to \{0, 1\}^{2\lambda} $ be a \prg{} such that it doubles the length of its input, and splits ithe images in halves, effectively returning string couples: 
     \[
         G(k)=(G_{0}(k), G_{1}(k))
     \]
 
-    Consider this \textsc{ggm}-tree, which describes how $G$ will be used in the \prf{} construction:
+    Consider the \textsc{ggm}-tree depicted in figure \ref{fig:ggmtree}, which describes how $G$ will be used to craft a \prf. To lighten up the notation, a function composition $G_a(G_b(G_c(k)))$ will be contracted to $G_{abc}(k)$. So let $\F=\{F_{k} : \{0, 1\}^n \to \{0, 1\}^\lambda\}$ be a family of functions such that:
+    \[
+        F_k(r)=G_{r_{n}}(G_{r_{n-1}}( \dots G_{r_2}(G_{r_1}(k)) \dots ))
+    \]
 
     \begin{figure}[htbp]
         \centering
-        \begin{tikzpicture}
+        \begin{tikzpicture}[
+            level 1/.style={sibling distance=16em},
+            level 2/.style={sibling distance=8em},
+            level 3/.style={sibling distance=4em}]
 
-            GGM TREE IMAGE - MISSING
-
+            \node{$k$}
+                child{ node {$G_0(k)$}
+                    child { node {$G_{00}(k)$}
+                        child { node (a) {$G_{000}(k)$} node [below of = a] {$\vdots$}}
+                        child { node (a) {$G_{001}(k)$} node [below of = a] {$\vdots$}}
+                    }
+                    child { node {$G_{01}(k)$}
+                        child { node (a) {$G_{010}(k)$} node [below of = a] {$\vdots$}}
+                        child { node (a) {$G_{011}(k)$} node [below of = a] {$\vdots$}}
+                    }
+                }
+                child { node {$G_1(k)$}
+                    child { node {$G_{10}(k)$}
+                        child { node (a) {$G_{100}(k)$} node [below of = a] {$\vdots$}}
+                        child { node (a) {$G_{101}(k)$} node [below of = a] {$\vdots$}}
+                    }
+                    child { node {$G_{11}(k)$}
+                        child { node (a) {$G_{110}(k)$} node [below of = a] {$\vdots$}}
+                        child { node (a) {$G_{111}(k)$} node [below of = a] {$\vdots$}}
+                    }
+                };
         \end{tikzpicture}
         \caption{The \textsc{ggm}-tree for $G$}
         \label{fig:ggmtree}
     \end{figure}
 
-
-    Build $\F=\{F_{k} : \{0,1\}^{n} \to \{0,1\}^{\lambda} \}$ such that:
-    \[
-        F_k(x)=G_{x_{n}}(G_{x_{n-1}}( \dots G_{x_2}(G_{x_1}(k)) \dots ))
-    \]
-
 \end{construction}
 
-For example, in the tree with height $n=3$,  for $x=001$ we have $F_{k}(001)$, which is
-$G_{0}(G_{0}(G_{1}(k)))$.
+An example, with a string value of $001$ for $r$ would evaluate as $F_k(001) = G_0(G_0(G_1(k)))$.
 
