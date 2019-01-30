@@ -97,7 +97,7 @@ Therefore, if left deterministic, a TDP is not CPA-secure.
 %The idea is to reuse the message as part of the randomness, or more in detail, use its hardcore predicate. The resulting scheme would the look like this:
 Here, in this scheme, we combine randomness and the notion of hardcore predicate $\mathfrak{hc}$:
 
-
+% AP190123 - IMPORTANT NOTE: This scheme is intended to work for single-bit messages
 \begin{itemize}
     \item $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
     \item $r \pickUAR \Xi_{pk}$
@@ -107,23 +107,24 @@ Here, in this scheme, we combine randomness and the notion of hardcore predicate
 \end{itemize}
 
 \begin{theorem}
-    If $(\mathcal{KG}en, f, g)$ is a TDP, and $\mathfrak{hc}$ is hardcore for $f$, then the above scheme is CPA-secure.    
+    If $(\mathcal{KG}en, f, g)$ is a TDP, and $\mathfrak{hc}$ is hardcore for $f$, then the above scheme is \cpa-secure.    
 \end{theorem}
 
-Proof: (Execrcise)
-\todo{Apparently, the reduction here is not easy at all. Some hints are needed
-to solve this exercise.}
+\begin{proof} The proof is left as exercise
+
+    \todo{Apparently, the reduction here is not easy at all, some hints are needed.}
+\end{proof}
 
 \subsection{TDP examples}
 
-One example stems form the factoring problem: let's look again at $\mathbb{Z}_n^\times$, where $n = pq$, $p, q \in \mathbb{P}$;
+One example stems form the factoring problem: let's look again at $\mathbb{Z}_n^\times$, where $n = pq$, $p, q \in \mathbb{P}$:
 
 \begin{theorem}
     (Chinese remainder, or CRT): The following isomorphisms to $\mathbb{Z}_n^\times$ are true:
 
 \begin{itemize}
     \item $\mathbb{Z}_n \simeq \mathbb{Z}_p \times \mathbb{Z}_q$
-        \item $\mathbb{Z}_n^\times \simeq \mathbb{Z}_p^\times \times \mathbb{Z}_q^\times$
+    \item $\mathbb{Z}_n^\times \simeq \mathbb{Z}_p^\times \times \mathbb{Z}_q^\times$
 \end{itemize}
 
 Note that the theorem is more general, and holds for any $p, q$ that are coprime.
@@ -148,57 +149,34 @@ c^b \mod n$.
 
 Observe that 
 \[
-g(b, f(a, m)) = (m^a)^b =m^{ab}=m^{k\varphi(n)+1}=(m^{\varphi(n)})^{k}m = m \mod n
+    g(b, f(a, m)) = (m^a)^b =m^{ab}=m^{k\varphi(n)+1}=(m^{\varphi(n)})^{k}m = m \mod n
 \]
-, because $ab = 1 \mod \varphi(n)$.
+because $ab = 1 \mod \varphi(n)$.
 
-So we conjecture that the above is a valid TDP-based PKE scheme. This is actually called the ``RSA assumption'':
+So we conjecture that the above is a valid \tdp-based \pke scheme. This is actually referred to as the \emph{\rsa{} assumption}, and is depicted in figure \ref{cryptogame:rsaass}
 
-\begin{figure}[h!]
-    \centering
-    \sdinit{}
-    \begin{tikzpicture}
-        \sdbegin{}
+\begin{cryptogame}
+    {rsaass}
+    {The \rsa{} assumption}
+    {rsa}
 
-        \newinst{A}{$ \mathcal{A} $}     % Adversary
-        % NOTE: the bracketed value expresses the distance between the two entities
-        \newinst[3]{C}{$ C^{\textsc{rsa}} $}  % Challenger
+    \receive{\shortstack[l]{
+        $b \pickUAR \{0, 1\}$ \\
+        $c \pickUAR \textrm{Enc}(pk, m_b)$
+    }}{$n, pk, m^{pk}$}{}
 
-        % BEGIN
+    \cseqdelay
 
-        % Adversary asks for the challenge
-        \postlevel
-        \mess{C}{$n, pk, m^{pk}$}{A}
-        \node[anchor=west] at (mess from) { \shortstack[l]{
-            $ b \pickUAR \{0, 1\} $ \\
-            $ c \pickUAR Enc(pk, m_b) $
-        }};
+    \send{}{$m'$}{\textsc{Output 1 iff} $m' = m$}
 
-        % Adversary guesses the plaintext
-        \postlevel
-        \mess{A}{$m'$}{C}
-        \node[anchor=west] at (mess to) {
-            \small{Output 1 iff $m' = m$}
-        };
-      
-        \sdend{}
-    \end{tikzpicture}
-    \caption{Depiction of the RSA assumption}
-    \label{fig:game_pke-rsa}
-\end{figure}
+\end{cryptogame}
 
-Relation to the factoring problem: $\textsc{rsa} \implies \textsc{fact}$
+
+Relation to the factoring problem: $\rsa \implies \textsc{fact}$
 
 Proof: Given $p, q$, an adversary can compute $\varphi(n) = (p-1)(q-1)$, and then find the inverse of the public key in $\mathbb{Z}_{pq}^\times$.
 
-It hasn't been proven that $\textsc{fact} \implies \textsc{rsa}$
-
-
-
-
-
-
-
+It hasn't been proven that $\textsc{fact} \implies \rsa$
 
 
 \section{Textbook RSA}
@@ -241,13 +219,13 @@ Since $Z_p^*$ is cyclic I can always write:
     \QR[p]=\{g^0,g^2,g^4,\ldots,\overbrace{g^{p-3}}^{g^{\frac{p-1}{2}-1} in Z_p^*},\underbrace{g^0}_{g^{\frac{p-1}{2}}in Z_p^*},\ldots\}\\
     |\QR[p]|=\frac{p-1}{2}
 \end{gather*}
+
 Moreover, since $(g^{\frac{p-1}{2}})^2 \equiv 1 \Mod{p} $ and $g^{\frac{p-1}{2}}$
 cannot be 1 (since $g^{0}\not=g^{\frac{p-1}{2}}\not=g^{p-1}$ ) but must be one
 of the $p-1$ elements of $Z_{p}^{*}$, then
-$g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.\\
+$g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.
 
-Now it's possible to show that $f: \QR[p]\to \QR[p] $ is a permutation, and we
-are going to show a method to invert it, aka $f^{-1}$.\\
+Now it's possible to show that $f: \QR[p]\to \QR[p] $ is a permutation, and we are going to show a method to invert it, aka $f^{-1}$.
 
 Assume $p\equiv 3 \Mod{4}$
 ([*]$p=4t+3\Rightarrow t=\frac{p-3}{4}$), then squaring $Mod{p}$ is a permutation because, given
@@ -257,17 +235,13 @@ Assume $p\equiv 3 \Mod{4}$
     \implies x=\pm y^{t+1} \end{gather*}
 
 But only 1 among the above $\pm y^{t+1}$ is a square, in particular only the
-positive one.\\
-Since we have that 
+positive one. Since we have that:
 \[ 
     p=k4+3 \Rightarrow \frac{p-1}{2}=\frac{4k+2}{2}=2k+1
 \]
-so $\frac{p-1}{2}$ is odd.\\
+so $\frac{p-1}{2}$ is odd.
 
-Now, since we are considering just $\QR[p]=\{y \in \mathbb{Z}_{p}^{*} : \exists
-x \in \mathbb{Z}_{p}^{*} x^{2}=y\}$ and we can write each $x \in
-\mathbb{Z}_{p}^{*} $ as
-$g^{z}$ for a $z \in \mathbb{Z}_{p}$, 
+Now, since we are considering just $\QR[p]=\{y \in \mathbb{Z}_{p}^{*} : \exists x \in \mathbb{Z}_{p}^{*} x^{2}=y\}$ and we can write each $x \in \mathbb{Z}_{p}^{*} $ as $g^{z}$ for a $z \in \mathbb{Z}_{p}$, 
 \[
     y=x^{2} \Leftrightarrow y=(g^{z})^{2}=g^{2z}
 \]
@@ -277,17 +251,14 @@ So, $y=g^{z'} \in \QR[p] \Leftrightarrow z'$ is even. If $z'$ is odd, then $y \n
 Since $\frac{p-1}{2}$ is odd, then $g^{\frac{p-1}{2}} \not\in \QR[p]$, and since
 it is possible to generate all of the other numbers with odd exponents 
 \[
-g^{odd}=g^{\frac{p-1}{2} \pm even}=g^{\frac{p-1}{2}}g^{ \pm even} \Rightarrow
--1(g^{\pm even})
+    g^{odd}=g^{\frac{p-1}{2} \pm even}=g^{\frac{p-1}{2}}g^{ \pm even} \Rightarrow -1(g^{\pm even})
 \]
-and $g$ powered to odd exponents will have this form.\\
+and $g$ powered to odd exponents will have this form.
 
-From that, it's possible to state the following
+From that, it's possible to state the following:
 \begin{lemma}
     $\forall z, z\in \QR[p] \implies  -z \notin \QR[p]$
 \end{lemma}
-
-
 
 \subsection{Rabin's Trapdoor permutation}
 
@@ -297,7 +268,7 @@ The \textit{Rabin trapdoor permutation} is defined as
 \[
     f(x)=x^{2} \text{ mod } n
 \]
-where $n=p*q$ for primes $p,q=3 \text{mod} 4$.\\
+where $n=p*q$ for primes $p,q=3 \text{mod} 4$.
 
 We can observe that the image of this function is $\QR[n]$, a subset of $\mathbb{Z}^{*}_{n} $.
 
@@ -307,7 +278,7 @@ as follows
     x= (x_{p}, x_{q}) \mapsto (x^{2}_{p}, x^{2}_{q})
 \]
 since each element of $ \mathbb{Z}_n$ has always two different forms , in $
-\mathbb{Z}_{p} $ and in $ \mathbb{Z}_{q} $.\\
+\mathbb{Z}_{p} $ and in $ \mathbb{Z}_{q} $.
 
 So
 \[
@@ -320,16 +291,15 @@ As before, the image of $f$ is exactly
     \mathbb{QR}_{n} = \{ y: \exists x : y=x^{2} \text{ mod } n\}
 \]
 
-If we try to invert the function $f$, even without applying the previous
-inversion algorithm, we easily note that among the 4 possible values
+If we try to invert the function $f$, even without applying the previous inversion algorithm, we easily note that among the 4 possible values:
+
 \[
     f^{-1}(y)=\{ (x_{p}, x_{q}),(-x_{p}, x_{q}),(x_{p},- x_{q})(-x_{p},- x_{q})\}
 \]\label{les15:outoffour}
-only 1 is a quadratic residue since we said, in the
-last lemma, that only one out of
-$-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.\\
 
-Therefore, we have that the Rabin's TDP is a permutation in $\QR[n]$, and that the cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.\\
+only 1 is a quadratic residue since we said, in the last lemma, that only one out of $-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.
+
+Therefore, we have that the Rabin's TDP is a permutation in $\QR[n]$, and that the cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.
 
 Furthermore, with the following claim we can state that the Rabin cryptosystem
 is OWF thanks to the hardness of factoring.
@@ -337,32 +307,27 @@ is OWF thanks to the hardness of factoring.
 \begin{claim}
     Given $x, z$ such that $x^{2}\text{ mod} n \equiv z^{2} \text{ mod } n
     \equiv y$ mod $n$,
-\[
-    x\not= \pm z \Rightarrow \text{ we can factor } n
-\]
+    \[
+        x \neq \pm z \Rightarrow \text{ we can factor } n
+    \]
 \end{claim}
+
 \begin{proof}
-    Since $f^{-1}(y)$ has only one value out of four, $x\neq \pm z$ and
-    $z\in \{(x_{p},x_{q}),(-x_{p},-x_{q})\}$ , then
-    $x \in \{(x_{p},-x_{q}),(-x_{p},x_{q})\}$ and 
+    Since $f^{-1}(y)$ has only one value out of four, $x\neq \pm z$ and $z\in \{(x_{p},x_{q}),(-x_{p},-x_{q})\}$ , then $x \in \{(x_{p},-x_{q}),(-x_{p},x_{q})\}$ and 
     \[
         x + z \in \{(0,2x_{q}), (2x_{p}, 0)\}
     \]
 
-    Now assume $x + z = (2x_{p}, 0)$ without loss of generality, since the proof for the other case is the same.
-
-    We have that $x+z \equiv 0$ mod $q$ and $x+z \not\equiv 0 $ mod $p$.
-
-    But then $gcd( x+z , n)=q$, and we obtain $q$.
+    Now assume $x + z = (2x_{p}, 0)$ without loss of generality, since the proof for the other case is the same. We have that $x+z \equiv 0$ mod $q$ and $x+z \not\equiv 0 $ mod $p$. But then $gcd( x+z , n)=q$, and we obtain $q$.
 \end{proof}
 
 \begin{theorem}
-    Squaring mod $n$ (where $n$ is a \textit{bloom integer}\footnote{ a bloom
-    integer $n$ is $n=p,q$ for $p,q=3 mod 4$, as the definition of Rabin's TDP})
-    is a \textbf{trapdoor permutation} under factoring.
+    Squaring mod $n$, where $n$ is a \emph{Blum integer}\footnotemark is a trapdoor permutation under the factoring assumption.
 \end{theorem}
-Since we have already shown tha Rabin's function is a permutation since it is
-invertible, we have to show that Rabin's function is also OWF.
+
+\footnotetext{a Blum integer $n$ is the product of two numbers $p$ and $q$ such that $p,q = 3 \mod 4$, as the definition of Rabin's \tdp}
+
+Since we have already shown tha Rabin's function is a permutation since it is invertible, we have to show that Rabin's function is also OWF.
 
 In other words
 \[
@@ -371,51 +336,43 @@ In other words
 \]
 The following proof is by contraddiction.
 \begin{proof}
-    Assume that exists an adversary PPT who, given $y=x^{2} \text{ mod }
-    n$, can find a $z \in \mathbb{Z}_{n} $ such that $z^{2} \text{ mod } n=y$
-    but $z\neq \pm x$ .\\
+    Assume that exists an adversary PPT who, given $y=x^{2} \text{ mod } n$, can find a $z \in \mathbb{Z}_{n} $ such that $z^{2} \text{ mod } n=y$ but $z\neq \pm x$ .
 
-    We can build the following reduction to show that $\A$ choses $x$:
+    We can build the following reduction to show that $\A$ choses $x$, here $\mathcal{BG}en$ is a sampler for Blum integers:
 
-\begin{figure}[ht]
-   \centering
-   \sdinit{}
-   \begin{tikzpicture}
-      \sdbegin{}
-      \newinst{A}{$ \A^{Rabin} $}
-      \newinst[2.5]{B}{$ \A_{fact} $}
-      \newinst[2]{C}{$\C_{(p,q,n) \leftarrow\$ Genbloom \wedge p,q \equiv 3
-      \text{ mod } 4}$}
-      
-            \postlevel
-            \mess{C}{$n=pq$}{B}
-            \node[anchor=west] at (mess to) {  };
-      
-      \postlevel
-      \mess{B}{$n,y$}{A}
-      \node[anchor=west] at (mess from) {\shortstack[l]{
-      $ x \leftarrow\$ \mathbb{Z}^{*}_{n} $
-      \\
-      $ y=x^{2} $ mod $n$
-      }  };
-
-      \postlevel
-      \mess{A}{$z$}{B}
-      \node[anchor=west] at (mess to) {\shortstack[l]{
-              $ f(z)=f(x) $ 
-             }};
-
-
-      \sdend{}
-      \sdend{}
-   \end{tikzpicture}
-\end{figure}
-
-Once obtained $z\neq \pm x$ which $z^{2}=y$ we can use \textbf{Claim 1}(just
-summing $x$ and $z$ and analyzing the result) to factorize $n$ in
-polytime.\\
-
-But factorizing $n$ in polytime is not possible.
+    \begin{figure}[ht]
+       \centering
+       \sdinit{}
+       \begin{tikzpicture}
+          \sdbegin{}
+          \newinst{A}{$ \A^{Rabin} $}
+          \newinst[2.5]{B}{$ \A_{fact} $}
+          \newinst[2]{C}{$\C_{(p,q,n) \pickUAR \mathcal{BG}en \wedge p,q \equiv 3
+          \text{ mod } 4}$}
+          
+                \postlevel
+                \mess{C}{$n=pq$}{B}
+                \node[anchor=west] at (mess to) {  };
+          
+          \postlevel
+          \mess{B}{$n,y$}{A}
+          \node[anchor=west] at (mess from) {\shortstack[l]{
+          $ x \pickUAR \mathbb{Z}^{*}_{n} $
+          \\
+          $ y=x^{2} $ mod $n$
+          }  };
+    
+          \postlevel
+          \mess{A}{$z$}{B}
+          \node[anchor=west] at (mess to) {\shortstack[l]{
+                  $ f(z)=f(x) $ 
+                 }};
+    
+    
+          \sdend{}
+          \sdend{}
+       \end{tikzpicture}
+    \end{figure}
+    
+    Once obtained $z\neq \pm x$ which $z^{2}=y$ we can use \textbf{Claim 1}(just summing $x$ and $z$ and analyzing the result)  to factorize $n$ in polytime. But factorizing $n$ in polytime is not possible.
 \end{proof}
-
-

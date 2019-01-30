@@ -49,14 +49,14 @@ Some additional notes (may be incorrect):
 
 
 \begin{theorem}
-    Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$ is Membership-hard, then the above scheme is \textsc{cca}-secure.
+    Assuming $\pi_1$ is 1-universal, $\pi_2$ is 2-universal and $L$ is a membership-hard language; then the above scheme is \textsc{cca}-secure.
 \end{theorem}
 
 \begin{proof}
-    Five different games will be defined, from $\textsc{Game}_{\Pi, A}^0$ up to $\textsc{Game}_{\Pi, A}^4$; the first game will be an analogous formalization of how the above \textsc{pke} scheme works. It shall be proven that, for either fixed b in $\{0, 1\}$:
-    \begin{equation*}
-        \textsc{Game}_{\Pi, A}^0(\lambda, b) = \textsc{Game}_{\Pi, A}^1(\lambda, b) \approx_C \textsc{Game}_{\Pi, A}^2(\lambda, b) \approx_S \textsc{Game}_{\Pi, A}^3(\lambda, b) = \textsc{Game}_{\Pi, A}^4(\lambda, b)
-    \end{equation*}
+    Five different games will be defined, from $\cryptog{0}$ up to $\cryptog{4}$; the first game will be an analogous formalization of how the above \textsc{pke} scheme works. It shall be proven that, for arbitrarily fixed $b$ in $\{0, 1\}$:
+    \[
+        \cryptog{0}(\lambda, b) \equiv \cryptog{1}(\lambda, b) \approx_C \cryptog{2}(\lambda, b) \approx_S \cryptog{3}(\lambda, b) \equiv \cryptog{4}(\lambda, b)
+    \]
     and finally that $\textsc{Game}_{\Pi, A}^4(\lambda, 0) = \textsc{Game}_{\Pi, A}^4(\lambda, 1)$, therefore concluding that $\textsc{Game}_{\Pi, A}^0(\lambda, 0) \approx_C \textsc{Game}_{\Pi, A}^0(\lambda, 1)$, and proving this scheme is \textsc{cca}-secure.
 
     \todo{Non sono per niente sicuro riguardo all'origine di $x$ ed $y$, né tantomeno dove sia definito il sampler per essi}
@@ -250,12 +250,12 @@ Some additional notes (may be incorrect):
         \Pi_{1}=\tau_{1}=Ver_{1}(\tau, y)\\
          \Pi_{2}= \tilde{\Pi}_{2}=Ver_{2}(\tau, y)
     \end{gather*}
-    with probability 1 over the choice of $(\omega_{1}, \tau_{1}) \leftarrow\$
+    with probability 1 over the choice of $(\omega_{1}, \tau_{1}) \pickUAR
     Setup_{1}(1^{\lambda})$
     
     \begin{gather*}
         \Pi_{1} \leftarrow Prove_{1}(\omega, y, x), (\omega_{2},
-        \tau_{1})\leftarrow\$ Setup_{2} (1^{\lambda})\\
+        \tau_{1})\pickUAR Setup_{2} (1^{\lambda})\\
         \Pi_{2} \leftarrow Prove(\omega_{2}, (y, l), x) \forall y \in L , l \in
         \P_{1}
     \end{gather*}
@@ -362,7 +362,7 @@ Given a group $\G$ of order $q$ with $(g_1,g_2)$ as generators, we will have $(g
 Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
 
 \begin{itemize}
-    \item $Setup(1^\lambda)$: Pick $x_1,x_2 \leftarrow\$ \Z_q$ and define:\\ $\omega=h_1=(g_1^{x_1},g_2^{x_2}$), $\tau=(x_1,x_2)$
+    \item $Setup(1^\lambda)$: Pick $x_1,x_2 \pickUAR \Z_q$ and define:\\ $\omega=h_1=(g_1^{x_1},g_2^{x_2}$), $\tau=(x_1,x_2)$
     \item $Prove(\omega, \underbrace{(c_1,c_2)}_{y}, r)$ output $\Pi=\omega^2$
     \item $Verify(\tau, \underbrace{(c_1,c_2)}_{y})$ output $\widetilde{\Pi}=c_1^{x_1}c_2^{x_2}$ %pretty shitty tilde here, I need a bigger tilde to cover the full length of Pi -> \usepackage{stackengine} \usepackage{scalerel} added in macro
 \end{itemize}
@@ -413,7 +413,7 @@ Now we can define our U-HPS $\Pi:=$(Setup, Prove, Verify)
 
 \begin{itemize}
     \item $Setup(1^\lambda)$: \begin{itemize}
-        \item Pick $x_3,x_4,x_5,x_6 \leftarrow\$ \Z_q$ and define:
+        \item Pick $x_3,x_4,x_5,x_6 \pickUAR \Z_q$ and define:
         \begin{itemize}
             \item $\omega=(h_2,h_3,s)=(g_1^{x_3},g_2^{x_4},g_1^{x_5},g_2^{x_6},s)$ where $s$ is a \textbf{seed} for a CRH$\rightarrow \H=\{H_s\}$ %\item $\tau=(x_3,x_4,x_5,x_6)$
         \end{itemize}

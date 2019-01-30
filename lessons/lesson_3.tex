@@ -1,7 +1,8 @@
 \mychapter{3}{Lesson 3} %181003
 
 \section{Randomness Extraction}
-\textbf{Goal:} extract "real" randomness from "imperfect" randomness.\\
+
+\textbf{Goal:} extract "real" randomness from "imperfect" randomness.
 
 \bigskip
 Suppose to have a biased coin $B s.t. Pr[B=0]=p\neq \frac{1}{2}$ and\\ $Pr[B=1]=1-p$.\\
@@ -34,7 +35,8 @@ Can you make it uniform?
     Where $max_x$ is the x that maximize the probability.
 \end{definition}
 \begin{example}
-    Say $X=\{0,1\}^n$\\
+    Say $X=\{0,1\}^n$
+
     \begin{enumerate}
         \item $X$ is constant($Pr[X=\bar{x}]=1, Pr[X=x\neq \bar{x}]=0$)\\
         $\implies H_{\infty}(X)=0$
@@ -83,7 +85,8 @@ Can you make it uniform?
 \end{proof}
 
 \begin{theorem}
-    \textbf{Way-Out-Seeded-Extractor} allow $X$ to take SMALL uniformly random SEED(catalyst)\\
+    \textbf{Way-Out-Seeded-Extractor} allow $X$ to take SMALL uniformly random SEED(catalyst)
+
     $$Ext: \underbrace{\{0,1\}^d}_{seed(public)}\times \underbrace{\{0,1\}^n}_{input} \to \underbrace{\{0,1\}^m}_{output}$$
 \end{theorem}
 \begin{definition}

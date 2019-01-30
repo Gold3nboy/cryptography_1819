@@ -24,8 +24,8 @@ Venturi said something here related to Weil pairing over an elliptic curve. I fo
 Now $KGen(1^{\lambda})$ will:
 \begin{itemize}
     \item Generate some params $ =(\G,\G_t,g,q,\hat{e})\leftarrow BilGen(1^{\lambda})$ 
-    \item Pick $a \leftarrow\$ \Z_q$ then $g_1=g^a$
-    \item Pick $g_2=g^b$ and $g_2,u_0,u_1,...,u_k \leftarrow\$ \G$.
+    \item Pick $a \pickUAR \Z_q$ then $g_1=g^a$
+    \item Pick $g_2=g^b$ and $g_2,u_0,u_1,...,u_k \pickUAR \G$.
     \item Then output: 
     \begin{itemize}
         \item $P_k=(params, g_1,g_2,u_0,...,u_k)$

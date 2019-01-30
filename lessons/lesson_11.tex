@@ -3,7 +3,7 @@
 % "The age of ULTRON" - wanted to keep that somewhere...
 \section{Authenticated encryption (continued)}
 
-Having proven \cpa-security of an authenticated encryption scheme in an \emph{Encrypt-then-Tag} mode, it remains to prove that it has the \textsc{auth} property. Before this, a new unforgeability definition is needed:
+Having proven that an authenticated encryption scheme in an \emph{Encrypt-then-Tag} mode is \cpa-secure, it remains to prove that it has the \textsc{auth} property. Before this, a new unforgeability definition is needed:
 
 \begin{definition}
     Let $\Pi = (\textit{Tag}, \textit{Verify})$ be a \mac{} scheme. Then $\Pi$ is \textsc{eufcma}-secure iff it is \ufcma-secure, that is:
@@ -27,7 +27,7 @@ Note the small difference in security between \ufcma{} and \textsc{eufcma}.
         {ettauth}
         {Breaking authenticity of $\Pi_2$}
         {eufcma$_2$}
-        {auth}
+        {auth}[1.7]
 
         \cseqbeginloop
 
@@ -47,14 +47,16 @@ Note the small difference in security between \ufcma{} and \textsc{eufcma}.
             $c^* \notin C$ \\
             $\phi^* \notin \Phi$
         }}{$(c^{*}, \phi^{*})$}{}
-        \send{}{$(c^*, \phi^*)$}{\shortstack[l]{\textsc{Output 1 iff} \\ $\quad \textit{Verify}_k(c^*, \phi^*) = 1$}}
+        \send{}{$(c^*, \phi^*)$}{\shortstack[l]{
+            \textsc{Output 1 iff} \\
+            $\quad \textit{Verify}_k(c^*, \phi^*) = 1$}}
 
     \end{cryptoredux}
 
 From $A^{auth}$ perspective, all the couples $(c_{i}, \phi_{i})$ received are made with the following schema:
 
 \begin{equation*}
-    c_{i} \in Enc(k_{1}, m \in \M) \wedge \phi_{i}\leftarrow\$ Enc(k_{2}, c_{i})
+    c_{i} \in Enc(k_{1}, m \in \M) \wedge \phi_{i}\pickUAR Enc(k_{2}, c_{i})
 \end{equation*}
 
 Since $\A^{auth}$ wins $Game^{auth}$, the challenge couple $(c^{}{*}, \phi^{*})$ which breaks $Game^{auth}$ will be produced to be decrypted as

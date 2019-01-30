@@ -187,9 +187,9 @@ Some useful observations can be made about this scheme:
     % I'd like to expand a bit more here, or else it may stay a bit obscure...
     \begin{align*}
         & (c_1\cdot c_1', c_2\cdot c_2') \\
-        =\;& (g^{r+r'}, h^{r+r'}(m\cdot m')) \\
+        =& (g^{r+r'}, h^{r+r'}(m\cdot m'))
     \end{align*}
-    thus, decrypting $c\cdot c'$, gives $m\cdot m'$.\\
+    thus, decrypting $c\cdot c'$, gives $m\cdot m'$.
     
     \item It is \textbf{re-randomizable}: Given a ciphertext $(c_1, c_2)$, and $r' \pickUAR \mathbb{Z}_q$, then computing $(g^{r'}\cdot c_1, h^{r'}\cdot c_2)$ results in a ``fresh'' encryption for the same message: the random value used at the encryption step will change from the original $r$ to $r+r'$
 \end{itemize}
@@ -332,12 +332,12 @@ we have
     ( \omega, Ver(\tau, y_{1}), \ldots, Ver(\tau, y_{t}))=(\omega, v_{1},
     \ldots, v_{t})
 \]
-where $(\omega, \tau) \leftarrow\$ Setup(1^{\lambda})$ and $v_{1}, \ldots, v_{t}
-\leftarrow\$ \P$ where $\P$ should be the proofs' space.
+where $(\omega, \tau) \pickUAR Setup(1^{\lambda})$ and $v_{1}, \ldots, v_{t}
+\pickUAR \P$ where $\P$ should be the proofs' space.
 \end{definition}
 
 \subsubsection{Enriching DV-NIKZ}
-Can we enrich DV-NIKZ with labels $l \in \{0,1\}^{*}$?\\
+Can we enrich DV-NIKZ with labels $l \in \{0,1\}^{*}$?
 
 Suppose to have the following:
 \[
@@ -352,16 +352,16 @@ l_{i})$.
     Language $L$ is \textit{ \textbf{MH}}if $ \exists  \bar{L}$ such that:
     \begin{enumerate}
         \item $L \cap \bar{L} = \emptyset$
-        \item $ \exists$ PPT \textit{Samp} outputting $y \leftarrow\$ \Y$
+        \item $ \exists$ PPT \textit{Samp} outputting $y \pickUAR \Y$
             together with $x \in \bar{\X}$ such that 
             \[
               R(y,x)=1  
             \]
             (it's possible
-            to say that $Samp(1^{\lambda}) \leftarrow\$ (y,x)$)
-        \item $ \exists$ PPT $\bar{Samp}$ outputting $y \leftarrow\$ \bar{L}$
-        \item $\{y:(y,x) \leftarrow\$ Samp(1^{\lambda})\} \approx_{c} \{y:y
-            \leftarrow\$ \bar{Samp}(1^{\lambda})\}$
+            to say that $Samp(1^{\lambda}) \pickUAR (y,x)$)
+        \item $ \exists$ PPT $\bar{Samp}$ outputting $y \pickUAR \bar{L}$
+        \item $\{y:(y,x) \pickUAR Samp(1^{\lambda})\} \approx_{c} \{y:y
+            \pickUAR \bar{Samp}(1^{\lambda})\}$
     \end{enumerate}
     
 \end{definition}

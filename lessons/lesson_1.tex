@@ -56,28 +56,40 @@ $\forall m \in \M, \forall k \in \K : Dec(k, Enc(k,m))=m$
     
     $(II)\implies(III)$
     Fix M, any $m\in M, c\in C$
-    \begin{gather*}
-        Pr[Enc(K,m)=c]=Pr[Enc(K,M)=c|M=m]=Pr[C=c|M=m]=Pr[C=c]   
-    \end{gather*}
+    \begin{align*}
+        &\Pr[\textsf{Enc}(K,m)=c]= \\
+        =&\Pr[\textsf{Enc}(K,M)=c|M=m]= \\
+        =&\Pr[C=c|M=m]=\Pr[C=c]   
+    \end{align*}
 
     $(III)\implies(I)$
-    \begin{gather*}
-        Pr[C=c]=\sum_{m'}Pr[C=c\wedge M=m']=\\
-        =\sum_{m'}Pr[Enc(K,M)=c\wedge M=m']=\\
-        =\sum_{m'}Pr[Enc(K,M)=c| M=m']Pr[M=m']=\\
-        =\sum_{m'}Pr[Enc(K,m')=c]Pr[M=m']= \text{(Using III)}\\
-        =Pr[Enc(K,m)=c]\underbrace{\sum_{m'}Pr[M=m']}_{=1}=\\
-        =Pr[Enc(K,m)=c]=Pr[Enc(K,M)=c|M=m]=\\
-        =\underbrace{Pr[C=c|M=m]}_{\text{\shortstack{The proof ends here\\but we want (I)}}}\implies Pr[M=m]Pr[C=c|M=m]\implies\\
-        \implies P[M=m]=\frac{Pr[C=c]Pr[M=m|C=c]}{Pr[C=c|M=m]}\\
-        \implies Pr[M=m]=Pr[M=m|C=c]
-    \end{gather*}
+    
+    \begin{align*}
+        \Pr[C=c] =& \sum_{m'}Pr[C=c\wedge M=m'] & \\
+        =& \sum_{m'}Pr[Enc(K,M)=c\wedge M=m'] & \\
+        =& \sum_{m'}Pr[Enc(K,M)=c| M=m']Pr[M=m'] & \\
+        =& \sum_{m'}Pr[Enc(K,m')=c]Pr[M=m'] & \text{(Using III)} \\
+        =& \Pr[Enc(K,m)=c]\sum_{m'}Pr[M=m'] & \\
+        =& \Pr[Enc(K,m)=c] & \text{(Using total prob.)} \\
+        =& \Pr[Enc(K,M)=c|M=m] & \\
+        =& \Pr[C=c|M=m] &
+    \end{align*}
+
+    Furthermore:
+
+    % AP190126: Correctness on these parts isn't verified, I may have rewrote them wrong...
+    \begin{align*}
+        \Pr[C=c] = \Pr[C=c|M=m] \implies& \Pr[M=m] = \Pr[C=c|M=m] \\
+        \implies& \Pr[M=m] = \frac{\Pr[C=c]\Pr[M=m|C=c]}{\Pr[C=c|M=m]} \\
+        \implies& \Pr[M=m] = \Pr[M=m|C=c]
+    \end{align*}
+
 \end{proof}
 
 \section{One Time Pad (OTP)}
 
 $K=M=C=\{0,1\}^l$\\
-$K\leftarrow\$ \{0,1\}^l$
+$K\pickUAR \{0,1\}^l$
 \begin{itemize}
     \item $Enc(k,m)=k\xor m=c$
     \item $Dec(k,c)=k\xor c=m$

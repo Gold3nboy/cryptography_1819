@@ -34,7 +34,7 @@ $$Pr[Mac(K,m')=\phi'|Mac(K,m)=\phi]\leq \epsilon$$
 \bigskip
 Tool:\textbf{ Pairwise Independent Hashing} 
 \begin{definition}
-    A family of (Hash) functions $H=\{h_s:\M \to \Phi\}_{s\in S}$ is \underline{Pairwise Independent} if $\forall m,m' \in \M s.t m\neq m'$ we have that $(h_s(m),h_s(m'))$ is uniform over $\Phi^2$ for random choice of seed $s \in S$. Meaning that:
+    A family of (Hash) functions $H=\{h_s:\M \to \Phi\}_{s\in S}$ is said to be \emph{pairwise independent} iff, for any two distinct messages $m$ and $m'$, we have that $(h_s(m),h_s(m'))$ is uniform over $\Phi^2$ for random choice of seed $s \in S$. Meaning that:
     \begin{gather*}
         \forall m,m' s.t. m\neq m',\forall \phi,\phi' \in \Phi \\
         Pr[h_s(m)=\phi \wedge h_s(m')=\phi']=\frac{1}{|\Phi|^2}

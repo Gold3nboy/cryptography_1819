@@ -1,5 +1,6 @@
 \mychapter{10}{Lesson 10} %181026
 
+% AP190125: Yeah, that's impossible to hyphenate...
 \section{Domain extension for \prf-based \mac{} schemes}
 
 \subsection{Hash function families from \prf{}s}
@@ -66,7 +67,7 @@ We can use this function to create an \textbf{encrypted CBC}, or \textbf{E-CBC}:
 \end{proof}
 
 \subsection{XOR MAC}
-Instead of $\F(\H)$ now the $Tag()$ function outputs $\phi = (\eta , F_{k}(\eta) \xor h_{s}(m))$ where $\eta \leftarrow\$ \{0,1\}^{n}$ is random and it's called \textit{nonce}.
+Instead of $\F(\H)$ now the $Tag()$ function outputs $\phi = (\eta , F_{k}(\eta) \xor h_{s}(m))$ where $\eta \pickUAR \{0,1\}^{n}$ is random and it's called \textit{nonce}.
 
 Authentication is done as:
 \[

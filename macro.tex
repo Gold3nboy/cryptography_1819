@@ -28,20 +28,17 @@
 \usepackage{preview}
 \usepackage{color}
 \usepackage{framed}
-\usepackage{preview}
 \usepackage{stackengine}
 \usepackage{scalerel}
 \usepackage{enumerate}
 \usetikzlibrary{tikzmark,decorations.pathreplacing,positioning,shapes,fit,arrows}
-\makeatletter
-\usepackage{framed}
-\usepackage{color}
+%\makeatletter
 \usepackage[normalem]{ulem} % For strikethrough text
 \newcommand{\review}[1]{
-  \definecolor{shadecolor}{rgb}{1,1,0} % this is yellow
-  \begin{shaded}
-  REVIEW: #1
- \end{shaded}
+    \definecolor{shadecolor}{rgb}{1,1,0} % this is yellow
+    \begin{shaded}
+    REVIEW: #1
+    \end{shaded}
 }
 
 \newcommand{\mychapter}[2]{
@@ -52,8 +49,7 @@
 }
 
 
-%this is used to create space between \forall, \exist [ and others ] with the
-      %next character
+%this is used to create space between \forall, \exist [ and others ] with the next character
 \let\eps\varepsilon
 \newcommand\+{\mkern2mu}
 
@@ -256,7 +252,7 @@
 %    \thmt@contentslineShow% default:show
 %  }%
 %}
-\makeatother
+%\makeatother
 
 
 \theoremstyle{plain}
@@ -323,11 +319,11 @@
 \newcommand{\notodo}[1]{
 }
 \newcommand{\todo}[1]{
-  \stepcounter{t0d0_counter}
-  \definecolor{shadecolor}{rgb}{1,1,0} % this is yellow
-  \begin{shaded}
-  T0D0 \arabic{t0d0_counter}: #1
-  \end{shaded}
+    \stepcounter{t0d0_counter}
+    \definecolor{shadecolor}{rgb}{1,1,0} % this is yellow
+    \begin{shaded}
+    T0D0 \arabic{t0d0_counter}: #1
+    \end{shaded}
 }
 
 %----------------------IMAGES-----------------------------------
@@ -336,79 +332,79 @@
 
 % From http://tex.stackexchange.com/questions/164707/how-to-use-greek-letters-in-pgf-umlsd-or-generally-terms-starting-with
 \renewcommand{\mess}[4][0]{
-  \stepcounter{seqlevel}
-  \path
-  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
-  \addtocounter{seqlevel}{#1}
-  \path
-  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
-  \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]
-  {#3};
-  \node (\detokenize{#3} from) at (mess from) {};
-  \node (\detokenize{#3} to) at (mess to) {};
+    \stepcounter{seqlevel}
+    \path
+    (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+    \addtocounter{seqlevel}{#1}
+    \path
+    (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+    \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]
+    {#3};
+    \node (\detokenize{#3} from) at (mess from) {};
+    \node (\detokenize{#3} to) at (mess to) {};
 }
 % From http://tex.stackexchange.com/questions/98525/pgf-umlsd-and-externalize
 \newcommand{\sdinit}{%
-   \pgfdeclarelayer{umlsd@background}%
-   \pgfdeclarelayer{umlsd@threadlayer}%
-   \pgfsetlayers{umlsd@background,umlsd@threadlayer,main}%
+    \pgfdeclarelayer{umlsd@background}%
+    \pgfdeclarelayer{umlsd@threadlayer}%
+    \pgfsetlayers{umlsd@background,umlsd@threadlayer,main}%
 }
 \newcommand{\sdbegin}{%
-   \setlength{\unitlength}{1cm}%
-   \tikzstyle{sequence}=[coordinate]%
-   \tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum
-   height=0.8cm, minimum width=1.6cm, fill=white, 
-   drop shadow={opacity=1,fill=black}]%
-   \ifpgfumlsdroundedcorners%
-      \tikzstyle{inststyle}+=[rounded corners=3mm]%
-   \fi%
-   \tikzstyle{blockstyle}=[anchor=north west]%
-   \tikzstyle{blockcommentstyle}=[anchor=north west, font=\small]%
-   \tikzstyle{dot}=[inner sep=0pt,fill=black,circle,minimum size=0.2pt]%
-   \global\def\unitfactor{0.6}%
-   \global\def\threadbias{center}%
-   % reset counters
-   \setcounter{preinst}{0}%
-   \setcounter{instnum}{0}%
-   \setcounter{threadnum}{0}%
-   \setcounter{seqlevel}{0}%
-   \setcounter{callevel}{0}%
-   \setcounter{callselflevel}{0}%
-   \setcounter{blocklevel}{0}%
-   % origin
-   \node[coordinate] (inst0) {};%
+    \setlength{\unitlength}{1cm}%
+    \tikzstyle{sequence}=[coordinate]%
+    \tikzstyle{inststyle}=[rectangle, draw, anchor=west, minimum
+    height=0.8cm, minimum width=1.6cm, fill=white, 
+    drop shadow={opacity=1,fill=black}]%
+    \ifpgfumlsdroundedcorners%
+        \tikzstyle{inststyle}+=[rounded corners=3mm]%
+    \fi%
+    \tikzstyle{blockstyle}=[anchor=north west]%
+    \tikzstyle{blockcommentstyle}=[anchor=north west, font=\small]%
+    \tikzstyle{dot}=[inner sep=0pt,fill=black,circle,minimum size=0.2pt]%
+    \global\def\unitfactor{0.6}%
+    \global\def\threadbias{center}%
+    % reset counters
+    \setcounter{preinst}{0}%
+    \setcounter{instnum}{0}%
+    \setcounter{threadnum}{0}%
+    \setcounter{seqlevel}{0}%
+    \setcounter{callevel}{0}%
+    \setcounter{callselflevel}{0}%
+    \setcounter{blocklevel}{0}%
+    % origin
+    \node[coordinate] (inst0) {};%
 }
 \newcommand{\sdend}{%
-   \begin{pgfonlayer}{umlsd@background}%
-      \ifnum\value{instnum}>0%
-         \foreach \t [evaluate=\t] in {1,...,\theinstnum}{%
-            \draw[dotted] (inst\t) -- ++(0,-\theseqlevel*\unitfactor-2.2*\unitfactor);%
-         }%
-      \fi%
-      \ifnum\value{threadnum}>0%
-         \foreach \t [evaluate=\t] in {1,...,\thethreadnum}{%
-            \path (thread\t)+(0,-\theseqlevel*\unitfactor-0.1*\unitfactor) node (threadend) {};%
-            \tikzstyle{threadstyle}+=[threadcolor\t]%
-            \drawthread{thread\t}{threadend}%
-         }%
-      \fi%
-   \end{pgfonlayer}%
+    \begin{pgfonlayer}{umlsd@background}%
+        \ifnum\value{instnum}>0%
+            \foreach \t [evaluate=\t] in {1,...,\theinstnum}{%
+                \draw[dotted] (inst\t) -- ++(0,-\theseqlevel*\unitfactor-2.2*\unitfactor);%
+            }%
+        \fi%
+        \ifnum\value{threadnum}>0%
+            \foreach \t [evaluate=\t] in {1,...,\thethreadnum}{%
+                \path (thread\t)+(0,-\theseqlevel*\unitfactor-0.1*\unitfactor) node (threadend) {};%
+                \tikzstyle{threadstyle}+=[threadcolor\t]%
+                \drawthread{thread\t}{threadend}%
+            }%
+        \fi%
+    \end{pgfonlayer}%
 }
 
 
 
 \newcounter{listcount} \newcounter{totcount}
 \newcommand{\printarray}[2][1em]{% \printarray[<width>]{<array list>}
-  \unskip \setcounter{totcount}{0}% Reset totcount counter
-  \renewcommand*{\do}[1]{\stepcounter{totcount}}% Count elements
-  \docsvlist{#2}% Process list a first time to obtain # of elements
-  \setcounter{listcount}{0}% Reset listcount counter
-  \renewcommand*{\do}[1]{%
-    \stepcounter{listcount}% Move to next element
-    \framebox[#1][c]{\rule{0pt}{1.5ex}\smash{\ensuremath{##1}}}%
-    \ifnum\value{listcount}<\value{totcount}\thickspace\fi
-  }
-  \docsvlist{#2}% Process list a second time to typeset each element
+    \unskip \setcounter{totcount}{0}% Reset totcount counter
+    \renewcommand*{\do}[1]{\stepcounter{totcount}}% Count elements
+    \docsvlist{#2}% Process list a first time to obtain # of elements
+    \setcounter{listcount}{0}% Reset listcount counter
+    \renewcommand*{\do}[1]{%
+        \stepcounter{listcount}% Move to next element
+        \framebox[#1][c]{\rule{0pt}{1.5ex}\smash{\ensuremath{##1}}}%
+        \ifnum\value{listcount}<\value{totcount}\thickspace\fi
+    }
+    \docsvlist{#2}% Process list a second time to typeset each element
 }
 
 

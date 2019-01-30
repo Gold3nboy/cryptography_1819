@@ -70,12 +70,12 @@ Having defined a good notion of security in the \mac{} scheme domain, we turn ou
         By assuming there is a distinguisher $\distinguisher^{\ufcma}$ capable of disproving the lemma, it can be used to distinguish the \prf{} itself, as depicted by the reduction in figure \ref{cryptoredux:prfufcma}
     \end{proof}
 
-    % AP190107: Can't solve this overfull warning elegantly for now, leaving it as-is...
+    % AP190107: Not so pretty in the last message...
     \begin{cryptoredux}
         {prfufcma}
         {Distinguishing a \prf{} by using $\distinguisher^{\ufcma}$}
         {prf}
-        {ufcma}
+        {ufcma}[1.94]
 
         \cseqchallenger{\shortstack[l]{
             $k \pickUAR \{0, 1\}^\lambda$ \\
