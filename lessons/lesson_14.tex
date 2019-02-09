@@ -2,11 +2,38 @@
 
 \subsection{Decisional Diffie-Hellman assumption}
 
-% Quadratic residues
+Claim: \ddh is not hard for groups $\integer_p^\times$
+
+Proof: Let $Quad_p$ be the group of quadratic residues modulo $p$, group operation is multiplication.
+
+We can test if a give number $y$ is in Quad by checking if $y^{(p-1)/2} \equiv_p 1$, because:
+\[
+    y = g^{2z} \implies y^{(p-1)/2} = g^{2z(p-1)/2} = g^{z(p-1)} \equiv_p 1
+\]
+Otherwise: % AP190208: Not sure at all that this is correct
+\[
+    y \neq g^{2z} \implies y^{(p-1)/2} \equiv_p g^{z'(p-1)} \cdot g^{(p-1)/2} \not\equiv_p 1
+\]
+
+Claim: $g^{xy} \in Quad_p \implies 2 | x \vee 2 | y$
+
+???
+
+Can have a distinguisher; end of Proof
+
+Nevertheless, some otehr groups are believed to harden quadratic residue membership; such groups are $Quad_p$ itself, or the elliptic curve groups.
+
+%-------------------------
+
+Recall: DL is hard
+
+Extend: $g^x, g^{y_1}, g^{xy_1}, g^{y_2}, g^{xy_2}, g^{y_3}, g^{xy_3}, \dots$
+
+prove this is hard by hybrid arg
 
 \subsection{Naor-Reingold encryption scheme}
 
-% Everything?!
+
 
 \section{Public key encryption schemes}
 

@@ -1,14 +1,106 @@
 \mychapter{12}{Lesson 12} %181107
 \section{Hashing}
 
-% Collision-resistant hash functions
+Remember one solution to domain-exetension for \prf{}s, as a composition of a prf into an (almost) universal hash function. Hash functions compress their arguments to some fingerprint which is asssumed to be unique. But since this compression in this context inherently introduces information loss, it is not guarantedd that every message gets its own unique fingerprint. On the contrary, there will be some instances, which we all \emph{collisions}, where two messages yield the same hash value. So it is desirable for a hash function to be \emph{resistant} to these events, meaning that they are hard to reproduce.
+
+\begin{definition}
+    A function family $\H$ is deemed \emph{collision-resistant} iff the probability of finding a collision is negligible, even when given a fixed key $s$. Formally:
+    \[
+        \forall\; \ppt\; A \implies \Pr(\cryptog{crh}(\lambda) = 1) \in \negl{\lambda} 
+    \]
+
+    \begin{cryptogame}
+        {collresistdef}
+        {The corresponding \emph{collision-resistance} game}
+        {crh}
+
+        \receive{$s \pickUAR \{0, 1\}^\lambda$}{$s$}{}
+
+        \send{}{$x, y$}{\textsc{Output 1 iff} $H_s(x) = H_s(y)$}
+        
+    \end{cryptogame}
+\end{definition}
+
+A note: before, we were dealing with unbounded adversaries, and the key was hidden. Now the tables are turned: key is public, but the adversary must be efficient.
+
+Exercise: Let $\Pi$ be a \ufcma authentication scheme over the message space $\{0, 1\}^n$. Show that $\Pi' = (Tag', Verify') : Tag'_{k, s}(m) = Tag_k(H_s(m))$ is \ufcma-secure over $\{0l, 1\}^l$, where $l \in \poly(n)$, as long as $H$ is resistant to collisions.
 
 \subsection{Merkle-Damg\r{a}rd construction}
 
-\subsection{Domain extension}
+% AP190203: To review, it is somewhat confused
+First step: Compress the original message (assuming fixed size) by one bit
 
-% Merkle trees
+Let H be a one-bit shrinking function. Then, it can be used to construct a hash function H' that splits an arbitrary-size message into fixed-size blocks, apply H onto them, and return a digest of fixed length. This is exemplified by the diagram in figure \ref{fig:mdbase}
+
+\begin{figure}
+    \centering
+
+    \tikzstyle{int}   = [draw, minimum size=2em]
+    \tikzstyle{empty} = [minimum size=2em]
+    \tikzstyle{init}  = [pin edge={to-,thin,black}]
+
+    \begin{tikzpicture}[node distance = 1.9cm, auto, >=latex']
+
+        \node (a) [empty] {$\textsc{iv}$};
+        \node (r) [int, pin={[init]above:$b_1$}] [right of=a] {$H_s$};
+        \node (d) [int, pin={[init]above:$b_2$}] [right of=r] {$H_s$};
+        \node (e) [int, pin={[init]above:$b_3$}] [right of=d] {$H_s$};
+        \node (f) [empty] [right of=e] {$...$};
+        \node (g) [int, pin={[init]above:$b_n$}] [right of=f] {$H_s$};
+        \node (h) [empty, right of=g] {$\phi$};
+
+        \path[->] (a) edge (r);
+        \path[->] (r) edge node {$t_1$} (d);
+        \path[->] (d) edge node {$t_2$} (e);
+        \path[->] (e) edge node {$t_3$} (f);
+        \path[->] (f) edge node {$t_{n-1}$} (g);
+        \path[->] (g) edge (h);
+    
+    \end{tikzpicture}
+    \caption{Basic outline of a Merkle-Damg\r{a}rd construction}
+    \label{fig:mdbase}
+\end{figure}
+
+
+\begin{theorem}
+    Let H be a CRH function from n+1 to n bits, then the construction H' obtained from using merkle-damgard is a crh function
+\end{theorem}
+
+% AP190204: Tentative
+\begin{proof}
+    Assume H' can be broken efficiently by a distinguisher $\distinguisher^{\crh}$, meaning that finding two distinct block sequences that give the same hash is easy.
+
+    Ignore same blocks: find largest j such that:
+    \[
+        (b_j, y_{j-1}) \neq (b'_j, y'_{j-1}) \wedge H_s(b_j, y_{j-1}) = H_s(b'_j, y'_{j-1})
+    \]
+    this implies the rest of th message is equal, then the resulting final hash will be equal, thus for $j>0$ we have a collision.
+
+    % Proof ends here?!? ------------
+
+\end{proof}
+
+Not secure for VLM, 
+
+Lemma: MD strengthening (suffix freeness): Let $H_s \in \binary^{n + l} \to \binary^n$, then:
+\[
+    H'_s = H_s(\left<l'\right>, H_s(x_{l'}, \dots , H_s(x_1, 0^n) \dots)), |l'|, |x_i| \in \binary^c 
+\]
+
+Theorem: strengthened md is crh
+
+Proof: similar as above, case by case
+
+\subsection{Merkle trees}
 
 \subsection{Compression functions}
 
+Let ($gen, f, g)$ be a \pke scheme, where the functions are \prp{}s. A \emph{claw} is a couple of values $(x, x')$ such that $f_{pk}(x) = g_{pk}(x')$
+
+Theorem: Assuming $/F$ is claw-free, H is a crh function from n+l to n bits.
+
 % Davies-Meyer / AES
+
+$H(k, x) = E_k(x) \xor x$, maps n+$\lambda$ to n. E is AES
+
+% ???

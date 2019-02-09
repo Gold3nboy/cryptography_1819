@@ -11,10 +11,22 @@
 
 \ProvidesPackage{notation}[2018/09/21 v1.0-crypto The Notation]
 
+% More blackboard symbols
+\RequirePackage{bbm}
+% Symbol negation
+\RequirePackage{centernot}
+
 % Required for crypto games
 \RequirePackage{tikz}
 \usetikzlibrary{arrows,shadows} % shadows for the entities, arrows for the messages
 \RequirePackage{xparse} % Improved macro/environment definition commands
+
+% The integers
+\newcommand{\integer}{\mathbb{Z}}
+% The generic doubleton, or binary set, to be interpreted as {0, 1}
+\newcommand{\binary}{\mathbbm{2}}
+
+\newcommand{\notimplies}{\centernot\implies}
 
 % Cryptography
 %
@@ -59,6 +71,8 @@
 \newcommand{\prp}{\textsc{prp}}
 % TrapDoor Permutation
 \newcommand{\tdp}{\textsc{tdp}}
+% Collision Resistant Hash (function)
+\newcommand{\crh}{\textsc{crh}}
 
 % Chosen Plaintext Attack
 \newcommand{\cpa}{\textsc{cpa}}

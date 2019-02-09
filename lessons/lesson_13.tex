@@ -2,14 +2,159 @@
 
 \section{Number theory}
 
-% Fermat's last theorem
+\begin{theorem} \emph{Fermat's last theorem}
+    \[
+        \forall x, y, z \in \integer, n > 2 \implies x^n + y^n \neq z^n
+    \]
+\end{theorem}
 
-% Some group theory
+\begin{lemma}
+    \[
+        \forall a \in \integer_n : \gcd(a, n) > 1 \implies a \notin \integer_n^\times
+    \]
+\end{lemma}
 
-% Milner-Rabin theorem - AKS
+\begin{proof}
+    Assume there exists $b$ in group such that $ab \equiv_n 1$. Then, there exisits a quotient for the division between a and b with remainder 1. Observe that $\gcd(a, n)$ divides $ab + qn$, which is equal to 1. It entails that $\gcd(a, n) = 1$, which is a contradiction.
+\end{proof}
+
+\begin{lemma}
+    \[
+        \forall a, b \in \integer : a \geq b > 0 \implies \gcd(a, b) = \gcd(b, \textsc{rem}_b(a))
+    \]
+\end{lemma}
+
+\begin{proof}
+    
+\end{proof}
+
+\begin{theorem}
+    Given $a, b$ integersl, their greatest common divisor can be computed efficiently wrt a and b's lengths. Additionally, two other numbers u and v can be computed in order to satisfy bezout's identity: $\gcd(a, b) = au + bv$
+\end{theorem}
+
+\begin{proof}
+    Hint: Use prev lemma recursively
+\end{proof}
+
+Claim: $r_{i+2} \leq r_i/2 \forall o \leq i \leq t-2 \implies \#steps = \lambda - 1 \text{ if } |b| \in \binary^\lambda$
+
+Proof: ...
+
+
+\begin{definition}
+    Exponentiation mod n: Square and multiply
+
+    Let $b in \binary^l$, where by writing $b_i$ we denote b's i-th bit. Then:
+    \[
+        a^b \equiv_n a^{\sum_{i=0}^l 2^ib_i} \equiv_n \prod_{i=0}^l a^{2^ib_i} 
+    \]
+\end{definition}
+
+\begin{theorem}
+    The number of primes lesser than or equal to x is a number greater than or equal to $x/3\log_2x$
+\end{theorem}
+
+\begin{theorem} (Milner-Rabin - AKS)
+    We can est in polytime if a random $\lambda$-bit number is prime
+\end{theorem}
+
+Conjecture: Integer multiplication of two lambda-bit primes is a \owf. (is this the factorization assumption?)
 
 \section{Standard model assumptions}
 
-% CDH -> DDH -> DL
+Given a group G, its order is the least i such that $a^i \equiv_n 1$ 
 
-% Diffie-Hellman Key Exchange
+Corollary: $\forall a \in \integer_m^\times \implies a^{\phi(n)} \equiv_n 1 \wedge a^b \equiv_n a^{rem_{\phi(n)}(b)}$
+
+\begin{theorem}
+    Let G, H be two groups such that H<G, meaning the order of H divides the order of G
+\end{theorem}
+
+
+% CDH -> DDH -> DL
+\subsubsection{Discrete logarithm}
+
+Given $g$ and $g^x$ in a n-bit group, there is no efficient algorithm for computing $y$ such that $g^y = g^x$ withouut knowing $x$ beforehand.
+
+\begin{cryptogame}
+    {dlass}
+    {}
+    {dl}
+
+    \receive{\shortstack[l]{
+        $(G, g, q) \pickUAR \Group\Gen(1^\lambda)$ \\
+        $x \pickUAR \integer_q$
+    }}{$y = g^x$}{}
+
+    \send{}{$x'$}{\textsc{Output 1 iff} $y^{x'} \equiv_G y$}
+    
+\end{cryptogame}
+
+Meaning, DL for a generic group G is a \owf, whereas in a multiplicative group $\integer_p^\times$, DL is a \owp.
+
+\subsubsection{Computational Diffie-Hellman}
+
+Statement: given a group, and two elements of it $g^x$, $g^y$, it is impractical to compute $g^{xy}$ without knowing both $x$ and $y$.
+
+\begin{cryptogame}
+    {cdhass}
+    {}
+    {cdh}
+
+    \receive{\shortstack[l]{
+        $(G, g, q) \pickUAR \Group\Gen(1^\lambda)$ \\
+        $x, y \pickUAR \integer_q$
+    }}{$(g^x, g^y)$}{}
+
+    \send{}{$h$}{\textsc{Output 1 iff} $h = g^{xy}$}
+    
+\end{cryptogame}
+
+\subsubsection{Decisional Diffie-Hellman}
+
+Statement: see game
+
+\begin{cryptogame}
+    {ddhass}
+    {}
+    {ddh}
+
+    \cseqdelay
+
+    \receive{\shortstack[l]{
+        $(G, g, q) \pickUAR \Group\Gen(1^\lambda)$ \\
+        $x, y \pickUAR \integer_q$ \\
+        $z_0 = xy$ \\
+        $z_1 \pickUAR G$ \\
+        $b \pickUAR \binary$
+    }}{$(g^x, g^y, g^{z_b})$}{}
+
+    \cseqdelay
+
+    \send{}{$b'$}{\textsc{Output 1 iff} $b' = b$}
+    
+\end{cryptogame}
+
+All these assumptions arose in definining what is the Diffie Hellman key exchange, which is a way to establish a \ske{} channel from an unsafe channel, with any adversary unable to efficiently break the channel's secrecy. Party authentication is not considered here.
+
+% AP190208: This is not a game (Magritte ahoy)
+\begin{cryptogame}
+    {dhkex}
+    {The Diffie-Hellman Key Exchange protocol}
+    {}
+
+    \receive{\shortstack[l]{
+        $(G, g, q) \pickUAR \Group\Gen(1^\lambda)$ \\
+        $x \pickUAR G$ 
+    }}{$(G, g, q, g^x)$}{}
+
+    \cseqdelay
+
+    \send{\shortstack[l]{
+        $y \pickUAR G$ \\
+        $k = (g^x)^y$
+    }}{$g^y$}{$k = (g^y)^x$}
+    
+\end{cryptogame}
+
+Some relationships have been established between these assumptions: it is known that $\ddh \implies \cdh \implies \dl$. Also, $\cdh \notimplies \ddh$.
