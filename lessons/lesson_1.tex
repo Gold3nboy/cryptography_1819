@@ -99,11 +99,11 @@ $K\pickUAR \{0,1\}^l$
 \end{theorem}
 \begin{proof}
     Fix any $m,c \in \{0,1\}^l$:
-    \begin{gather*}
-        Pr[Enc(k,m)=c]=Pr[k\xor m=c]=\\
-        =Pr[k=c\xor m]=2^{-l} \text{(because k is uniform)}\\
-        =Pr[Enc(k,m')=c] \forall m'    
-    \end{gather*}
+    \begin{align*}
+        \Pr[Enc(k,m)=c] &= \Pr[k\xor m=c] \\
+        &= \Pr[k=c\xor m]=2^{-l} \text{(because k is uniform)} \\
+        &= \Pr[Enc(k,m')=c] \forall m'    
+    \end{align*}
     This satisfies (III)
 \end{proof}
 

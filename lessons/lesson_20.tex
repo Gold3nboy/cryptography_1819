@@ -1,7 +1,82 @@
 \mychapter{20}{Lesson 20} %181205
 \section{Random Oracle Model (ROM)}
-The Random Oracle Model treats an Hash function $\H$ as a truly random function.
+The Random Oracle Model treats a given hash function $\H$ as a truly random function.
+
+Recall: a truly random function $\F$ is defined to have a specific evaluation behaviour. Between subsequent evaluations:
+
+\begin{itemize}
+    \item if the argument hasn't been submitted to the function beforehand, then a value is chosen \uar{} from the codomain, and assigned as the image of said argument in the function;
+    \item otherwise, the function will return the image as assigned in the corresponding previous evaluation.
+\end{itemize}
+
+They do act, in fact, as truth tables\footnotemark.
+
+\footnotetext{Such tables are also aptly called \emph{rainbow tables}.}
+
+\section{Full domain hashing}
+
+Let $(f, f^{-1}, \Gen)$ be a \tdp{} scheme over some domain $\X_{pk}$
+
+Take \rsa:
+\begin{itemize}
+    \item $(m, pk, sk) \pickUAR \Gen\rsa(1^\lambda)$
+    \item $f(pk, x) = x^{pk} \mod n$
+    \item $f^{-1}(sk, y) = y^{sk} \mod n$
+\end{itemize}
+
+Build a similar asymmetric-authentication scheme as such:
+
+\begin{itemize}
+    \item $(m, pk, sk) \pickUAR \Gen\rsa(1^\lambda)$
+    \item $Sign_{sk, H}(x): \sigma = f^{-1}(sk, H(m))$
+    \item $Verify_{pk, H}: H(m) = f(pk, \sigma)$
+\end{itemize}
+
+Exercise: show \rsa-sign is not secure without $H$. (Hint: The scheme becomes malleable)
+
+Theorem: If the above scheme (full-domain hash) uses a \tdp{} for $f, f^{-1}$, then it is (asymmetric)-\ufcma under the random oracle model.
+
+Proof: Reduce to \tdp, program the random oracle.
+
+\begin{cryptoredux}
+    {fdhufcma}
+    {}
+    {tdp}
+    {ufcma(a)}
+
+    \receive{\shortstack[l]{
+        $(pk, sk) \pickUAR \Gen(1^\lambda)$ \\
+        $x \pickUAR \X_{pk}$ \\
+        $y = f(pk, x)$
+    }}{$pk, y$}{}
+
+    \invoke{$*$}{$pk$}{}
+
+    \cseqdelay
+    \cseqbeginloop
+    \return{}{$m$}{}
+    \invoke{}{$\sigma$}{}
+    \cseqendloop
+    \cseqdelay
+
+    \return{}{$(m^*, \sigma^*)$}{}
+
+    \send{}{$\sigma^*$}{}
+\end{cryptoredux}
+
+Notes: this is a loose reduction
+
+Some assumptions are made:
+
+\begin{itemize}
+    \item The adversary makes the same number of RO queries as the number of signing queries done by the distinguisher (without loss of generality)
+    \item The RO query must be done \emph{before} the corresponding sign query, otherwise the advarsary cannot sign the messages, as specified by the scheme
+\end{itemize}
+
+The RO queries are actually an analogue of the definition of a random function, and it is the \emph{programming} step of the oracle itself; then if the signing queries do not correspond to any RO query, abort the game.
 
 \section{ID Scheme}
 
 \section{Honest Verifier Zero Knowledge (HVZK) and Special Soundness (SS)}
+
+\subsection{Fiat-Shamir scheme}

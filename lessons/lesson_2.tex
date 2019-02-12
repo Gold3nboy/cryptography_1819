@@ -28,11 +28,10 @@ Assume Tag is \underline{deterministic}, then $Vrf(k,m,\phi)=1 \Leftrightarrow T
 $\forall m,m' \in \M s.t. m\neq m', \forall \phi,phi' \in \Phi$
 $$Pr[Mac(K,m')=\phi'|Mac(K,m)=\phi]\leq \epsilon$$
 
-\todo{Not really sure of the Correctness of the following thins}
-\noindent Think of an "Unbounded" adversary choosing $m \in \M$ and obtaining $\phi=Mac(k,m)$. His goal is to forge on $m'\neq m'$ a tag $\phi'$ such that $Mac(k,m')=\phi'$ (with no knowledge of $k$).
+Think of a computationally unbounded adversary choosing $m \in \M$ and obtaining $\phi = Tag(k, m)$. His goal is to forge on a \emph{fresh} message $m' \neq m$, that is, finding its tag $\phi'$ such that $Tag(k,m') = \phi'$, with no knowledge of $k$.
 
-\bigskip
-Tool:\textbf{ Pairwise Independent Hashing} 
+\subsubsection{Pairwise-independent hashing}
+
 \begin{definition}
     A family of (Hash) functions $H=\{h_s:\M \to \Phi\}_{s\in S}$ is said to be \emph{pairwise independent} iff, for any two distinct messages $m$ and $m'$, we have that $(h_s(m),h_s(m'))$ is uniform over $\Phi^2$ for random choice of seed $s \in S$. Meaning that:
     \begin{gather*}

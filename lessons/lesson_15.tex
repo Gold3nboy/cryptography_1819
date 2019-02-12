@@ -74,14 +74,17 @@ Every time an encryption is made, a fresh value $r$ is picked UAR.
 \pagebreak
 \subsection{Trapdoor permutation}
 
-A TDP(TrapDoor Permutation) is a OWP family structured has these features:
+A \emph{trapdoor permutation} (or \tdp) is a \owp{} family structured has these features:
 
 \begin{itemize}
-    \item A key pair is chosen UAR by a key generator algorithm: $(pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)$
+    \item A key pair is chosen \uar{} by a key generator algorithm:
+    \[
+        (pk, sk) \pickUAR \mathcal{KG}en(1^\lambda)
+    \]
     \item There is a function family $f_{pk} \subseteq (V_{pk} \to V_{pk})$ such that:
     \begin{itemize}
         \item Computing $f_{pk}$ is efficient
-        \item Sampling from the domain ($x \pickUAR V_{pk}$) is efficient
+        \item Domain sampling ($x \pickUAR V_{pk}$) is efficient
     \end{itemize}
     \item There is an efficient function $g_{sk}$ that ``inverts'' $f_{pk}$ ($sk$ is the ``trapdoor''): 
     \begin{equation*}
@@ -90,9 +93,9 @@ A TDP(TrapDoor Permutation) is a OWP family structured has these features:
     \item No efficient adversary is able to invert $f_{pk}$ wihout knowing $sk$
 \end{itemize}
 
-Note: Since $pk$ is public, any adversary gets the capability of encrypting messages for free, without requiring n external challenger/oracle!
+Note: Since $pk$ is public, any adversary gets the capability of encrypting messages for free, without requiring an external challenger/oracle!
 
-Therefore, if left deterministic, a TDP is not CPA-secure.
+Therefore, if left deterministic, a \tdp{} is not \cpa-secure.
 
 %The idea is to reuse the message as part of the randomness, or more in detail, use its hardcore predicate. The resulting scheme would the look like this:
 Here, in this scheme, we combine randomness and the notion of hardcore predicate $\mathfrak{hc}$:
@@ -115,7 +118,7 @@ Here, in this scheme, we combine randomness and the notion of hardcore predicate
     \todo{Apparently, the reduction here is not easy at all, some hints are needed.}
 \end{proof}
 
-\subsection{TDP examples}
+\subsection{\textsc{Tdp} examples}
 
 One example stems form the factoring problem: let's look again at $\mathbb{Z}_n^\times$, where $n = pq$, $p, q \in \mathbb{P}$:
 
@@ -130,7 +133,7 @@ One example stems form the factoring problem: let's look again at $\mathbb{Z}_n^
 Note that the theorem is more general, and holds for any $p, q$ that are coprime.
 \end{theorem}
 
-How to use this theorem for constructing a PKE scheme:
+How to use this theorem for constructing a \pke{} scheme:
 
 Reminder (Euler's theorem):\review{ $\forall x \in \mathbb{Z}_n \implies
 x^{\varphi(n)} = x \mod n$ \\
@@ -153,7 +156,7 @@ Observe that
 \]
 because $ab = 1 \mod \varphi(n)$.
 
-So we conjecture that the above is a valid \tdp-based \pke scheme. This is actually referred to as the \emph{\rsa{} assumption}, and is depicted in figure \ref{cryptogame:rsaass}
+So we conjecture that the above is a valid \tdp-based \pke{} scheme. This is actually referred to as the \emph{\rsa{} assumption}, and is depicted in figure \ref{cryptogame:rsaass}
 
 \begin{cryptogame}
     {rsaass}
@@ -179,63 +182,59 @@ Proof: Given $p, q$, an adversary can compute $\varphi(n) = (p-1)(q-1)$, and the
 It hasn't been proven that $\textsc{fact} \implies \rsa$
 
 
-\section{Textbook RSA}
-This is an \underline{insecure} toy example of the more complex \textit{RSA} (Rivest Shamir Adleman) algorithm.
-The key generation algorithm: $\KGen=\Gen RSA(1^{\lambda})$ outputs $P_k=(n,e)$ and $S_k=d$, then we have
+\section{Textbook \rsa}
+This is an \underline{insecure} toy example of the more complex \rsa{} (Rivest Shamir Adleman) scheme.
 
-\begin{gather*}
-    Enc(P_k,m)=m^e\Mod{n}\\
-    Dec(S_k,c)=c^d\Mod{n}
-\end{gather*}
+\begin{itemize}
+    \item Setup: $pk \pickUAR \integer_n^\times, sk \equiv_{\varphi(n)} pk^{-1}$
+    \item Encrypt: $Enc_{pk}(m) = m^{pk} \Mod{n}$
+    \item Decrypt: $Dec_{sk}(c) = c^{sk} \Mod{n}$
+    \item Correctness: $Enc_{pk}(Dec_{sk}(m)) = m^{pk \cdot sk} \equiv_n m$
+\end{itemize}
 
-Since the output of Enc is deterministic this is \textbf{not CPA secure}! However it can be used with HARD-CORE Predicate.\\
-Preprocess the message to add randomness:
-$$\hat{m}=r||m \text{ where }r\leftarrow\mathdollar\{0,1\}^l$$
-now Enc is not deterministic.\\
+Again, since the encryption routine is deterministic, the scheme is not \cpa-secure. However, a hardcore predicate can be inserted to the routine: $\hat{m} = r||m$, where $r \pickUAR \{0, 1\}^l$. Now the encryption is pseudorandom.
+
 \textbf{Facts:}
 \begin{enumerate}
-    \item $l \in super(log(\lambda))$ otherwise it is possible to bruteforce in PPT.
-        \review{\item If $m\in\{0,1\}$ then I can prove it CPA secure under RSA
+    \item $l \in \omega(log(\lambda))$ otherwise it is possible to eficiently bruteforce it.
+        \review{\item If $m \in \{0,1\}$ then I can prove it CPA secure under RSA
         (just use standard TDP)}
-    \item If $m$ is "in the middle" ($\{0,1\} \leq m \leq \{0,1\}^l$) RSA is believed to be secure and is \underline{standardized} (PKCS\#1,5)
+    \item If $m$ is "in the middle" ($\{0,1\} \leq m \leq \{0, 1\}^l$) RSA is believed to be secure and is \underline{standardized} (PKCS\#1,5)
         \review{ \item Still not CCA secure! counterexample?}
 \end{enumerate}
 
 
-
 \subsection{Trapdoor Permutation from Factoring}
-Let's look at $f(x)=x^2\Mod{n}$ where $f: \Z_n^* \to \QR[n] (\subset \Z_n^*)$, this is not a permutation in general.\\
+Let's look at $f(x) = x^2\Mod{n}$ where $f: \integer_n^\times \to \QR[n] (\subset \integer_n^\times)$, this is not a permutation in general.
+
 Now let's consider the Chinese Reminder Theorem (CRT) representation:
 
-    \begin{gather*}
-        x=(x_p,x_q) \rightarrow x_p\equiv x\Mod{p} , x_q\equiv x\Mod{q}\\
-        f(x)=x^2\Mod{p}; x \from \$ \Z_p^*
-    \end{gather*}
+\begin{gather*}
+    x=(x_p,x_q) \rightarrow x_p\equiv x\Mod{p} , x_q\equiv x\Mod{q}\\
+    f(x)=x^2\Mod{p}; x \pickUAR \integer_p^\times
+\end{gather*}
 
-Since $Z_p^*$ is cyclic I can always write:
+Since $\integer_p^\times$ is cyclic I can always write:
 
 \begin{gather*}
-    Z_p^*=\{g^0,g^1,g^2,\ldots,g^{\frac{p-1}{2}-1},g^{\frac{(p-1)}{2}},\ldots,g^{p-2} \}\\
-    \QR[p]=\{g^0,g^2,g^4,\ldots,\overbrace{g^{p-3}}^{g^{\frac{p-1}{2}-1} in Z_p^*},\underbrace{g^0}_{g^{\frac{p-1}{2}}in Z_p^*},\ldots\}\\
+    \integer_p^\times = \{g^0,g^1,g^2,\ldots,g^{\frac{p-1}{2}-1},g^{\frac{(p-1)}{2}},\ldots,g^{p-2} \} \\
+    \QR[p]=\{g^0,g^2,g^4,\ldots,\overbrace{g^{p-3}}^{g^{\frac{p-1}{2}-1} \in \integer_p^\times},\underbrace{g^0}_{g^{\frac{p-1}{2}} \in \integer_p^\times},\ldots\} \\
     |\QR[p]|=\frac{p-1}{2}
 \end{gather*}
 
-Moreover, since $(g^{\frac{p-1}{2}})^2 \equiv 1 \Mod{p} $ and $g^{\frac{p-1}{2}}$
-cannot be 1 (since $g^{0}\not=g^{\frac{p-1}{2}}\not=g^{p-1}$ ) but must be one
-of the $p-1$ elements of $Z_{p}^{*}$, then
-$g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.
+Moreover, since $(g^{\frac{p-1}{2}})^2 \equiv 1 \Mod{p} $ and $g^{\frac{p-1}{2}}$ cannot be 1 (since $g^{0}\not=g^{\frac{p-1}{2}}\not=g^{p-1}$ ) but must be one of the $p-1$ elements of $\integer_p^\times$, then $g^{\frac{p-1}{2}} \equiv -1 \Mod{p}$.
 
 Now it's possible to show that $f: \QR[p]\to \QR[p] $ is a permutation, and we are going to show a method to invert it, aka $f^{-1}$.
 
-Assume $p\equiv 3 \Mod{4}$
-([*]$p=4t+3\Rightarrow t=\frac{p-3}{4}$), then squaring $Mod{p}$ is a permutation because, given
-\underline{$y=x^2 \Mod{p}$} if I compute: \begin{gather*}
+Assume $p\equiv 3 \Mod{4}$ ([*]$p=4t+3\Rightarrow t=\frac{p-3}{4}$), then squaring modulo $p$ is a permutation because, given
+\underline{$y=x^2 \Mod{p}$} if I compute:
+\begin{gather*}
     (y^{t+1})^2=\underbrace{y^{2t+2}}_{\text{[*]
     }2t+2=\frac{p-3}{2}+2=\frac{p+1}{2}=\frac{p-1}{2}+1}=(x^2)^{\frac{p-1}{2}+1}=1x^2=x^2\\
-    \implies x=\pm y^{t+1} \end{gather*}
+    \implies x=\pm y^{t+1}
+\end{gather*}
 
-But only 1 among the above $\pm y^{t+1}$ is a square, in particular only the
-positive one. Since we have that:
+But only 1 among the above $\pm y^{t+1}$ is a square, in particular only the positive one. Since we have that:
 \[ 
     p=k4+3 \Rightarrow \frac{p-1}{2}=\frac{4k+2}{2}=2k+1
 \]
@@ -246,18 +245,17 @@ Now, since we are considering just $\QR[p]=\{y \in \mathbb{Z}_{p}^{*} : \exists 
     y=x^{2} \Leftrightarrow y=(g^{z})^{2}=g^{2z}
 \]
 
-So, $y=g^{z'} \in \QR[p] \Leftrightarrow z'$ is even. If $z'$ is odd, then $y \notin \QR[p] $.
+So, $y = g^{z'} \in \QR[p] \Leftrightarrow z'$ is even. If $z'$ is odd, then $y \notin \QR[p]$.
 
-Since $\frac{p-1}{2}$ is odd, then $g^{\frac{p-1}{2}} \not\in \QR[p]$, and since
-it is possible to generate all of the other numbers with odd exponents 
+Since $\frac{p-1}{2}$ is odd, then $g^{\frac{p-1}{2}} \not\in \QR[p]$, and since it is possible to generate all of the other numbers with odd exponents 
 \[
-    g^{odd}=g^{\frac{p-1}{2} \pm even}=g^{\frac{p-1}{2}}g^{ \pm even} \Rightarrow -1(g^{\pm even})
+    g^{odd}=g^{\frac{p-1}{2} \pm even} = g^{\frac{p-1}{2}}g^{ \pm even} \Rightarrow -1(g^{\pm even})
 \]
 and $g$ powered to odd exponents will have this form.
 
 From that, it's possible to state the following:
 \begin{lemma}
-    $\forall z, z\in \QR[p] \implies  -z \notin \QR[p]$
+    $\forall z, z\in \QR[p] \implies -z \notin \QR[p]$
 \end{lemma}
 
 \subsection{Rabin's Trapdoor permutation}
@@ -268,22 +266,19 @@ The \textit{Rabin trapdoor permutation} is defined as
 \[
     f(x)=x^{2} \text{ mod } n
 \]
-where $n=p*q$ for primes $p,q=3 \text{mod} 4$.
+where $n=p*q$ for primes $p, q = 3 \text{mod} 4$.
 
-We can observe that the image of this function is $\QR[n]$, a subset of $\mathbb{Z}^{*}_{n} $.
+We can observe that the image of this function is $\QR[n]$, a subset of $\integer_n^\times$.
 
-For \textbf{Chinese remainder theorem} it is possible to state that $f$ maps
-as follows
+For \textbf{Chinese remainder theorem} it is possible to state that $f$ maps as follows
 \[
-    x= (x_{p}, x_{q}) \mapsto (x^{2}_{p}, x^{2}_{q})
+    x = (x_p, x_q) \mapsto (x^2_p, x^2_q)
 \]
-since each element of $ \mathbb{Z}_n$ has always two different forms , in $
-\mathbb{Z}_{p} $ and in $ \mathbb{Z}_{q} $.
+since each element of $\integer_n$ has always two different forms, in $\integer_p$ and in $\integer_q$.
 
 So
 \[
-y \in  \mathbb{QR}_{n} \Leftrightarrow y_{p} \in \mathbb{QR}_{p} \wedge y_{q} \in
-\mathbb{QR}_{q} 
+    y \in  \mathbb{QR}_{n} \Leftrightarrow y_{p} \in \mathbb{QR}_{p} \wedge y_{q} \in \mathbb{QR}_{q} 
 \]
 
 As before, the image of $f$ is exactly
@@ -299,7 +294,7 @@ If we try to invert the function $f$, even without applying the previous inversi
 
 only 1 is a quadratic residue since we said, in the last lemma, that only one out of $-x_{k}, x_{k}$ is a quadratic residue for $k=q,p$.
 
-Therefore, we have that the Rabin's TDP is a permutation in $\QR[n]$, and that the cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\mathbb{Z}^{*}_{n} |}{4}$.
+Therefore, we have that the Rabin's TDP is a permutation in $\QR[n]$, and that the cardinality of $ \mathbb{QR}_{n} $ is $\frac{|\integer_n^\times|}{4}$.
 
 Furthermore, with the following claim we can state that the Rabin cryptosystem
 is OWF thanks to the hardness of factoring.

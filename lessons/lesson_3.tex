@@ -50,36 +50,35 @@ Can you make it uniform?
     Let Ext be any candidate extractor, Let b be any binary value s.t. $|Ext^-1(b)|$ is maximal ($Ext^-1: \{0,1\} \to \{0,1\}^n$)\\
     $\implies |Ext^-1(b)|\geq 2^{n-1}=\frac{2^2}{2}$
 
-    \begin{tikzpicture}[line width=1pt,>=latex]
-        \sffamily
-        \node (a1) {};
-        \node[below=0.5cm of a1] (a2) {};
-        \node[below=0.5cm of a2] (a3) {};
+    \begin{figure}[ht]
+        \centering
+        \begin{tikzpicture}[>=latex]
+            
+            \node (a1) {};
+            \node[below=0.3cm of a1] (a2) {};
+            \node[below=0.3cm of a2] (a3) {};
 
-        \node[below=0.5cm of a3] (a4) {};
-        \node[below=0.5cm of a4] (a5) {};
-        \node[below=0.5cm of a5] (a6) {};
-        
-        \node[right=4cm of a1] (aux1) {};
-        \node[right=4cm of a2] (b1) {$x=0$};
-        
-        \node[right=4cm of a5] (b3) {$x=1$};
-        \node[right=4cm of a4] (aux2) {};
-        
-        \node[ellipse,draw=black,minimum size=3cm,fit={(a1) (a6)}] {};
-        
-        \node[below=1cm of a6,font=\color{black}\Large] {$\{0,1\}^n$};
-        
-        \draw[-,black] (a3) to[out=-10,in=190] (b1.190);
-        \draw[-,black] (a2) -- (b1.180);
-        \draw[-,black] (a1) to[out=10,in=170] (b1.170);
-        
-        \draw[-,black] (a6) to[out=-10,in=190] (b3.190);
-        \draw[-,black] (a5) -- (b3.180);
-        \draw[-,black] (a4) to[out=10,in=170] (b3.170);
-    \end{tikzpicture}\\
-    %how do you split an ellipse in haf? I don't know
-    \bigskip
+            \node[below=0.6cm of a3] (a4) {};
+            \node[below=0.3cm of a4] (a5) {};
+            \node[below=0.3cm of a5] (a6) {};
+
+            \node[right=4cm of a2] (b1) {$x=0$};
+            \node[right=4cm of a5] (b3) {$x=1$};
+
+            \node[ellipse,line width = 1pt, draw=black,minimum size=3cm,fit={(a1) (a6)}] {};
+
+            \node[below=1cm of a6,font=\color{black}\Large] {$\{0,1\}^n$};
+
+            \draw[-,black] (a3) to[out=-10,in=190] (b1.190);
+            \draw[-,black] (a2) -- (b1.180);
+            \draw[-,black] (a1) to[out=10,in=170] (b1.170);
+
+            \draw[-,black] (a6) to[out=-10,in=190] (b3.190);
+            \draw[-,black] (a5) -- (b3.180);
+            \draw[-,black] (a4) to[out=10,in=170] (b3.170);
+        \end{tikzpicture}
+    \end{figure}
+
     Define $X$ to be uniform over $Ext^-1(b)$ so $H_{\infty}(x)=n-1$ but $Ext(X)=b$ CONSTANT.
     \todo{Help with the proof}
 \end{proof}
